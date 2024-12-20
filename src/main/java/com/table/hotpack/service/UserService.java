@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
+import java.util.zip.DataFormatException;
 
 @RequiredArgsConstructor
 @Service
@@ -17,16 +18,25 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public Long save(AddUserRequest dto) {
+    public Long save(AddUserRequest request) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-        return userRepository.save(User.builder()
-                .email(dto.getEmail())
-                .name(dto.getName())
-                .nickname(dto.getNickname())
-                .password(encoder.encode(dto.getPassword()))
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+        }
+        if (userRepository.existsByNickname(request.getNickname())) {
+            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+        }
+
+        User user = User.builder()
+                .email(request.getEmail())
+                .name(request.getName())
+                .nickname(request.getNickname())
+                .password(encoder.encode(request.getPassword1()))
                 .roles(Set.of("ROLE_USER"))
-                .build()).getId();
+                .build();
+
+        return userRepository.save(user).getId();
     }
 
     public User findById(Long userId) {
