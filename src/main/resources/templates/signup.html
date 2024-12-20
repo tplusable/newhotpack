@@ -26,7 +26,11 @@
                         <input type="hidden" th:name="${_csrf?.parameterName}" th:value="${_csrf?.token}" />
                         <div class="mb-3">
                             <label for ="email" class="form-label text-white">이메일</label>
-                            <input type="email" class="form-control" name="email" th:field="*{email}">
+                            <div class="d-flex">
+                                <input type="email" class="form-control" id="email" name="email" th:field="*{email}">
+                                <button type="button" id="checkEmailButton" class="btn btn-secondary">중복 확인</button>
+                            </div>
+                            <div id="emailFeedback" class="text-danger mt-2"></div>
                         </div>
                         <div class="mb-3">
                             <label for="name" class="form-label text-white">이름</label>
@@ -52,5 +56,48 @@
         </div>
     </div>
 </section>
+<script>
+function isValidEmail(email) {
+    const emailRegex = /^[A-Za-z0-9+_.-]+@(.+)$/;
+    return emailRegex.test(email);
+}
+
+document.getElementById('checkEmailButton').addEventListener('click', function () {
+    const email = document.getElementById('email').value;
+    const feedback = document.getElementById('emailFeedback');
+
+    if (!email) {
+        feedback.textContent = '이메일을 입력해주세요.';
+        feedback.classList.add('text-danger');
+        return;
+    }
+
+    if (!isValidEmail(email)) {
+        feedback.textContent = '유효하지 않은 이메일 형식입니다.';
+        feedback.classList.add('text-danger');
+        return;
+    }
+
+    // 서버 요청
+    fetch(`/user/check-email?email=${encodeURIComponent(email)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.exists) {
+                feedback.textContent = '이미 사용 중인 이메일입니다.';
+                feedback.classList.remove('text-success');
+                feedback.classList.add('text-danger');
+            } else {
+                feedback.textContent = '사용 가능한 이메일입니다.';
+                feedback.classList.remove('text-danger');
+                feedback.classList.add('text-success');
+            }
+        })
+        .catch(error => {
+            feedback.textContent = '오류가 발생했습니다. 다시 시도해주세요.';
+            feedback.classList.remove('text-success');
+            feedback.classList.add('text-danger');
+        });
+});
+</script>
 </body>
 </html>

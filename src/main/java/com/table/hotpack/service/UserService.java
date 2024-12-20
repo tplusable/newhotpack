@@ -18,6 +18,18 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    public boolean checkEmailExists(String email) {
+        if (!isValidEmail(email)) {
+            throw new IllegalArgumentException("유효하지 않은 이메일 형식입니다.");
+        }
+        return userRepository.existsByEmail(email);
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        return email.matches(emailRegex);
+    }
+
     public Long save(AddUserRequest request) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
