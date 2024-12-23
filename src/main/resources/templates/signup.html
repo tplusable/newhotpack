@@ -46,11 +46,12 @@
                         </div>
                         <div class="mb-3">
                             <label for="password1" class="form-label text-white">비밀번호</label>
-                            <input type="password" class="form-control" name="password1" th:field="*{password1}">
+                            <input type="password" class="form-control" id="password1" name="password1" th:field="*{password1}">
                         </div>
                         <div class="mb-3">
                             <label for="password2" class="form-label text-white">비밀번호 확인</label>
-                            <input type="password" class="form-control" name="password2" th:field="*{password2}">
+                            <input type="password" class="form-control" id="password2" name="password2" th:field="*{password2}">
+                            <div id="passwordFeedback" class="text-danger mt-2"></div>
                         </div>
 
                         <button type="submit" class="btn btn-primary">회원가입</button>
@@ -69,6 +70,8 @@ function isValidEmail(email) {
 document.getElementById('checkEmailButton').addEventListener('click', function () {
     const email = document.getElementById('email').value;
     const feedback = document.getElementById('emailFeedback');
+
+    feedback.textContent = ''; // 메시지 초기화
 
     if (!email) {
         feedback.textContent = '이메일을 입력해주세요.';
@@ -108,6 +111,8 @@ document.getElementById('checkNicknameButton').addEventListener('click', functio
     const nickname = document.getElementById('nickname').value;
     const feedback = document.getElementById('nicknameFeedback');
 
+    feedback.textContent = ''; // 메시지 초기화
+
     if (!nickname) {
         feedback.textContent = '닉네임을 입력해주세요.';
         feedback.classList.add('text-danger');
@@ -133,6 +138,35 @@ document.getElementById('checkNicknameButton').addEventListener('click', functio
             feedback.classList.add('text-danger');
         });
 });
+
+const password1Input = document.getElementById('password1');
+const password2Input = document.getElementById('password2');
+const feedback = document.getElementById('passwordFeedback');
+
+// 실시간 검증 이벤트 추가
+function validatePasswords() {
+    const password1 = password1Input.value;
+    const password2 = password2Input.value;
+
+    if (!password1 || !password2) {
+        feedback.textContent = ''; // 하나롣 비어 있으면 메시지 초기화
+        feedback.classList.remove('text-danger', 'text-success');
+        return;
+    }
+
+    if (password1 !== password2) {
+        feedback.textContent = '비밀번호가 서로 일치하지 않습니다.';
+        feedback.classList.add('text-danger');
+        feedback.classList.remove('text-success');
+    } else {
+        feedback.textContent = '비밀번호가 일치합니다.';
+        feedback.classList.add('text-success');
+        feedback.classList.remove('text-danger');
+    }
+}
+
+password1Input.addEventListener('input', validatePasswords);
+password2Input.addEventListener('input', validatePasswords);
 
 </script>
 </body>
