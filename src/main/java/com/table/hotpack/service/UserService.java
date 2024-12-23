@@ -30,6 +30,10 @@ public class UserService {
         return email.matches(emailRegex);
     }
 
+    public boolean checkNicknameExists(String nickname) {
+        return userRepository.existsByNickname(nickname);
+    }
+
     public Long save(AddUserRequest request) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 

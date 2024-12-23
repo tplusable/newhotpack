@@ -38,7 +38,11 @@
                         </div>
                         <div class="mb-3">
                             <label for="nickname" class="form-label text-white">닉네임</label>
-                            <input type="nickname" class="form-control" name="nickname" th:field="*{nickname}">
+                            <div class="d-flex">
+                                <input type="text" class="form-control" id="nickname" name="nickname" th:field="*{nickname}">
+                                <button type="button" id="checkNicknameButton" class="btn btn-secondary ml-2">중복 확인</button>
+                            </div>
+                            <div id="nicknameFeedback" class="text-danger mt-2"></div>
                         </div>
                         <div class="mb-3">
                             <label for="password1" class="form-label text-white">비밀번호</label>
@@ -79,9 +83,10 @@ document.getElementById('checkEmailButton').addEventListener('click', function (
     }
 
     // 서버 요청
-    fetch(`/user/check-email?email=${encodeURIComponent(email)}`)
+    fetch(`check-email?email=${encodeURIComponent(email)}`)
         .then(response => response.json())
         .then(data => {
+        console.log("Response Data:", data);
             if (data.exists) {
                 feedback.textContent = '이미 사용 중인 이메일입니다.';
                 feedback.classList.remove('text-success');
@@ -98,6 +103,37 @@ document.getElementById('checkEmailButton').addEventListener('click', function (
             feedback.classList.add('text-danger');
         });
 });
+
+document.getElementById('checkNicknameButton').addEventListener('click', function () {
+    const nickname = document.getElementById('nickname').value;
+    const feedback = document.getElementById('nicknameFeedback');
+
+    if (!nickname) {
+        feedback.textContent = '닉네임을 입력해주세요.';
+        feedback.classList.add('text-danger');
+        return;
+    }
+
+    fetch(`check-nickname?nickname=${encodeURIComponent(nickname)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.exists) {
+                feedback.textContent = '이미 사용 중인 닉네임입니다.';
+                feedback.classList.remove('text-success');
+                feedback.classList.add('text-danger');
+            } else {
+                feedback.textContent = '사용 가능한 닉네임입니다.';
+                feedback.classList.remove('text-danger');
+                feedback.classList.add('text-success');
+            }
+        })
+        .catch(error => {
+            feedback.textContent = '오류가 발생했습니다. 다시 시도해주세요.';
+            feedback.classList.remove('text-success');
+            feedback.classList.add('text-danger');
+        });
+});
+
 </script>
 </body>
 </html>
