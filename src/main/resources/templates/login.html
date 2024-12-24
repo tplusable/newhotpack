@@ -8,6 +8,16 @@
         .gradient-custom {
             background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));
         }
+        .oauth-icons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .oauth-icons a img {
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body class="gradient-custom">
@@ -31,16 +41,20 @@
                     <button type="submit" class="btn btn-primary btn-block">로그인</button>
                 </form>
 
-                <!-- OAuth2 로그인 버튼 -->
-                <div class="mb-2">
-                    <a href="/oauth2/authorization/google" class="btn btn-danger btn-block">
-                        <img src="https://developers.google.com/identity/images/g-logo.png" style="width:20px;"> Google 로그인
-                    </a>
-                </div>
-
                 <!-- 회원가입 버튼 -->
                 <div>
                     <button type="button" class="btn btn-secondary btn-block" onclick="location.href='/signup'">회원가입</button>
+                </div>
+
+                <!-- 간편 로그인 -->
+                <p class="mt-3">간편 로그인</p>
+                <div class="oauth-icons">
+                    <a href="/oauth2/authorization/google">
+                        <img height="50" src="/img/google.png" alt="구글 로그인">
+                    </a>
+                    <a href="/oauth2/authorization/naver">
+                        <img height="50" src="/img/naver.png" alt="네이버 로그인">
+                    </a>
                 </div>
             </div>
         </div>
