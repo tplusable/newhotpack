@@ -34,13 +34,7 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
         // 사용자 저장 또는 업데이트
         User user = saveOrUpdate(oAuth2User, provider);
 
-        if ("google".equals(provider)) {
-            return new DefaultOAuth2User(
-                    user.getAuthorities(),
-                    oAuth2User.getAttributes(),
-                    "email" // 주 키 설정 (OAuth2 제공자에 따라 변경 가능)
-            );
-        } else if ("naver".equals(provider)) {
+        if ("naver".equals(provider)) {
             Object response = attributes.get("response");
             if (response == null) {
                 throw new IllegalArgumentException("'response' 필드가 없습니다.");
@@ -52,7 +46,6 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
             );
         }
 
-        System.out.println("getAttributes" + oAuth2User.getAttributes());
         // 사용자 정보를 기반으로 DefaultOAuth2User 반환
         return new DefaultOAuth2User(
                 user.getAuthorities(),
@@ -70,15 +63,21 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
 
         Optional<User> existingUser = userRepository.findByEmail(email);
 
-        // 기존 사용자 업데이트 또는 새 사용자 생성
-        User user = existingUser.orElseGet(() -> User.builder()
-                .email(email)
-                .name(name)
-                .nickname("")
-                .password("") // OAuth2 로그인은 비밀번호 필요 없음
-                .roles(Set.of("ROLE_USER")) // 기본 역할
-                .build());
-
+        User user;
+        if (existingUser.isPresent()) {
+            // 기존 사용자 이름 업데이트
+            user = existingUser.get();
+            if (!user.getName().equals(name)) {
+                user.setName(name);
+            }
+        } else {
+            // 새 사용자 생성
+            user = User.builder()
+                    .email(email)
+                    .name(name)
+                    .roles(Set.of("ROLE_USER")) // 기본 역할
+                    .build();
+        }
         return userRepository.save(user);
     }
 

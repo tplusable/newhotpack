@@ -38,6 +38,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+
+        System.out.println("Authorization Header: " + authorizationHeader);
+        System.out.println("Token: " + token);
+        System.out.println("Valid Token: " + tokenProvider.validToken(token));
+
     }
 
     private String getAccessToken(String authorizationHeader) {

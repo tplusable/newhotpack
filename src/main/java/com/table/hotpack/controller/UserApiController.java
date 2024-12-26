@@ -8,12 +8,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.HashMap;
@@ -53,6 +56,35 @@ public class UserApiController {
 
         // 회원가입 성공 시 로그인 페이지로 리다이렉트
         return "redirect:/login";
+    }
+
+    @PostMapping("/update-user")
+    public String updateUser(@AuthenticationPrincipal UserDetails userDetails, @Valid AddUserRequest request, BindingResult bindingResult) {
+
+        if (userDetails == null) {
+            throw new IllegalStateException("인증된 사용자가 아닙니다.");
+        }
+
+        if (bindingResult.hasErrors()) {
+            return "updateUser";
+        }
+
+        if (!request.getPassword1().equals(request.getPassword2())) {
+            bindingResult.rejectValue("password2", "passwordIncorrect", "2개의 비밀번호가 일치하지 않습니다.");
+            return "updateUser";
+        }
+
+        try {
+            userService.update(request);
+        } catch (IllegalArgumentException e) {
+            bindingResult.reject("updateUserFailed", e.getMessage());
+            return "updateUser";
+        } catch (Exception e) {
+            bindingResult.reject("updateUserFailed", "회원정보 수정 중 오류가 발생했습니다. 다시 시도해주세요.");
+            return "updateUser";
+        }
+        String username = userDetails.getUsername();
+        return "redirect:/mypage";
     }
 
     // 이메일 중복 확인 API

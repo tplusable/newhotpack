@@ -9,6 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.zip.DataFormatException;
 
@@ -51,6 +52,24 @@ public class UserService {
                 .password(encoder.encode(request.getPassword1()))
                 .roles(Set.of("ROLE_USER"))
                 .build();
+
+        return userRepository.save(user).getId();
+    }
+
+    public Long update(AddUserRequest request) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        if (!user.getNickname().equals(request.getNickname()) &&
+            userRepository.existsByNickname(request.getNickname())) {
+            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+        }
+
+        user.setName(request.getName());
+        user.setNickname(request.getNickname());
+        user.setPassword(encoder.encode(request.getPassword1()));
 
         return userRepository.save(user).getId();
     }
