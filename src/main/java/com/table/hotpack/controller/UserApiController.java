@@ -1,6 +1,11 @@
 package com.table.hotpack.controller;
 
+import com.table.hotpack.domain.Article;
+import com.table.hotpack.domain.User;
 import com.table.hotpack.dto.AddUserRequest;
+import com.table.hotpack.dto.ArticleResponse;
+import com.table.hotpack.dto.UpdateUserRequest;
+import com.table.hotpack.dto.UserResponse;
 import com.table.hotpack.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,11 +19,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,12 +61,19 @@ public class UserApiController {
         return "redirect:/login";
     }
 
-    @PostMapping("/update-user")
-    public String updateUser(@AuthenticationPrincipal UserDetails userDetails, @Valid AddUserRequest request, BindingResult bindingResult) {
+    @GetMapping("/api/user/{id}")
+    public ResponseEntity<UserResponse> findUser(@PathVariable("id") long id) {
+        User user = userService.findById(id);
 
-        if (userDetails == null) {
-            throw new IllegalStateException("인증된 사용자가 아닙니다.");
-        }
+        return ResponseEntity.ok()
+                .body(new UserResponse(user));
+    }
+
+    @PostMapping("/update-user")
+    public String updateUser(
+            @Valid UpdateUserRequest request,
+            BindingResult bindingResult,
+            Principal principal) {
 
         if (bindingResult.hasErrors()) {
             return "updateUser";
@@ -75,7 +85,8 @@ public class UserApiController {
         }
 
         try {
-            userService.update(request);
+            User user = userService.findByEmail(principal.getName());
+            userService.updateUser(user.getId(), request);
         } catch (IllegalArgumentException e) {
             bindingResult.reject("updateUserFailed", e.getMessage());
             return "updateUser";
@@ -83,12 +94,11 @@ public class UserApiController {
             bindingResult.reject("updateUserFailed", "회원정보 수정 중 오류가 발생했습니다. 다시 시도해주세요.");
             return "updateUser";
         }
-        String username = userDetails.getUsername();
         return "redirect:/mypage";
     }
 
     // 이메일 중복 확인 API
-    @GetMapping("/check-email")
+    @GetMapping("check-email")
     public ResponseEntity<Map<String, Object>> checkEmail(@RequestParam("email") String email) {
         Map<String, Object> response = new HashMap<>();
 
@@ -103,7 +113,7 @@ public class UserApiController {
     }
 
     // 닉네임 중복 확인 API
-    @GetMapping("/check-nickname")
+    @GetMapping({"/check-nickname", "/mypage/check-nickname"})
     public ResponseEntity<Map<String, Object>> checkNickname(@RequestParam("nickname") String nickname) {
         Map<String, Object> response = new HashMap<>();
         try {

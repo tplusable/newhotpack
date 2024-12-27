@@ -60,7 +60,7 @@ public class SecurityConfig {
                 // 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/signup", "/oauth2/**").permitAll()
-                        .requestMatchers("/api/**", "/update-user").authenticated()
+                        .requestMatchers("/api/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 //                        .requestMatchers("/mypage").authenticated()
                         .anyRequest().permitAll()
@@ -76,7 +76,8 @@ public class SecurityConfig {
                 // OAuth2 로그인 설정
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
-                        .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserCustomService))
+                        .authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint.authorizationRequestRepository(oAuth2AuthorizationRequestBasedOnCookieRepository()))
+                        .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint.userService(oAuth2UserCustomService))
                         .successHandler(oAuth2SuccessHandler())
                 )
 

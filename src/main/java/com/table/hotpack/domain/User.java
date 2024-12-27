@@ -42,7 +42,7 @@ public class User implements UserDetails {
     @PostPersist
     private void updateNickname() {
         // id가 생성된 후 nickname 업데이트
-        if (this.nickname == null || this.nickname.isEmpty()) {
+        if (this.nickname == null || this.nickname.isBlank()) {
             this.nickname = "hotpack" + this.id;
         }
     }
@@ -93,9 +93,9 @@ public class User implements UserDetails {
         return true;
     }
 
-    public User update(String nickname) {
+    public void update(String name, String nickname, String password) {
+        this.name = name;
         this.nickname = nickname;
-
-        return this;
+        this.password = password;
     }
 }

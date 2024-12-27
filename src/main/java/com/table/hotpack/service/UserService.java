@@ -2,9 +2,11 @@ package com.table.hotpack.service;
 
 import com.table.hotpack.domain.User;
 import com.table.hotpack.dto.AddUserRequest;
+import com.table.hotpack.dto.UpdateUserRequest;
 import com.table.hotpack.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,10 +58,11 @@ public class UserService {
         return userRepository.save(user).getId();
     }
 
-    public Long update(AddUserRequest request) {
+    @Transactional
+    public User updateUser(long id, UpdateUserRequest request) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-        User user = userRepository.findByEmail(request.getEmail())
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         if (!user.getNickname().equals(request.getNickname()) &&
@@ -67,11 +70,17 @@ public class UserService {
             throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
         }
 
-        user.setName(request.getName());
-        user.setNickname(request.getNickname());
-        user.setPassword(encoder.encode(request.getPassword1()));
+        authorizeUser(user);
+        user.update(request.getName(), request.getNickname(), encoder.encode(request.getPassword1()));
 
-        return userRepository.save(user).getId();
+        return user;
+    }
+
+    private static void authorizeUser(User user) {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!user.getEmail().equals(userName)) {
+            throw new IllegalArgumentException("not authorized");
+        }
     }
 
     public User findById(Long userId) {
