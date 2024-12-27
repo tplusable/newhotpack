@@ -2,10 +2,7 @@ package com.table.hotpack.controller;
 
 import com.table.hotpack.domain.Article;
 import com.table.hotpack.domain.User;
-import com.table.hotpack.dto.AddUserRequest;
-import com.table.hotpack.dto.ArticleResponse;
-import com.table.hotpack.dto.UpdateUserRequest;
-import com.table.hotpack.dto.UserResponse;
+import com.table.hotpack.dto.*;
 import com.table.hotpack.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -67,6 +64,18 @@ public class UserApiController {
 
         return ResponseEntity.ok()
                 .body(new UserResponse(user));
+    }
+
+    @PutMapping("/api/mypage/{id}")
+    public ResponseEntity<User> updateArticle(@PathVariable("id") Long id,
+                                                 @RequestBody UpdateUserRequest request) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("유효하지 않은 ID입니다.");
+        }
+        User updatedUser = userService.updateUser(id, request);
+
+        return ResponseEntity.ok()
+                .body(updatedUser);
     }
 
     @PostMapping("/update-user")

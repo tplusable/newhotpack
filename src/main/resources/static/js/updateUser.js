@@ -1,3 +1,32 @@
+// 수정 기능
+const modifyButton = document.getElementById('updateUser-btn');
+
+if (modifyButton) {
+    modifyButton.addEventListener('click', event => {
+        let params = new URLSearchParams(location.search);
+        let id = location.pathname.split('/').pop();
+
+        body = JSON.stringify({
+            name: document.getElementById('name').value,
+            nickname: document.getElementById('nickname').value,
+            password1: password1Input.value
+        })
+
+        function success() {
+            alert('수정 완료되었습니다.');
+            location.replace(`/mypage/${id}`);
+        }
+
+        function fail() {
+            alert('수정 실패했습니다.');
+            location.replace(`/mypage/${id}`);
+        }
+        httpRequest('PUT',`/api/mypage/${id}`, body, success, fail);
+    });
+}
+
+
+
 document.getElementById('checkNicknameButton').addEventListener('click', function () {
     const nickname = document.getElementById('nickname').value;
     const feedback = document.getElementById('nicknameFeedback');
@@ -30,34 +59,34 @@ document.getElementById('checkNicknameButton').addEventListener('click', functio
         });
 });
 
-//const password1Input = document.getElementById('password1');
-//const password2Input = document.getElementById('password2');
-//const feedback = document.getElementById('passwordFeedback');
-//
-//// 실시간 검증 이벤트 추가
-//function validatePasswords() {
-//    const password1 = password1Input.value;
-//    const password2 = password2Input.value;
-//
-//    if (!password1 || !password2) {
-//        feedback.textContent = ''; // 하나롣 비어 있으면 메시지 초기화
-//        feedback.classList.remove('text-danger', 'text-success');
-//        return;
-//    }
-//
-//    if (password1 !== password2) {
-//        feedback.textContent = '비밀번호가 서로 일치하지 않습니다.';
-//        feedback.classList.add('text-danger');
-//        feedback.classList.remove('text-success');
-//    } else {
-//        feedback.textContent = '비밀번호가 일치합니다.';
-//        feedback.classList.add('text-success');
-//        feedback.classList.remove('text-danger');
-//    }
-//}
-//
-//password1Input.addEventListener('input', validatePasswords);
-//password2Input.addEventListener('input', validatePasswords);
+const password1Input = document.getElementById('password1');
+const password2Input = document.getElementById('password2');
+const feedback = document.getElementById('passwordFeedback');
+
+// 실시간 검증 이벤트 추가
+function validatePasswords() {
+    const password1 = password1Input.value;
+    const password2 = password2Input.value;
+
+    if (!password1 || !password2) {
+        feedback.textContent = ''; // 하나롣 비어 있으면 메시지 초기화
+        feedback.classList.remove('text-danger', 'text-success');
+        return;
+    }
+
+    if (password1 !== password2) {
+        feedback.textContent = '비밀번호가 서로 일치하지 않습니다.';
+        feedback.classList.add('text-danger');
+        feedback.classList.remove('text-success');
+    } else {
+        feedback.textContent = '비밀번호가 일치합니다.';
+        feedback.classList.add('text-success');
+        feedback.classList.remove('text-danger');
+    }
+}
+
+password1Input.addEventListener('input', validatePasswords);
+password2Input.addEventListener('input', validatePasswords);
 
 // 쿠키를 가져오는 함수
 function getCookie(key) {

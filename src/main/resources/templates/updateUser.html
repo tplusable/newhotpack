@@ -47,15 +47,15 @@
                             </div>
                             <div id="nicknameFeedback" class="text-danger mt-2"></div>
                         </div>
-<!--                        <div class="mb-3">-->
-<!--                            <label for="password1" class="form-label text-white">비밀번호</label>-->
-<!--                            <input type="password" class="form-control" id="password1" name="password1" placeholder="비밀번호" th:field="*{password1}">-->
-<!--                        </div>-->
-<!--                        <div class="mb-3">-->
-<!--                            <label for="password2" class="form-label text-white">비밀번호 확인</label>-->
-<!--                            <input type="password" class="form-control" id="password2" name="password2" placeholder="비밀번호 확인" th:field="*{password2}">-->
-<!--                            <div id="passwordFeedback" class="text-danger mt-2"></div>-->
-<!--                        </div>-->
+                        <div class="mb-3">
+                            <label for="password1" class="form-label text-white">비밀번호</label>
+                            <input type="password" class="form-control" id="password1" name="password1" placeholder="비밀번호" th:value="${password1}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password2" class="form-label text-white">비밀번호 확인</label>
+                            <input type="password" class="form-control" id="password2" name="password2" placeholder="비밀번호 확인" th:value="${password2}">
+                            <div id="passwordFeedback" class="text-danger mt-2"></div>
+                        </div>
 
                         <button th:if="${id} != null" type="button" id="updateUser-btn" class="btn btn-primary">수정</button>
                     </form>
