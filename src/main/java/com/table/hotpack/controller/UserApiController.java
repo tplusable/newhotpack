@@ -66,7 +66,7 @@ public class UserApiController {
                 .body(new UserResponse(user));
     }
 
-    @PutMapping("/api/mypage/{id}")
+    @PutMapping("/api/updateUser/{id}")
     public ResponseEntity<User> updateArticle(@PathVariable("id") Long id,
                                                  @RequestBody UpdateUserRequest request) {
         if (id == null || id <= 0) {
@@ -122,7 +122,7 @@ public class UserApiController {
     }
 
     // 닉네임 중복 확인 API
-    @GetMapping({"/check-nickname", "/mypage/check-nickname"})
+    @GetMapping({"/check-nickname", "/updateUser/check-nickname"})
     public ResponseEntity<Map<String, Object>> checkNickname(@RequestParam("nickname") String nickname) {
         Map<String, Object> response = new HashMap<>();
         try {

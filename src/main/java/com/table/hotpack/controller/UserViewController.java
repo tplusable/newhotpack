@@ -36,12 +36,10 @@ public class UserViewController {
         return "mypage";
     }
 
-    @GetMapping("/mypage/{id}")
+    @GetMapping("/updateUser/{id}")
     public String getUser(@PathVariable("id") Long id, Model model) {
         User user = userService.findById(id);
         model.addAttribute("user", new UserViewResponse(user));
-
-        System.out.println("User ID: " + user.getId());
 
         return "updateUser";
     }

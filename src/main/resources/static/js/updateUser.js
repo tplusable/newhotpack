@@ -14,24 +14,25 @@ if (modifyButton) {
 
         function success() {
             alert('수정 완료되었습니다.');
-            location.replace(`/mypage/${id}`);
+            location.replace(`/mypage`);
         }
 
         function fail() {
             alert('수정 실패했습니다.');
-            location.replace(`/mypage/${id}`);
+            location.replace(`/updateUser/${id}`);
         }
-        httpRequest('PUT',`/api/mypage/${id}`, body, success, fail);
+        httpRequest('PUT',`/api/updateUser/${id}`, body, success, fail);
     });
 }
 
 
-
+const currentNickname = document.getElementById('nickname').getAttribute('data-current-nickname');
 document.getElementById('checkNicknameButton').addEventListener('click', function () {
     const nickname = document.getElementById('nickname').value;
     const feedback = document.getElementById('nicknameFeedback');
 
     feedback.textContent = ''; // 메시지 초기화
+    console.log(currentNickname);
 
     if (!nickname) {
         feedback.textContent = '닉네임을 입력해주세요.';
@@ -39,10 +40,18 @@ document.getElementById('checkNicknameButton').addEventListener('click', functio
         return;
     }
 
-    fetch(`/mypage/check-nickname?nickname=${encodeURIComponent(nickname)}`)
+    // 현재 닉네임과 입력된 닉네임 비교
+    if (nickname === currentNickname) {
+        feedback.textContent = '현재 닉네임과 동일합니다.';
+        feedback.classList.add('text-info'); // 스타일 조정
+        feedback.classList.remove('text-danger', 'text-success');
+        return;
+    }
+
+    fetch(`/updateUser/check-nickname?nickname=${encodeURIComponent(nickname)}`)
         .then(response => response.json())
         .then(data => {
-            if (data.exists) {
+             if (data.exists) {
                 feedback.textContent = '이미 사용 중인 닉네임입니다.';
                 feedback.classList.remove('text-success');
                 feedback.classList.add('text-danger');
