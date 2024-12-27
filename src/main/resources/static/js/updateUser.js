@@ -1,5 +1,24 @@
 // 수정 기능
 const modifyButton = document.getElementById('updateUser-btn');
+const nicknameFeedback = document.getElementById('nicknameFeedback');
+const passwordFeedback = document.getElementById('passwordFeedback');
+
+// 상태 체크 함수
+function checkFormValidity() {
+    // 닉네임이나 비밀번호 관련 오류 메시지가 있는지 확인
+    const nicknameError = nicknameFeedback.classList.contains('text-danger');
+    const passwordError = passwordFeedback.classList.contains('text-danger');
+
+    // 비밀번호 확인 메시지가 비어 있는지 확인
+    const isPasswordFeedbackEmpty = passwordFeedback.textContent.trim() === '';
+
+    // **모든 조건을 만족해야 버튼 활성화**
+    if (!nicknameError && !passwordError && !isPasswordFeedbackEmpty) {
+        modifyButton.disabled = false; // **활성화**
+    } else {
+        modifyButton.disabled = true; // **비활성화**
+    }
+}
 
 if (modifyButton) {
     modifyButton.addEventListener('click', event => {
@@ -29,22 +48,22 @@ if (modifyButton) {
 const currentNickname = document.getElementById('nickname').getAttribute('data-current-nickname');
 document.getElementById('checkNicknameButton').addEventListener('click', function () {
     const nickname = document.getElementById('nickname').value;
-    const feedback = document.getElementById('nicknameFeedback');
 
-    feedback.textContent = ''; // 메시지 초기화
-    console.log(currentNickname);
+    nicknameFeedback.textContent = ''; // 메시지 초기화
 
     if (!nickname) {
-        feedback.textContent = '닉네임을 입력해주세요.';
-        feedback.classList.add('text-danger');
-        return;
+            nicknameFeedback.textContent = '닉네임을 입력해주세요.';
+            nicknameFeedback.classList.add('text-danger'); // **오류 메시지**
+            checkFormValidity(); // **유효성 확인**
+            return;
     }
 
     // 현재 닉네임과 입력된 닉네임 비교
     if (nickname === currentNickname) {
-        feedback.textContent = '현재 닉네임과 동일합니다.';
-        feedback.classList.add('text-info'); // 스타일 조정
-        feedback.classList.remove('text-danger', 'text-success');
+        nicknameFeedback.textContent = '현재 닉네임과 동일합니다.';
+        nicknameFeedback.classList.add('text-info'); // 현재 닉네임과 동일
+        nicknameFeedback.classList.remove('text-danger', 'text-success');
+        checkFormValidity();
         return;
     }
 
@@ -52,25 +71,26 @@ document.getElementById('checkNicknameButton').addEventListener('click', functio
         .then(response => response.json())
         .then(data => {
              if (data.exists) {
-                feedback.textContent = '이미 사용 중인 닉네임입니다.';
-                feedback.classList.remove('text-success');
-                feedback.classList.add('text-danger');
+                nicknameFeedback.textContent = '이미 사용 중인 닉네임입니다.';
+                nicknameFeedback.classList.remove('text-success');
+                nicknameFeedback.classList.add('text-danger');
             } else {
-                feedback.textContent = '사용 가능한 닉네임입니다.';
-                feedback.classList.remove('text-danger');
-                feedback.classList.add('text-success');
+                nicknameFeedback.textContent = '사용 가능한 닉네임입니다.';
+                nicknameFeedback.classList.remove('text-danger');
+                nicknameFeedback.classList.add('text-success');
             }
+            checkFormValidity();
         })
         .catch(error => {
-            feedback.textContent = '오류가 발생했습니다. 다시 시도해주세요.';
-            feedback.classList.remove('text-success');
-            feedback.classList.add('text-danger');
+            nicknameFeedback.textContent = '오류가 발생했습니다. 다시 시도해주세요.';
+            nicknameFeedback.classList.remove('text-success');
+            nicknameFeedback.classList.add('text-danger');
+            checkFormValidity();
         });
 });
 
 const password1Input = document.getElementById('password1');
 const password2Input = document.getElementById('password2');
-const feedback = document.getElementById('passwordFeedback');
 
 // 실시간 검증 이벤트 추가
 function validatePasswords() {
@@ -78,24 +98,28 @@ function validatePasswords() {
     const password2 = password2Input.value;
 
     if (!password1 || !password2) {
-        feedback.textContent = ''; // 하나롣 비어 있으면 메시지 초기화
-        feedback.classList.remove('text-danger', 'text-success');
+        passwordFeedback.textContent = ''; // 하나롣 비어 있으면 메시지 초기화
+        passwordFeedback.classList.remove('text-danger', 'text-success');
+        checkFormValidity();
         return;
     }
 
     if (password1 !== password2) {
-        feedback.textContent = '비밀번호가 서로 일치하지 않습니다.';
-        feedback.classList.add('text-danger');
-        feedback.classList.remove('text-success');
+        passwordFeedback.textContent = '비밀번호가 서로 일치하지 않습니다.';
+        passwordFeedback.classList.add('text-danger');
+        passwordFeedback.classList.remove('text-success');
     } else {
-        feedback.textContent = '비밀번호가 일치합니다.';
-        feedback.classList.add('text-success');
-        feedback.classList.remove('text-danger');
+        passwordFeedback.textContent = '비밀번호가 일치합니다.';
+        passwordFeedback.classList.add('text-success');
+        passwordFeedback.classList.remove('text-danger');
     }
+    checkFormValidity();
 }
 
 password1Input.addEventListener('input', validatePasswords);
 password2Input.addEventListener('input', validatePasswords);
+
+checkFormValidity();
 
 // 쿠키를 가져오는 함수
 function getCookie(key) {
