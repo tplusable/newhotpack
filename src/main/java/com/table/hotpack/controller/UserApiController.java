@@ -69,54 +69,22 @@ public class UserApiController {
                 .body(new UserResponse(user));
     }
 
-    // 마이페이지
-    @GetMapping("/api/mypage")
+    // 사용자 정보 조회
+    @GetMapping("/api/user")
     public ResponseEntity<UserResponse> getMyPage(Principal principal) {
-        System.out.println("apicontroller에서 principal" + principal.getName());
         User user = userService.findByEmail(principal.getName());
         UserResponse userResponse = new UserResponse(user);
 
         return ResponseEntity.ok(userResponse);
     }
 
-    @PutMapping("/api/updateUser/{id}")
-    public ResponseEntity<User> updateArticle(@PathVariable("id") Long id,
-                                                 @RequestBody UpdateUserRequest request) {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("유효하지 않은 ID입니다.");
-        }
-        User updatedUser = userService.updateUser(id, request);
+    // 사용자 정보 수정
+    @PutMapping("/api/user")
+    public ResponseEntity<?> updateArticle(@RequestBody UpdateUserRequest request, Principal principal) {
 
-        return ResponseEntity.ok()
-                .body(updatedUser);
-    }
+        User updatedUser = userService.updateUser(principal.getName(), request);
 
-    @PostMapping("/update-user")
-    public String updateUser(
-            @Valid UpdateUserRequest request,
-            BindingResult bindingResult,
-            Principal principal) {
-
-        if (bindingResult.hasErrors()) {
-            return "updateUser";
-        }
-
-        if (!request.getPassword1().equals(request.getPassword2())) {
-            bindingResult.rejectValue("password2", "passwordIncorrect", "2개의 비밀번호가 일치하지 않습니다.");
-            return "updateUser";
-        }
-
-        try {
-            User user = userService.findByEmail(principal.getName());
-            userService.updateUser(user.getId(), request);
-        } catch (IllegalArgumentException e) {
-            bindingResult.reject("updateUserFailed", e.getMessage());
-            return "updateUser";
-        } catch (Exception e) {
-            bindingResult.reject("updateUserFailed", "회원정보 수정 중 오류가 발생했습니다. 다시 시도해주세요.");
-            return "updateUser";
-        }
-        return "redirect:/mypage";
+        return ResponseEntity.ok(new UserResponse(updatedUser));
     }
 
     // 이메일 중복 확인 API

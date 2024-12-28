@@ -2,8 +2,8 @@
 function fetchMyPage() {
     function success() {
         // 토큰 갱신 후 재요청 결과는 `httpRequest` 내부에서 자동으로 처리되므로
-        // 여기서 데이터를 가져오는 로직을 실행합니다.
-        fetch('/api/mypage', {
+        // 여기서 데이터를 가져오는 로직을 실행
+        fetch('/api/user', {
             method: 'GET',
             headers: {
                 Authorization: 'Bearer ' + localStorage.getItem('access_token'),
@@ -32,8 +32,8 @@ function fetchMyPage() {
         location.replace('/login');
     }
 
-    // `httpRequest` 함수로 `/api/mypage` 호출
-    httpRequest('GET', '/api/mypage', null, success, fail);
+    // `httpRequest` 함수로 `/api/user` 호출
+    httpRequest('GET', '/api/user', null, success, fail);
 }
 
 // HTML 페이지 로드 후 데이터 가져오기

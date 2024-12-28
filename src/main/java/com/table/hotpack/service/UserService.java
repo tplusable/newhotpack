@@ -59,15 +59,19 @@ public class UserService {
     }
 
     @Transactional
-    public User updateUser(long id, UpdateUserRequest request) {
+    public User updateUser(String email, UpdateUserRequest request) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-        User user = userRepository.findById(id)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         if (!user.getNickname().equals(request.getNickname()) &&
             userRepository.existsByNickname(request.getNickname())) {
             throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+        }
+
+        if (!request.getPassword1().equals(request.getPassword2())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
         authorizeUser(user);

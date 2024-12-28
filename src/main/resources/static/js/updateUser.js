@@ -1,3 +1,41 @@
+// 사용자 데이터 로드
+function loadUserData() {
+    function success() {
+        fetch('/api/user', {
+            method: 'GET',
+            headers: {
+                Authorization: 'Bearer ' + localStorage.getItem('access_token'),
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch user data');
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('email').value = data.email;
+            document.getElementById('name').value = data.name;
+            document.getElementById('nickname').value = data.nickname;
+            document.getElementById('nickname').setAttribute('data-current-nickname', data.nickname); // data-current-nickname 속성 설정
+        })
+        .catch(error => {
+            console.error('Error loading user data:', error);
+            alert('로그인이 필요합니다.');
+            location.replace('/login');
+        });
+    }
+
+    function fail() {
+        alert("데이터를 가져올 수 없습니다. 로그인 페이지로 이동합니다.");
+        location.replace('/login');
+    }
+    httpRequest('GET', '/api/user', null, success, fail);
+}
+
+// HTML 페이지 로드 후 데이터 가져오기
+window.onload = loadUserData;
+
 // 수정 기능
 const modifyButton = document.getElementById('updateUser-btn');
 const nicknameFeedback = document.getElementById('nicknameFeedback');
@@ -22,10 +60,8 @@ function checkFormValidity() {
 
 if (modifyButton) {
     modifyButton.addEventListener('click', event => {
-        let params = new URLSearchParams(location.search);
-        let id = location.pathname.split('/').pop();
 
-        body = JSON.stringify({
+        const body = JSON.stringify({
             name: document.getElementById('name').value,
             nickname: document.getElementById('nickname').value,
             password1: password1Input.value
@@ -38,18 +74,21 @@ if (modifyButton) {
 
         function fail() {
             alert('수정 실패했습니다.');
-            location.replace(`/updateUser/${id}`);
+            location.replace('/updateUser');
         }
-        httpRequest('PUT',`/api/updateUser/${id}`, body, success, fail);
+        httpRequest('PUT', '/api/user', body, success, fail);
     });
 }
 
-
-const currentNickname = document.getElementById('nickname').getAttribute('data-current-nickname');
+// 닉네임 중복 확인
 document.getElementById('checkNicknameButton').addEventListener('click', function () {
     const nickname = document.getElementById('nickname').value;
+    const currentNickname = document.getElementById('nickname').getAttribute('data-current-nickname');
 
-    nicknameFeedback.textContent = ''; // 메시지 초기화
+    // 메시지 초기화
+    nicknameFeedback.textContent = '';
+    nicknameFeedback.classList.remove('text-danger', 'text-success', 'text-info');
+
 
     if (!nickname) {
             nicknameFeedback.textContent = '닉네임을 입력해주세요.';
@@ -62,7 +101,6 @@ document.getElementById('checkNicknameButton').addEventListener('click', functio
     if (nickname === currentNickname) {
         nicknameFeedback.textContent = '현재 닉네임과 동일합니다.';
         nicknameFeedback.classList.add('text-info'); // 현재 닉네임과 동일
-        nicknameFeedback.classList.remove('text-danger', 'text-success');
         checkFormValidity();
         return;
     }
@@ -72,18 +110,15 @@ document.getElementById('checkNicknameButton').addEventListener('click', functio
         .then(data => {
              if (data.exists) {
                 nicknameFeedback.textContent = '이미 사용 중인 닉네임입니다.';
-                nicknameFeedback.classList.remove('text-success');
                 nicknameFeedback.classList.add('text-danger');
             } else {
                 nicknameFeedback.textContent = '사용 가능한 닉네임입니다.';
-                nicknameFeedback.classList.remove('text-danger');
                 nicknameFeedback.classList.add('text-success');
             }
             checkFormValidity();
         })
         .catch(error => {
             nicknameFeedback.textContent = '오류가 발생했습니다. 다시 시도해주세요.';
-            nicknameFeedback.classList.remove('text-success');
             nicknameFeedback.classList.add('text-danger');
             checkFormValidity();
         });
