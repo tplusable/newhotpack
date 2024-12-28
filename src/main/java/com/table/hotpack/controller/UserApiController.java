@@ -1,7 +1,6 @@
 package com.table.hotpack.controller;
 
 import com.table.hotpack.config.jwt.TokenProvider;
-import com.table.hotpack.domain.Article;
 import com.table.hotpack.domain.User;
 import com.table.hotpack.dto.*;
 import com.table.hotpack.service.UserService;
@@ -10,11 +9,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -59,14 +55,6 @@ public class UserApiController {
 
         // 회원가입 성공 시 로그인 페이지로 리다이렉트
         return "redirect:/login";
-    }
-
-    @GetMapping("/api/user/{id}")
-    public ResponseEntity<UserResponse> findUser(@PathVariable("id") long id) {
-        User user = userService.findById(id);
-
-        return ResponseEntity.ok()
-                .body(new UserResponse(user));
     }
 
     // 사용자 정보 조회

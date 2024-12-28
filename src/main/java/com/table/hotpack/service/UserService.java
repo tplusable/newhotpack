@@ -11,9 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.Set;
-import java.util.zip.DataFormatException;
 
 @RequiredArgsConstructor
 @Service
@@ -68,10 +66,6 @@ public class UserService {
         if (!user.getNickname().equals(request.getNickname()) &&
             userRepository.existsByNickname(request.getNickname())) {
             throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
-        }
-
-        if (!request.getPassword1().equals(request.getPassword2())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
         authorizeUser(user);
