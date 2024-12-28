@@ -2,14 +2,19 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>블로그 글</title>
+    <title>My Page</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
 </head>
 <body>
 <h1>마이페이지</h1>
+<p>Email: <span id="email">Loading...</span></p>
+<p>Nickname: <span id="nickname">Loading...</span></p>
+
 <button type="button" class="btn btn-secondary">내가 쓴 글</button>
 <button type="button" class="btn btn-secondary">내가 쓴 댓글</button>
 <button type="button" class="btn btn-secondary">내가 추천한 글</button>
 <button type="button" id="updateUser-btn" class="btn btn-secondary"
         onclick="location.href='/mypage/'">회원정보 수정</button>
+<script src="/js/mypage.js"></script>
 </body>
+</html>

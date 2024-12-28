@@ -1,5 +1,6 @@
 package com.table.hotpack.controller;
 
+import com.table.hotpack.config.jwt.TokenProvider;
 import com.table.hotpack.domain.Article;
 import com.table.hotpack.domain.User;
 import com.table.hotpack.dto.*;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +28,7 @@ import java.util.Map;
 @Controller
 public class UserApiController {
     private final UserService userService;
+    private final TokenProvider tokenProvider;
 
     @PostMapping("/user")
     public String signup(@Valid AddUserRequest request, BindingResult bindingResult) {
@@ -64,6 +67,16 @@ public class UserApiController {
 
         return ResponseEntity.ok()
                 .body(new UserResponse(user));
+    }
+
+    // 마이페이지
+    @GetMapping("/api/mypage")
+    public ResponseEntity<UserResponse> getMyPage(Principal principal) {
+        System.out.println("apicontroller에서 principal" + principal.getName());
+        User user = userService.findByEmail(principal.getName());
+        UserResponse userResponse = new UserResponse(user);
+
+        return ResponseEntity.ok(userResponse);
     }
 
     @PutMapping("/api/updateUser/{id}")
