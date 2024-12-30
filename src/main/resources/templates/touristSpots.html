@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>관광지 리스트</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<!-- 헤더 -->
+<header>
+  <div class="logo">
+    <img src="/img/logo.png" alt="로고">
+  </div>
+  <h2 style="color: black; font-size: 24px; text-align: center;">HOTPACK</h2>
+  <div class="auth-buttons">
+    <a href="/signup" class="signup-btn">회원가입</a>
+    <a href="/login" class="login-btn">로그인</a>
+  </div>
+</header>
+<!-- 여행 일정 버튼 생성 -->
+<div id="daysContainer" class="days-list">
+  <div class="days-content">
+    <!-- 버튼 생성 -->
+    <script>
+      const startDate = new Date("[[${startDate}]]");
+      const endDate = new Date("[[${endDate}]]");
+      const dayCount = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
+      for (let i = 0; i < dayCount; i++) {
+          const button = document.createElement('button');
+          button.textContent = `${startDate.getDate() + i}일차`;
+          button.onclick = function() {
+              // 날자 버튼 클릭 시 처리할 내용(예: 추가 정보 표시 등)
+              alert(`${startDate.getDate() + i}일차 선택됨`);
+          };
+          document.getElementById('daysContainer').appendChild(button);
+      }
+    </script>
+  </div>
+</div>
+<!-- 본문 콘텐츠 -->
+<div class="main-container">
+  <div class="tourist-list">
+    <h1>관광지 목록 for [[${areaName}]]</h1>
+    <div th:if="${touristSpots}" class="items-container">
+      <!-- 관광지 리스트 출력 -->
+      <ul th:each="item : ${touristSpots}" class="item"
+          th:attr="data-mapx=${item['mapx'] != null ? item['mapx'] : '126.570667'},
+                     data-mapy=${item['mapy'] != null ? item['mapy'] : '33.450701'},
+                     data-title=${item['title'] != null ? item['title'] : 'No Title'},
+                      data-image=${item['firstimage'] != null ? item['firstimage'] : '/img/null.jpeg'}"
+          onclick="handleItemClick(event)">
+        <div class="item-content">
+          <img th:src="${item['firstimage'] != null ? item['firstimage'] : '/img/null.jpeg'}" alt="이미지" />
+          <span th:text="${item['title'] != null ? item['title'] : 'No Title'}"></span>
+
+          <button class="add-button">+</button>
+        </div>
+      </ul>
+    </div>
+  </div>
+  <div class="custom-list">
+    <h1>선택한 관광지</h1>
+    <ul id="customItems" class="custom-container">
+      <!-- 선택된 관광지 리스트 -->
+    </ul>
+  </div>
+
+  <div class="map-section">
+    <div id="map"></div>
+  </div>
+</div>
+<form action="/attachment/pdf" method="post">
+  <label for="pdfContent">PDF 내용:</label>
+  <input type="text" id="pdfContent" name="pdfContent" required>
+  <input type="hidden" name="pdfFileName" value="${randomFileName}.pdf">
+  <button type="submit">PDF 다운로드</button>
+</form>
+<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a2608814fa4fc80c1c244684819fa4dd&libraries=drawing"></script>
+<script src="/js/map.js"></script>
+</body>
+</html>

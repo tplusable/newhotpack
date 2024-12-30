@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>여행 계획</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    function setCurrentDate() {
+        const today = new Date();
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+        const formattedDate = today.toLocaleDateString('ko-KR', options).replace(/\./g, '-');
+        document.getElementById('startDate').value = formattedDate;
+        document.getElementById('endDate').value = formattedDate;
+    }
+
+    function submitForm() {
+        const areaCode = document.getElementById('areaCode').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        if (new Date(startDate) > new Date(endDate)) {
+            alert("종료 날짜는 시작 날짜 이후이어야 합니다.");
+            return;
+        }
+
+        const form = document.getElementById('travelForm');
+        form.action = "/getTouristSpots"; // destination URL
+        form.submit();
+    }
+  </script>
+</head>
+<body onload="setCurrentDate()">
+<header>
+  <div class="logo">
+    <img src="/img/logo.png" alt="로고">
+  </div>
+  <h2 style="color: black; font-size: 24px; text-align: center;">HOTPACK</h2>
+  <div class="auth-buttons">
+    <a href="/signup" class="signup-btn">회원가입</a>
+    <a href="/login" class="login-btn">로그인</a>
+  </div>
+</header>
+<main>
+  <section class="date-selection">
+  <h1>여행 계획 설정</h1>
+  <form id="travelForm" method="get">
+    <label for="areaCode">지역을 선택하세요:</label>
+    <select id="areaCode" name="areaCode" required>
+      <th:block th:each="area : ${areaList}">
+        <option th:value="${area.areaCode}" th:text="${area.areaName}"></option>
+      </th:block>
+    </select>
+
+  <h2>여행 날짜 선택</h2>
+    <label for="startDate">시작 날짜:</label>
+    <input type="date" id="startDate" name="startDate" required>
+
+    <label for="endDate">종료 날짜:</label>
+    <input type="date" id="endDate" name="endDate" required>
+
+    <button type="button" onclick="submitForm()">다음</button>
+  </form>
+  </section>
+</main>
+<footer>
+  <p>© 2024 HOTPACK. All rights reserved.</p>
+</footer>
+</body>
+</html>

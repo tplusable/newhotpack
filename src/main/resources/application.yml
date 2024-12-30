@@ -61,3 +61,6 @@ logging:
 jwt:
   issuer: ${JWT_ISSUER}       # .env의 JWT_ISSUER 값
   secret_key: ${JWT_SECRET_KEY}  # .env의 JWT_SECRET_KEY 값
+
+api:
+  key: ${API_KEY}
