@@ -1,9 +1,7 @@
 package com.table.hotpack.controller;
 
 import com.table.hotpack.domain.Article;
-import com.table.hotpack.dto.AddArticleRequest;
-import com.table.hotpack.dto.ArticleResponse;
-import com.table.hotpack.dto.UpdateArticleRequest;
+import com.table.hotpack.dto.*;
 import com.table.hotpack.service.BlogService;
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +36,7 @@ public class BlogApiController {
         return ResponseEntity.ok()
                 .body(articles);
     }
+
     @GetMapping("/api/articles/{id}")
     public ResponseEntity<ArticleResponse> findArticle(@PathVariable("id") long id) {
         Article article = blogService.findById(id);
@@ -63,4 +62,14 @@ public class BlogApiController {
                 .body(updatedArticle);
     }
 
+    @GetMapping("/api/user/articles")
+    public ResponseEntity<List<ArticleListViewResponse>> getUserArticles(Principal principal) {
+        List<ArticleListViewResponse> articles = blogService.getUserArticles(principal.getName())
+                .stream()
+                .map(ArticleListViewResponse::new)
+                .toList();
+
+        return ResponseEntity.ok()
+                .body(articles);
+    }
 }
