@@ -45,6 +45,7 @@ public class FormLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandl
         // 액세스 토큰 생성 -> URL에 추가
         String accessToken = tokenProvider.generateToken(user, ACCESS_TOKEN_DURATION);
         String targetUrl = getTargetUrl(accessToken);
+        response.setHeader("Authorization", "Bearer " + accessToken);
 
         // 리다이렉트
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
