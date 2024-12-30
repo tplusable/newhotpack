@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const firstimage = item.getAttribute('data-image');
       const mapx = item.getAttribute('data-mapx');
       const mapy = item.getAttribute('data-mapy');
-      const
 
       // 선택된 아이템을 커스텀 리스트에 추가
       const listItem = document.createElement('li');
