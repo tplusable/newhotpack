@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -25,6 +26,15 @@ import java.util.Map;
 public class UserApiController {
     private final UserService userService;
     private final TokenProvider tokenProvider;
+
+    @GetMapping("/isLogin")
+    public ResponseEntity<?> getUserInfo(Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in");
+        }
+        User user = userService.findByEmail(principal.getName());
+        return ResponseEntity.ok(new UserResponse(user));
+    }
 
     @PostMapping("/user")
     public String signup(@Valid AddUserRequest request, BindingResult bindingResult) {
