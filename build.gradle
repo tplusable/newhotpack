@@ -52,6 +52,21 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
 	implementation 'io.github.cdimascio:java-dotenv:5.2.2'
+
+
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+
+	// mybatis
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
+
+	// OkHttp 의존성
+	implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+
+	// Jackson XML 의존성
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2'
+
+	// markdown
+	implementation 'org.commonmark:commonmark:0.21.0'
 }
 
 tasks.named('test') {
