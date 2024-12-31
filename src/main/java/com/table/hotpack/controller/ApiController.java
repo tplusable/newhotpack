@@ -3,6 +3,7 @@ package com.table.hotpack.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.servlet.http.HttpServletResponse;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.WebRequest;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +54,8 @@ public class ApiController {
     // 지역 목록을 가져오는 메서드
     @RequestMapping("/getAreaList")
     public String getAreaList(Model model) {
+
+        // 인증된 사용자에게 지역 목록 전달
         List<Map<String, String>> areaList = new ArrayList<>();
         for (Map.Entry<Integer, String> entry : areaCodeMap.entrySet()) {
             areaList.add(Map.of("areaCode", String.valueOf(entry.getKey()), "areaName", entry.getValue()));
@@ -60,6 +64,7 @@ public class ApiController {
         model.addAttribute("areaList", areaList);
         return "areaList"; // areaList.html 페이지로 이동
     }
+
 
     // 선택한 지역에 대한 관광지 목록을 가져오는 메서드
     @RequestMapping("/getTouristSpots")

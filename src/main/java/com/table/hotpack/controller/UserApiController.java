@@ -27,15 +27,6 @@ public class UserApiController {
     private final UserService userService;
     private final TokenProvider tokenProvider;
 
-    @GetMapping("/isLogin")
-    public ResponseEntity<?> getUserInfo(Principal principal) {
-        if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in");
-        }
-        User user = userService.findByEmail(principal.getName());
-        return ResponseEntity.ok(new UserResponse(user));
-    }
-
     @PostMapping("/user")
     public String signup(@Valid AddUserRequest request, BindingResult bindingResult) {
 

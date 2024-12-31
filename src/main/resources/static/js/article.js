@@ -4,6 +4,9 @@ const deleteButton = document.getElementById('delete-btn');
 if (deleteButton) {
     deleteButton.addEventListener('click', event => {
         let id = document.getElementById('article-id').value;
+        if (!confirm('정말 삭제하시겠습니까?')) {
+            return;
+        }
         function success() {
             alert('삭제가 완료되었습니다.');
             location.replace('/articles');
@@ -78,7 +81,7 @@ if (logoutButton) {
             // 쿠키에 저장된 리프레시 토큰을 삭제
             deleteCookie('refresh_token');
             alert('로그아웃 성공')
-            location.replace('/login');
+            location.replace('/');
         }
         function fail() {
             alert('로그아웃 실패했습니다.');
