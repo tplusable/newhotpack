@@ -1,12 +1,15 @@
 package com.table.hotpack.controller;
 
 import com.table.hotpack.domain.Article;
+import com.table.hotpack.domain.User;
 import com.table.hotpack.dto.*;
 import com.table.hotpack.service.BlogService;
+import com.table.hotpack.service.UserService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -17,6 +20,7 @@ import java.util.List;
 public class BlogApiController {
 
     private final BlogService blogService;
+    private final UserService userService;
 
     @PostMapping("/api/articles")
     public ResponseEntity<Article> addArticle(@RequestBody AddArticleRequest request, Principal principal) {
@@ -61,6 +65,22 @@ public class BlogApiController {
         return ResponseEntity.ok()
                 .body(updatedArticle);
     }
+
+    // 추천/취소 토글
+    @PostMapping("/api/articles/{id}/recommend")
+    public ToggleRecommendResponse toggleRecommendResponse(@PathVariable("id") Long id,
+                                                           Principal principal) {
+        User user = userService.findByEmail(principal.getName());
+
+        blogService.toggleRecommend(id, user);
+        int newCount = blogService.getRecommendCount(id);
+        boolean isNowRecommended = blogService.isRecommended(id, user);
+
+        return new ToggleRecommendResponse(newCount, isNowRecommended);
+    }
+
+    // 응답용 DTO
+    record ToggleRecommendResponse(int recommendCount, boolean recommended) {}
 
     @GetMapping("/api/user/articles")
     public ResponseEntity<List<ArticleListViewResponse>> getUserArticles(Principal principal) {

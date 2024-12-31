@@ -43,6 +43,7 @@ public class BlogViewController {
         Article article = blogService.findById(id);
         model.addAttribute("article", new ArticleViewResponse(article));
 
+        model.addAttribute("recommendCount", blogService.getRecommendCount(id));
         return "article";
     }
 

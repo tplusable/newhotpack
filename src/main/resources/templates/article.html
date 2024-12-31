@@ -4,6 +4,38 @@
     <meta charset="UTF-8">
     <title>블로그 글</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        /* 버튼 컨테이너 - 필요시 추가 스타일 */
+        .recommend-container {
+          display: inline-block;
+        }
+
+        /* 기본 버튼 스타일 */
+        .recommend-btn {
+          border: 1px solid #ff5050;    /* 테두리 색: 빨간색 계열 */
+          background-color: #ffffff;    /* 기본은 흰색(또는 투명) */
+          border-radius: 2rem;         /* 동그란 모서리 */
+          color: #ff5050;              /* 텍스트/아이콘 색 */
+          padding: 0.3rem 0.6rem;
+          display: inline-flex;
+          align-items: center;
+          font-size: 1rem;
+          cursor: pointer;
+          outline: none;
+        }
+
+        /* 엄지 아이콘과 숫자 사이 약간 간격 */
+        .recommend-btn i {
+          margin-right: 0.3rem;
+        }
+
+        /* 추천 상태(이미 추천함)일 때 - 배경/아이콘 색 반전 */
+        .recommend-btn.recommended {
+          background-color: #ff5050; /* 빨간색 배경 */
+          color: #fff;               /* 흰색 아이콘/텍스트 */
+        }
+    </style>
 </head>
 <body>
 <div class="p-5 mb-5 text-center</> bg-light">
@@ -19,6 +51,13 @@
                 <header class="mb-4">
                     <h1 class="fw-bolder mb-1" th:text="${article.title}"></h1>
                     <div class="text-muted fst-italic mb-2" th:text="|Posted on ${#temporals.format(article.createdAt, 'yyyy-MM-dd HH:mm')} By ${article.nickname}|"></div>
+                    <!-- 추천 버튼 & 추천수 표시 영역 -->
+                    <div class="recommend-container">
+                        <button id="recommend-btn" class="recommend-btn">
+                            <i class="fa fa-thumbs-up"></i>
+                            <span id="recommend-count">0</span>
+                        </button>
+                    </div>
                 </header>
                 <section class="mb-5">
                     <p class="fs-5 mb-4" th:text="${article.content}"></p>

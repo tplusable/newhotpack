@@ -71,6 +71,69 @@ if (createButton) {
     });
 }
 
+const token = localStorage.getItem("access_token");
+
+// 추천기능
+// 버튼, 표시 요소 가져오기
+const recommendButton = document.getElementById('recommend-btn');
+const recommendCount = document.getElementById('recommend-count');
+
+// 버튼이 존재할 경우 이벤트 리스너 등록
+if (recommendButton) {
+  recommendButton.addEventListener('click', () => {
+
+    // 로그인 여부 확인
+    if (!token) {
+      alert('로그인이 필요합니다.');
+      return;  // 함수 종료, fetch 요청을 하지 않음
+    }
+
+    // 게시글 ID 가져오기
+    const articleId = document.getElementById('article-id').value;
+
+    // POST 요청: /api/articles/{id}/recommend
+    fetch(`/api/articles/${articleId}/recommend`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: null
+    })
+    .then(response => {
+      // 응답이 200~299 이외라면 에러 처리
+      if (!response.ok) {
+        // 예: 401, 403 등
+        return response.text().then(msg => { throw new Error(msg); });
+      }
+      // 정상 응답이면 JSON 파싱
+      return response.json();
+    })
+    .then(data => {
+      // data = { recommendCount, recommended } 형태라고 가정
+      console.log('서버 응답:', data);
+
+      // 추천수 업데이트
+      recommendCount.textContent = data.recommendCount;
+
+      // recommended 상태면 버튼에 클래스를 추가
+      if (data.recommended) {
+        recommendButton.classList.add('recommended');
+      } else {
+        // 취소 상태면 클래스 제거
+        recommendButton.classList.remove('recommended');
+      }
+    })
+    .catch(error => {
+      console.error('추천/취소 요청 실패:', error);
+      alert('추천/취소에 실패했습니다.');
+    });
+  });
+}
+
+
+
+// 로그아웃
 const logoutButton = document.getElementById('logout-btn');
 if (logoutButton) {
     logoutButton.addEventListener('click', event => {
