@@ -65,4 +65,9 @@ public class BlogViewController {
         return "myArticleList";
     }
 
+    @GetMapping("myRecommends")
+    public String getMyRecommends() {
+        return "myRecommendsList";
+    }
+
 }

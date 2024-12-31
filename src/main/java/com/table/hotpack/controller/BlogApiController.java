@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -81,6 +82,18 @@ public class BlogApiController {
 
     // 응답용 DTO
     record ToggleRecommendResponse(int recommendCount, boolean recommended) {}
+
+    // 추천한 글 목록 조회
+    @GetMapping("/api/user/recommended-articles")
+    public ResponseEntity<List<ArticleListViewResponse>> getUserRecommendedArticles(Principal principal) {
+        // 내가 추천한 Article 목록
+        List<ArticleListViewResponse> articles = blogService.getUserRecommendedArticles(principal.getName())
+                .stream()
+                .map(ArticleListViewResponse::new)
+                .toList();
+
+        return ResponseEntity.ok(articles);
+    }
 
     @GetMapping("/api/user/articles")
     public ResponseEntity<List<ArticleListViewResponse>> getUserArticles(Principal principal) {

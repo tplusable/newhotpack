@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -97,6 +98,21 @@ public class BlogService {
     public boolean isRecommended(Long id, User user) {
         Article article = findById(id);
         return recommendRepository.findByArticleAndUser(article, user).isPresent();
+    }
+
+    // 특정 유저가 추천한 게시글 목록 조회
+    public List<Article> getUserRecommendedArticles(String email) {
+        // 유저 엔티티를 찾음
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("유저가 존재하지 않습니다: " + email));
+
+        // 해당 유저가 추천한 Recommend 레코드 목록
+        List<Recommend> recommends = recommendRepository.findAllByUser(user);
+
+        // Recommend -> Article 매핑
+        return recommends.stream()
+                .map(Recommend::getArticle)
+                .collect(Collectors.toList());
     }
 
 }
