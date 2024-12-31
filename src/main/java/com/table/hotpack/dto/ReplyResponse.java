@@ -2,12 +2,14 @@ package com.table.hotpack.dto;
 
 import com.table.hotpack.domain.Reply;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
+@Builder
 public class ReplyResponse {
     private Long replyId;
     private String reply;
