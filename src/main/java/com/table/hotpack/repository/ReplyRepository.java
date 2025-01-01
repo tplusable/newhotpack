@@ -21,6 +21,8 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
     @Query("SELECT r FROM Reply r WHERE r.article.id= :articleId")
     Page<Reply> findByArticleIdWithPaging(@Param("articleId")Long articleId, Pageable pageable);
 
+    Page<Reply> findByArticleIdOrderByCreatedAtDesc(Long articleId, Pageable pagealbe);
+
     List<Reply> findByUser(User user);
     @Query("SELECT r FROM Reply r WHERE r.user.id= :userId")
     List<Reply> findByUserId(@Param("userId") Long userId);

@@ -120,7 +120,7 @@ function httpRequest(method, url, body, success, fail) {
         },
         body: body,
     }).then(response => {
-        if (response.status === 200 || response.status === 201) {
+        if (response.status === 200 || response.status === 201 || response.status === 204) {
             return success();
         }
         const refresh_token = getCookie('refresh_token');
@@ -150,3 +150,76 @@ function httpRequest(method, url, body, success, fail) {
         }
     });
 }
+
+//const articleId=document.getElementById('article-id').value;
+//  const repliesList=document.getElementById('replies-list');
+//  const pagination=document.getElementById('pagination');
+//  const replyContent=document.getElementById('reply-content');
+//
+//  let currentPage =0;
+//
+//  // Load replies for the current page
+//  function loadReplies(page=0) {
+//    fetch(`/api/replies/articles/${articleId}?page=${page}&size=10`)
+//      .then(response => response.json())
+//      .then(data => {
+//        //Render replies
+//        repliesList.innerHTML='';
+//        data.content.forEach(reply=>{
+//          const replyElement=document.createElement('div');
+//          replyElement.className='border p-3 mb-2';
+//          replyElement.innerHTML=`
+//            <p id="comment-text-${reply.replyId}">${reply.reply}</p>
+//            <small class="text-muted">${reply.replyer} | ${new Date(reply.createAt).toLocaleString()}</small>
+//            <div>
+//              <button class="btn btn-link btn-sm text-primary" onclick="editReply(${reply.replyId},'${reply.reply}')">수정</button>
+//              <button class="btn btn-link btn-sm text-danger" onclick="deleteReply(${reply.replyId})">삭제</button>
+//            </div>
+//          `;
+//          repliesList.appendChild(replyElement);
+//        });
+//
+//        //Render pagination
+//        pagination.innerHTML='';
+//        for (let i =0; i<data.totalPages; i++) {
+//          const pageItem=document.createElement('li');
+//          pageItem.className='page-item';
+//          if (i===page) pageItem.classList.add('active');
+//          pageItem.innerHTML=`<a class="page-link" href="#">${i+1}</a>`;
+//          pageItem.addEventListener('click', (e) => {
+//            e.preventDefault();
+//            loadReplies(i);
+//          });
+//          pagination.querySelector('.pagination').appendChild(pageItem);
+//        }
+//      });
+//  }
+//
+//  //Add a new comment
+//  document.getElementById('submit-reply').addEventListener('click', () => {
+//    const content=replyContent.value;
+//    if(!content.trim()) {
+//      alert('댓글 내용을 입력하세요.');
+//      return;
+//    }
+//
+//    //POST 요청의 URL
+//    const url =`/api/replies/article/${articleId}`;
+//    // 요청 본문 데이터
+//    const body=JSON.stringify({ articleId: articleId, reply: content });
+//
+//    // 성공 시 처리 로직
+//    const success=()=>{
+//      replyContent.value='';  // Clear the textarea
+//      loadReplies(); // Reload replies
+//    }
+//
+//    // 실패시 처리 로직
+//    const fail =() =>{
+//      alert ('댓글 작성에 실패했습니다.');
+//    };
+//
+//    //httpRequest를 사용하여 요청 보내기
+//    httpRequest('POST', url, body, success, fail);
+//  });
+//

@@ -1,5 +1,6 @@
 package com.table.hotpack.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.table.hotpack.domain.Reply;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,8 +15,10 @@ public class ReplyResponse {
     private Long replyId;
     private String reply;
     private String replyer;
-    private LocalDateTime createAt;
-    private LocalDateTime updateAt;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime createdAt;
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime updatedAt;
 
     public static ReplyResponse fromEntity(Reply reply) {
         return new ReplyResponse(
@@ -23,7 +26,7 @@ public class ReplyResponse {
                 reply.getReply(),
                 reply.getReplyer(),
                 reply.getCreatedAt(),
-                reply.getUpdateAt()
+                reply.getUpdatedAt()
                 );
     }
 }
