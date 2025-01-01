@@ -22,6 +22,7 @@ public class HotpackApplication {
 		System.setProperty("NAVER_CLIENT_ID", dotenv.get("NAVER_CLIENT_ID"));
 		System.setProperty("NAVER_CLIENT_SECRET", dotenv.get("NAVER_CLIENT_SECRET"));
 		System.setProperty("API_KEY", dotenv.get("API_KEY"));
+		System.setProperty("APP_KEY", dotenv.get("APP_KEY"));
 
 		SpringApplication.run(HotpackApplication.class, args);
 	}

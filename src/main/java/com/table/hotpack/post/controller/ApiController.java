@@ -1,4 +1,4 @@
-package com.table.hotpack.controller;
+package com.table.hotpack.post.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,6 +24,8 @@ public class ApiController {
 
     @Value("${API_KEY}")
     private String apiKey;
+    @Value("${myapp.appkey}")
+    private String appkey;
 
     private static final Map<Integer, String> areaCodeMap = new HashMap<>();
     static {
@@ -71,6 +73,7 @@ public class ApiController {
         String endDate = webRequest.getParameter("endDate");
         // 지역 코드에 해당하는 areaName을 찾기
         String areaName = areaCodeMap.get(Integer.parseInt(areaCode));
+        //model.addAttribute("appkey", appkey);
 
         // 지역에 맞는 관광지 정보 API URL
         String url12 = "https://apis.data.go.kr/B551011/KorService1/areaBasedList1?serviceKey=" + this.apiKey +
@@ -121,6 +124,7 @@ public class ApiController {
                     String firstimage = item.path("firstimage").asText();
                     String mapx = item.path("mapx").asText(); // mapx 값 추가
                     String mapy = item.path("mapy").asText();
+                    String contentid = item.path("contentid").asText();
                     if (firstimage == null || firstimage.isEmpty()) {
                         firstimage = "/img/null.jpeg"; // 기본 이미지로 설정
                     }
@@ -131,7 +135,8 @@ public class ApiController {
                             "addr1", addr1,
                             "firstimage", firstimage,
                             "mapx", mapx, // mapx 추가
-                                "mapy", mapy  // mapy 추가
+                                "mapy", mapy,
+                            "contentid",contentid// mapy 추가
                     ));
                 }
             }

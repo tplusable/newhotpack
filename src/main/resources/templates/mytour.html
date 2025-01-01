@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Tour</title>
+    <style>
+        table {
+        width: 100%;
+        border-collapse: collapse;
+        }
+
+        th, td {
+        padding: 8px;
+        border: 1px solid #ddd;
+        text-align: left;
+        }
+
+        th {
+        background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<h1>My Tour Information</h1>
+
+<table id="tripInfoTable">
+    <thead>
+    <tr>
+        <th>Area Name</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Content IDs</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- 여행 정보가 여기에 동적으로 삽입됩니다. -->
+    </tbody>
+</table>
+
+<script>
+    // 여행 정보를 가져오기 위한 함수
+    function fetchTripInfo() {
+        fetch('/trip/all')
+            .then(response => {
+                if (response.ok) {
+                    return response.json(); // JSON 형식으로 응답 본문을 파싱
+                }
+                throw new Error('Network response was not ok');
+            })
+            .then(data => {
+                displayTripInfo(data); // 데이터를 처리하여 테이블에 표시
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    }
+
+    // 여행 정보를 테이블에 표시하는 함수
+    function displayTripInfo(tripInfos) {
+        const tableBody = document.getElementById('tripInfoTable').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = ''; // 기존 테이블 데이터 지우기
+
+        tripInfos.forEach(tripInfo => {
+            const row = tableBody.insertRow(); // 새로운 행 추가
+
+            // Area Name
+            const areaNameCell = row.insertCell(0);
+            areaNameCell.textContent = tripInfo.areaName;
+
+            // Start Date
+            const startDateCell = row.insertCell(1);
+            startDateCell.textContent = new Date(tripInfo.startDate).toLocaleDateString();
+
+            // End Date
+            const endDateCell = row.insertCell(2);
+            endDateCell.textContent = new Date(tripInfo.endDate).toLocaleDateString();
+
+            // Content IDs
+            const contentIdsCell = row.insertCell(3);
+            contentIdsCell.textContent = tripInfo.contentIds.join(', '); // ContentId 목록을 쉼표로 구분하여 표시
+        });
+    }
+
+    // 페이지가 로드되면 여행 정보 가져오기
+    window.onload = fetchTripInfo;
+</script>
+
+</body>
+</html>

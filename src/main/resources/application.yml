@@ -64,3 +64,6 @@ jwt:
 
 api:
   key: ${API_KEY}
+
+myapp:
+  appkey: ${APP_KEY}

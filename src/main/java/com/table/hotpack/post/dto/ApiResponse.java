@@ -1,5 +1,8 @@
-package com.table.hotpack.dto;
+package com.table.hotpack.post.dto;
 
+import lombok.Data;
+
+@Data
 public class ApiResponse {
     private String title;
     private String tel;
@@ -7,18 +10,22 @@ public class ApiResponse {
     private String firstimage;
     private String mapx;
     private String mapy;
+    private String contentid;
+    private String btitle;
+    private String author;
 
     // 기본 생성자
     public ApiResponse() {}
 
     // 파라미터화된 생성자
-    public ApiResponse(String title, String tel, String addr1, String firstimage, String mapx, String mapy) {
+    public ApiResponse(String title, String tel, String addr1, String firstimage, String mapx, String mapy,String contentid) {
         this.title = title;
         this.tel = tel;
         this.addr1 = addr1;
         this.firstimage = firstimage;
         this.mapx = mapx;
         this.mapy = mapy;
+        this.contentid=contentid;
     }
 
     // Getter 및 Setter 메소드
@@ -40,6 +47,9 @@ public class ApiResponse {
     public String getMapy() { return mapy; }
     public void setMapy(String mapy) { this.mapy = mapy; }
 
+    public String getContentId() { return contentid; }
+    public void setContentId(String contentid) { this.contentid = contentid; }
+
 
     @Override
     public String toString() {
@@ -50,6 +60,8 @@ public class ApiResponse {
                 ", firstimage='" + firstimage + '\'' +
                 ", mapx='" + mapx + '\'' +
                 ", mapy='" + mapy + '\'' +
+                ", contentid='" + contentid + '\''+
                 '}';
     }
+
 }

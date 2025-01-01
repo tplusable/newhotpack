@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Trip Information</title>
+</head>
+<body>
+<h1>Edit Trip Information</h1>
+
+<form th:action="@{/trip/update/{id}(id=${tripInfo.id})}" method="post">
+  <div>
+    <label for="areaName">Area Name:</label>
+    <input type="text" id="areaName" name="areaName" th:value="${tripInfo.areaName}" required>
+  </div>
+  <div>
+    <label for="startDate">Start Date:</label>
+    <input type="date" id="startDate" name="startDate" th:value="${tripInfo.startDate}" required>
+  </div>
+  <div>
+    <label for="endDate">End Date:</label>
+    <input type="date" id="endDate" name="endDate" th:value="${tripInfo.endDate}" required>
+  </div>
+  <div>
+    <label for="contentIdsByDate">Content IDs by Date:</label>
+    <!-- Content ID 입력을 위한 부분 추가 -->
+    <textarea id="contentIdsByDate" name="contentIdsByDate" th:value="${tripInfo.contentIds}" required></textarea>
+  </div>
+  <button type="submit">Update</button>
+</form>
+
+<br>
+<a href="/trip/all">Back to Trip Info List</a>
+</body>
+</html>

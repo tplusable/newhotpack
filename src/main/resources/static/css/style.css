@@ -143,7 +143,20 @@ main {
   padding: 10px 15px;
   border: none;
   border-radius: 5px;
-  background-color: #27ae60; /* Green for add button */
+  background-color: #3498db; /* Green for add button */
+  color: white;
+  cursor: pointer;
+}
+
+.item-content .delete-button {
+  position: absolute;
+  right: 10px; /* 오른쪽으로 10px 여백 */
+  top: 50%; /* 세로 중앙 정렬 */
+  transform: translateY(-50%); /* 세로 중앙 정렬을 위한 변환 */
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: #cb67a4; /* Green for add button */
   color: white;
   cursor: pointer;
 }
@@ -156,7 +169,7 @@ main {
 }
 
 .item-content .add-button:hover {
-  background-color: #218838; /* Darker green on hover */
+  background-color: #1b6b99; /* Darker green on hover */
 }
 
 /*커스텀 박스*/
