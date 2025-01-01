@@ -1,7 +1,9 @@
 package com.table.hotpack.controller;
 
+import com.table.hotpack.dto.ReplyLikeResponse;
 import com.table.hotpack.service.UserService;
 import lombok.extern.log4j.Log4j2;
+import okhttp3.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -24,6 +26,7 @@ import com.table.hotpack.service.ReplyService;
 import lombok.RequiredArgsConstructor;
 
 import java.security.Principal;
+import java.util.List;
 
 @Log4j2
 @RestController
@@ -80,6 +83,25 @@ public class ReplyController {
     public ResponseEntity<Void> deleteReply(@PathVariable Long replyId) {
         replyService.deleteReply(replyId);
         return ResponseEntity.noContent().build();
+    }
+
+    // 댓글 추천 토글
+    @PostMapping("/{replyId}/like")
+    public ResponseEntity<ReplyLikeResponse> toggleLike(
+            @PathVariable Long replyId,
+            Principal principal) {
+
+        if (principal == null || principal.getName() == null) {
+            throw new IllegalArgumentException("로그인이 필요합니다.");
+        }
+        ReplyLikeResponse response=replyService.toggleLike(replyId, principal.getName());
+        return ResponseEntity.ok(response); // 업데이트된 추천 수 반환
+    }
+
+    @GetMapping("/{replyId}/likers")
+    public ResponseEntity<List<String>> getLikers(@PathVariable Long replyId) {
+        List<String> likers=replyService.getLikers(replyId);
+        return ResponseEntity.ok(likers);
     }
 
 }

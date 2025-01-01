@@ -2,11 +2,14 @@ package com.table.hotpack.service;
 
 import com.table.hotpack.domain.Article;
 import com.table.hotpack.domain.Reply;
+import com.table.hotpack.domain.ReplyLike;
 import com.table.hotpack.domain.User;
 import com.table.hotpack.dto.AddReplyRequest;
+import com.table.hotpack.dto.ReplyLikeResponse;
 import com.table.hotpack.dto.ReplyResponse;
 import com.table.hotpack.dto.UpdateReplyRequest;
 import com.table.hotpack.repository.ArticleRepository;
+import com.table.hotpack.repository.ReplyLikeRepository;
 import com.table.hotpack.repository.ReplyRepository;
 import com.table.hotpack.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +42,9 @@ class ReplyServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private ReplyLikeRepository replyLikeRepository;
 
     private Article article;
     private User user;
@@ -140,6 +146,41 @@ class ReplyServiceImplTest {
         replyService.deleteReply(reply.getReplyId());
         //then
         verify(replyRepository, times(1)).delete(reply);
+    }
+
+    @Test
+    void toggleLike_ShouldAddLike_WhenNotLiked() {
+        //given
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(replyRepository.findById(reply.getReplyId())).thenReturn(Optional.of(reply));
+        when(replyLikeRepository.findByReplyAndUser(reply, user)).thenReturn(Optional.empty());
+        when(replyLikeRepository.countByReply(reply)).thenReturn(1);
+        when(replyLikeRepository.existsByReplyAndUser(reply, user)).thenReturn(true);
+        //when
+        ReplyLikeResponse result = replyService.toggleLike(reply.getReplyId(), user.getEmail());
+        //then
+        assertThat(result.getReplyId()).isEqualTo(reply.getReplyId());
+        assertThat(result.getTotalLikes()).isEqualTo(1);
+        assertThat(result.isLiked()).isTrue();
+        verify(replyLikeRepository, times(1)).save(any(ReplyLike.class));
+    }
+
+    @Test
+    void getLikers_ShouldReturnListOfUsernames() {
+        //given
+        ReplyLike replyLike1 = ReplyLike.builder().reply(reply).user(user).build();
+        User anotherUser= User.builder().email("another@test.com").nickname("AnotherUser").build();
+        ReplyLike replyLike2 = ReplyLike.builder().reply(reply).user(anotherUser).build();
+
+        when(replyRepository.findById(reply.getReplyId())).thenReturn(Optional.of(reply));
+        when(replyLikeRepository.findAllReply(reply)).thenReturn(List.of(replyLike1, replyLike2));
+
+        //when
+        List<String> likers=replyService.getLikers(reply.getReplyId());
+
+        //then
+        assertThat(likers).containsExactly(user.getNickname(), anotherUser.getNickname());
+        verify(replyLikeRepository, times(1)).findAllReply(reply);
     }
 
 }
