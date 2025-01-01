@@ -61,12 +61,11 @@
           th:attr="data-mapx=${item['mapx'] != null ? item['mapx'] : '126.570667'},
                      data-mapy=${item['mapy'] != null ? item['mapy'] : '33.450701'},
                      data-title=${item['title'] != null ? item['title'] : 'No Title'},
-                      data-image=${item['firstimage'] != null ? item['firstimage'] : '/img/null.jpeg'},
+                      data-image=${item['firstimage'] != null ? item['firstimage'] : '/img/logo.png'},
                       data-content=${item['contentid'] != null ? item['contentid'] : 'No Id'}">
         <div class="item-content">
-          <img th:src="${item['firstimage'] != null ? item['firstimage'] : '/img/null.jpeg'}" alt="이미지" />
+          <img th:src="${item['firstimage'] != null ? item['firstimage'] : '/img/logo.png'}" alt="이미지" />
           <span th:text="${item['title'] != null ? item['title'] : 'No Title'}"></span>
-          <span th:text="${item['contentid'] != null ? item['contentid'] : 'No Title'}"></span>
           <button class="add-button">+</button>
         </div>
       </ul>

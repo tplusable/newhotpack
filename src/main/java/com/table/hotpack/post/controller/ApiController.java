@@ -126,7 +126,7 @@ public class ApiController {
                     String mapy = item.path("mapy").asText();
                     String contentid = item.path("contentid").asText();
                     if (firstimage == null || firstimage.isEmpty()) {
-                        firstimage = "/img/null.jpeg"; // 기본 이미지로 설정
+                        firstimage = "/img/logo.png"; // 기본 이미지로 설정
                     }
 
                     touristList.add(Map.of(
