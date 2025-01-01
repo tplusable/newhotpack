@@ -26,11 +26,24 @@ public class TripInfoDto {
         this.startDate = tripInfo.getStartDate();
         this.endDate = tripInfo.getEndDate();
 
-        // contentIds를 날짜별로 그룹화하여 Map 형태로 변환
+       /* // contentIds를 날짜별로 그룹화하여 Map 형태로 변환
         this.contentIdsByDate = tripInfo.getContentIds().stream()
                 .collect(java.util.stream.Collectors.groupingBy(
                         contentId -> contentId.getDayIndex(),
                         java.util.stream.Collectors.mapping(contentId -> contentId.getContentId(), java.util.stream.Collectors.toList())
+                ));*/
+
+        // contentIds를 날짜별로 그룹화하고 중복을 제거한 dayIndex 생성
+        this.contentIdsByDate = tripInfo.getContentIds().stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        contentId -> contentId.getDayIndex(), // dayIndex를 키로 사용
+                        java.util.stream.Collectors.mapping(
+                                contentId -> contentId.getContentId(),
+                                java.util.stream.Collectors.toList()
+                        )
                 ));
+
+
     }
+
 }

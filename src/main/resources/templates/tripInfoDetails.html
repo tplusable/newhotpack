@@ -21,6 +21,26 @@
           <p class="card-text" th:text="'여행 지역: ' + ${tripInfo.areaName}">여행 지역</p>
           <p class="card-text" th:text="'시작일: ' + ${tripInfo.startDate}">시작일</p>
           <p class="card-text" th:text="'종료일: ' + ${tripInfo.endDate}">종료일</p>
+          <!-- 날짜별 Content IDs -->
+          <h2>날짜별 콘텐츠 정보</h2>
+          <ul>
+            <li th:each="content : ${contentByDateList}">
+              <strong th:text="'날짜: ' + ${content.date}"></strong>
+              <ul>
+                <li th:each="contentId : ${content.contentIds}">
+                  콘텐츠 ID: <span th:text="${contentId}"></span>
+                </li>
+              </ul>
+            </li>
+          </ul>
+
+          <!-- 고유 날짜 리스트 -->
+          <h2>여행 날짜 목록</h2>
+          <ul>
+            <li th:each="date : ${uniqueDates}">
+              <span th:text="'날짜: ' + ${date}"></span>
+            </li>
+          </ul>
           <p class="card-text" th:text="'콘텐츠 ID 목록: ' + ${tripInfo.contentIdsByDate}">콘텐츠 ID 목록</p>
           <!-- 뒤로 가기 버튼 -->
           <a href="/trip/view/all" class="btn btn-secondary">목록으로 돌아가기</a>

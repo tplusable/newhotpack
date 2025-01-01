@@ -8,7 +8,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Controller
@@ -43,8 +46,30 @@ public class TripViewController {
             tripInfoDto.setAreaName("정보 없음");
         }
 
-        // model에 tripInfoDto 추가
+        List<Map<String, Object>> contentByDateList = tripInfoDto.getContentIdsByDate().entrySet().stream()
+                .map(entry -> {
+                    Map<String, Object> map = new java.util.HashMap<>();
+                    map.put("date", entry.getKey());
+                    map.put("contentIds", entry.getValue());
+                    return map;
+                })
+                .collect(java.util.stream.Collectors.toList());
+
+        contentByDateList.sort((entry1, entry2) -> {
+            String date1 = (String) entry1.get("date");
+            String date2 = (String) entry2.get("date");
+            int day1 = Integer.parseInt(date1.replaceAll("\\D", "")); // 숫자만 추출
+            int day2 = Integer.parseInt(date2.replaceAll("\\D", "")); // 숫자만 추출
+            return Integer.compare(day1, day2); // 숫자 비교
+        });
+        // 예시 contentId
+
+
+        // Model에 추가
         model.addAttribute("tripInfo", tripInfoDto);
+        model.addAttribute("areaName", tripInfoDto.getAreaName() != null ? tripInfoDto.getAreaName() : "정보 없음");
+        model.addAttribute("contentByDateList", contentByDateList);
+
 
         // "tripInfoDetails" 페이지로 이동
         return "tripInfoDetails";

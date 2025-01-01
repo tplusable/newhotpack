@@ -28,7 +28,7 @@ public class ApiResponse {
         this.contentid=contentid;
     }
 
-    // Getter 및 Setter 메소드
+    /*// Getter 및 Setter 메소드
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
 
@@ -45,7 +45,7 @@ public class ApiResponse {
     public void setMapx(String mapx) { this.mapx = mapx; }
 
     public String getMapy() { return mapy; }
-    public void setMapy(String mapy) { this.mapy = mapy; }
+    public void setMapy(String mapy) { this.mapy = mapy; }*/
 
     public String getContentId() { return contentid; }
     public void setContentId(String contentid) { this.contentid = contentid; }
