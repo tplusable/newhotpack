@@ -77,6 +77,41 @@ const token = localStorage.getItem("access_token");
 // 버튼, 표시 요소 가져오기
 const recommendButton = document.getElementById('recommend-btn');
 const recommendCount = document.getElementById('recommend-count');
+const articleId = document.getElementById('article-id').value;
+
+window.addEventListener('DOMContentLoaded', () => {
+
+  // GET /api/articles/{id} (또는 /recommend/status 같은 API)로
+  // 이미 추천했는지 여부와 현재 추천수를 받아옴
+  fetch(`/api/articles/${articleId}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      // 401 등 → 토큰 만료 or 미인증
+      return response.text().then(msg => { throw new Error(msg); });
+    }
+    return response.json();
+  })
+  .then(data => {
+    // 예: { id: 123, title: "...", recommendCount: 5, recommended: true/false }
+    if (data.recommendCount !== undefined) {
+      recommendCount.textContent = data.recommendCount;
+    }
+    if (data.recommended === true) {
+      recommendButton.classList.add('recommended');
+    } else {
+      recommendButton.classList.remove('recommended');
+    }
+  })
+  .catch(error => {
+    console.error('추천 상태 불러오기 실패:', error);
+    // 로그인 유도 or 에러 안내
+  });
+});
 
 // 버튼이 존재할 경우 이벤트 리스너 등록
 if (recommendButton) {
@@ -87,9 +122,6 @@ if (recommendButton) {
       alert('로그인이 필요합니다.');
       return;  // 함수 종료, fetch 요청을 하지 않음
     }
-
-    // 게시글 ID 가져오기
-    const articleId = document.getElementById('article-id').value;
 
     // POST 요청: /api/articles/{id}/recommend
     fetch(`/api/articles/${articleId}/recommend`, {

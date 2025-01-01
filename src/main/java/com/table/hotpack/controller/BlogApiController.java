@@ -3,6 +3,7 @@ package com.table.hotpack.controller;
 import com.table.hotpack.domain.Article;
 import com.table.hotpack.domain.User;
 import com.table.hotpack.dto.*;
+import com.table.hotpack.repository.RecommendRepository;
 import com.table.hotpack.service.BlogService;
 import com.table.hotpack.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class BlogApiController {
 
     private final BlogService blogService;
     private final UserService userService;
+    private final RecommendRepository recommendRepository;
 
     @PostMapping("/api/articles")
     public ResponseEntity<Article> addArticle(@RequestBody AddArticleRequest request, Principal principal) {
@@ -31,23 +33,33 @@ public class BlogApiController {
                 .body(savedArticle);
     }
 
-    @GetMapping("/api/articles")
-    public ResponseEntity<List<ArticleResponse>> findAllArticles() {
-        List<ArticleResponse> articles = blogService.findAll()
-                .stream()
-                .map(ArticleResponse::new)
-                .toList();
-
-        return ResponseEntity.ok()
-                .body(articles);
-    }
+//    @GetMapping("/api/articles")
+//    public ResponseEntity<List<ArticleResponse>> findAllArticles() {
+//        List<ArticleResponse> articles = blogService.findAll()
+//                .stream()
+//                .map(ArticleResponse::new)
+//                .toList();
+//
+//        return ResponseEntity.ok()
+//                .body(articles);
+//    }
 
     @GetMapping("/api/articles/{id}")
-    public ResponseEntity<ArticleResponse> findArticle(@PathVariable("id") long id) {
+    public ResponseEntity<ArticleResponse> findArticle(@PathVariable("id") long id, Principal principal) {
         Article article = blogService.findById(id);
 
+        int recommendCount = recommendRepository.countByArticle(article);
+
+        boolean recommended = false;
+        if (principal != null) {
+            User user = userService.findByEmail(principal.getName());
+            if (user != null) {
+                recommended = recommendRepository.findByArticleAndUser(article, user).isPresent();
+            }
+        }
+
         return ResponseEntity.ok()
-                .body(new ArticleResponse(article));
+                .body(new ArticleResponse(article, recommendCount, recommended));
     }
 
     @DeleteMapping("/api/articles/{id}")
