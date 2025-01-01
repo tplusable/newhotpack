@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <header
+            th:fragment="header"
+            style="display: flex;
+             align-items: center;
+             justify-content: space-between;
+             padding: 0 20px;">
+
+        <!-- 왼쪽 로고, HOTPACK 묶음 -->
+        <div style="display: flex; align-items: center;">
+            <div class="logo">
+                <img src="/img/logo.png" alt="로고" style="height: 40px;" />
+            </div>
+            <h2 style="color: black; font-size: 24px; margin-left: 10px;">HOTPACK</h2>
+        </div>
+
+        <!-- 가운데 메뉴(nav) -->
+        <nav style="display: flex; gap: 20px;">
+            <a href="/" style="text-decoration: none; color: black;">홈</a>
+            <a href="/getAreaList" style="text-decoration: none; color: black;">계획 만들기</a>
+            <a href="/articles" style="text-decoration: none; color: black;">계획보기</a>
+        </nav>
+
+        <!-- 오른쪽 인증(로그인/회원가입) 버튼 영역 -->
+        <div id="auth-buttons" class="auth-buttons">
+            <!-- JavaScript가 동적으로 내용 변경 -->
+        </div>
+    </header>
+</html>
