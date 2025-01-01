@@ -22,7 +22,7 @@ function loadReplies(page = 0) {
 //            const formattedDate= reply.createAt ? new Date(reply.createdAt).toLocaleString() : "invalidDate"
             replyElement.className = 'border p-3 mb-2';
             replyElement.innerHTML = `
-                <p id="comment-text-${reply.replyId}">${reply.reply}</p>
+                <p id="reply-text-${reply.replyId}">${reply.reply}</p>
                 <small class="text-muted">${reply.replyer} | ${new Date(reply.createdAt).toLocaleString()}</small>
                 <div>
                     <button class="btn btn-link btn-sm text-primary" onclick="editReply(${reply.replyId}, '${reply.reply}')">수정</button>
@@ -76,19 +76,77 @@ document.getElementById('submit-reply').addEventListener('click', () => {
 
 // 댓글 수정 함수
 window.editReply = (replyId, currentContent) => {
-    const newContent = prompt('댓글을 수정하세요:', currentContent);
-    if (newContent !== null && newContent.trim()) {
+    const replyText = document.getElementById(`reply-text-${replyId}`);
+    const editButton = document.querySelector(`button[onclick="editReply(${replyId}, '${currentContent}')"]`);
+    const deleteButton = document.querySelector(`button[onclick="deleteReply(${replyId})"]`);
+
+    // 이미 수정 중이면 return
+    if (editButton.textContent === "수정완료") return;
+
+    // 댓글 텍스트를 텍스트 박스로 변경
+    const textarea = document.createElement('textarea');
+    textarea.className = "form-control mb-2";
+    textarea.value = currentContent;
+    textarea.id = `textarea-${replyId}`;
+
+    replyText.replaceWith(textarea);
+
+    // "수정" 버튼을 "수정완료" 버튼으로 변경
+    editButton.textContent = "수정완료";
+    deleteButton.style.display = "none"; // 삭제 버튼 숨김
+
+    // 수정 완료 버튼 클릭 이벤트 추가
+    const onEditComplete = () => {
+        const newContent = textarea.value.trim();
+        if (!newContent) {
+            alert("댓글 내용을 입력하세요.");
+            return;
+        }
+
         const body = JSON.stringify({ reply: newContent });
         const url = `/api/replies/${replyId}`;
 
+        // HTTP 요청
         httpRequest('PUT', url, body, () => {
             alert('댓글이 수정되었습니다.');
-            loadReplies(currentPage);
+
+            // 텍스트 영역을 원래 텍스트로 되돌림
+            const updatedReply = document.createElement('p');
+            updatedReply.id = `comment-text-${replyId}`;
+            updatedReply.textContent = newContent;
+
+            textarea.replaceWith(updatedReply);
+
+            // 버튼 원래 상태로 복구
+            editButton.textContent = "수정";
+            deleteButton.style.display = "inline"; // 삭제 버튼 다시 표시
+
+            // 수정 완료 후 이벤트 리스너 제거
+            editButton.removeEventListener('click', onEditComplete);
         }, () => {
             alert('댓글 수정에 실패했습니다.');
         });
-    }
+    };
+
+    // 수정 완료 버튼 클릭 시 동작 추가
+    editButton.addEventListener('click', onEditComplete);
 };
+
+//// 댓글 수정 함수
+//window.editReply = (replyId, currentContent) => {
+//    const newContent = prompt('댓글을 수정하세요:', currentContent);
+//    if (newContent !== null && newContent.trim()) {
+//        const body = JSON.stringify({ reply: newContent });
+//        const url = `/api/replies/${replyId}`;
+//
+//        httpRequest('PUT', url, body, () => {
+//            alert('댓글이 수정되었습니다.');
+//            loadReplies(currentPage);
+//        }, () => {
+//            alert('댓글 수정에 실패했습니다.');
+//        });
+//    }
+//};
 
 // 댓글 삭제 함수
 window.deleteReply = (replyId) => {
