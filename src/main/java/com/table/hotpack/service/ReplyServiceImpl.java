@@ -2,11 +2,11 @@ package com.table.hotpack.service;
 
 import com.table.hotpack.domain.Article;
 import com.table.hotpack.domain.Reply;
+import com.table.hotpack.domain.ReplyLike;
 import com.table.hotpack.domain.User;
-import com.table.hotpack.dto.AddReplyRequest;
-import com.table.hotpack.dto.ReplyResponse;
-import com.table.hotpack.dto.UpdateReplyRequest;
+import com.table.hotpack.dto.*;
 import com.table.hotpack.repository.ArticleRepository;
+import com.table.hotpack.repository.ReplyLikeRepository;
 import com.table.hotpack.repository.ReplyRepository;
 import com.table.hotpack.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +16,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -24,6 +28,7 @@ public class ReplyServiceImpl implements ReplyService{
     private final ReplyRepository replyRepository;
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
+    private final ReplyLikeRepository replyLikeRepository;
 
     @Override
     public Page<ReplyResponse> findRepliesByArticleId(Long articleId, Pageable pageable) {
@@ -76,6 +81,7 @@ public class ReplyServiceImpl implements ReplyService{
         replyRepository.delete(reply);
     }
 
+
     // 댓글을 작성한 유저인지 확인
     private static void authorizeReplyAuthor(Reply reply) {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -83,4 +89,43 @@ public class ReplyServiceImpl implements ReplyService{
             throw new IllegalArgumentException("not authorized");
         }
     }
+
+    // 추천 토글
+    public ReplyLikeResponse toggleLike(Long replyId, String username) {
+        User user =userRepository.findByEmail(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Reply reply = replyRepository.findById(replyId)
+                .orElseThrow(() -> new IllegalArgumentException("Reply not found"));
+
+        Optional<ReplyLike> existingLike = replyLikeRepository.findByReplyAndUser(reply, user);
+        if (existingLike.isPresent()) {
+            // 추천 취소
+            replyLikeRepository.delete(existingLike.get());
+        } else {
+            //추천 추가
+            ReplyLike newLike= ReplyLike.builder()
+                    .reply(reply)
+                    .user(user)
+                    .build();
+            replyLikeRepository.save(newLike);
+        }
+
+        int totalLikes=replyLikeRepository.countByReply(reply);
+        boolean liked=replyLikeRepository.existsByReplyAndUser(reply, user);
+
+        return ReplyLikeResponse.builder()
+                .replyId(replyId)
+                .totalLikes(totalLikes)
+                .liked(liked)
+                .build();
+    }
+
+    public List<String> getLikers(Long replyId) {
+        Reply reply=replyRepository.findById(replyId)
+                .orElseThrow(() -> new IllegalArgumentException("Reply not found"));
+        return replyLikeRepository.findAllReply(reply).stream()
+                .map(rl->rl.getUser().getNickname())
+                .collect(Collectors.toList());
+    }
+
 }

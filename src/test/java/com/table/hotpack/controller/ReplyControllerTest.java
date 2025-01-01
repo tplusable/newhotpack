@@ -1,10 +1,9 @@
 package com.table.hotpack.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.table.hotpack.dto.AddReplyRequest;
-import com.table.hotpack.dto.ReplyResponse;
-import com.table.hotpack.dto.UpdateReplyRequest;
+import com.table.hotpack.dto.*;
 import com.table.hotpack.service.ReplyService;
+import com.table.hotpack.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -40,7 +39,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ReplyControllerTest {
 
     private ReplyController replyController;
+
+    @Mock
     private ReplyService replyService;
+
+    @Mock
+    private UserService userService;
+
     private ObjectMapper objectMapper;
 
     private ReplyResponse replyResponse;
@@ -48,14 +53,14 @@ class ReplyControllerTest {
     @BeforeEach
     void setUp() {
         replyService= Mockito.mock(ReplyService.class);
-        replyController = new ReplyController(replyService);
+        replyController = new ReplyController(replyService, userService);
         objectMapper = new ObjectMapper();
 
         replyResponse=ReplyResponse.builder()
                 .replyId(1L)
                 .reply("testcontroller")
                 .replyer("testUser")
-                .createAt(LocalDateTime.of(2024,12,30,15,30,0))
+                .createdAt(LocalDateTime.of(2024,12,30,15,30,0))
                 .build();
     }
 
@@ -112,6 +117,48 @@ class ReplyControllerTest {
         //then
         assertThat(response.getStatusCodeValue()).isEqualTo(204);
         verify(replyService, times(1)).deleteReply(eq(1L));
+    }
+
+    @Test
+    void toggleLike_ShouldToggleReplyLike() {
+        //given
+        Long replyId=1L;
+        String principalName="testUser";
+        Principal mockPrincipal=mock(Principal.class);
+        when(mockPrincipal.getName()).thenReturn(principalName);
+
+        ReplyLikeResponse replyLikeResponse = ReplyLikeResponse.builder()
+                .replyId(replyId)
+                .totalLikes(5)
+                .liked(true)
+                .build();
+
+        when(replyService.toggleLike(replyId, principalName)).thenReturn(replyLikeResponse);
+        //when
+        ResponseEntity<ReplyLikeResponse> response=replyController.toggleLike(replyId, mockPrincipal);
+        //then
+        assertThat(response.getStatusCodeValue()).isEqualTo(200);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getReplyId()).isEqualTo(replyId);
+        assertThat(response.getBody().getTotalLikes()).isEqualTo(5);
+        assertThat(response.getBody().isLiked()).isTrue();
+        verify(replyService, times(1)).toggleLike(replyId,principalName);
+    }
+
+    @Test
+    void getLikers_ShouldReturnListOfLikers() {
+        //given
+        Long replyId=1L;
+        List<String> likers =List.of("testUser", "AnotherUser");
+
+        when(replyService.getLikers(replyId)).thenReturn(likers);
+        //when
+        ResponseEntity<List<String>> response=replyController.getLikers(replyId);
+        //then
+        assertThat(response.getStatusCodeValue()).isEqualTo(200);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody()).containsExactly("testUser", "AnotherUser");
+        verify(replyService,times(1)).getLikers(replyId);
     }
 
 }

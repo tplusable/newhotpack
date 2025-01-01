@@ -25,6 +25,13 @@ function loadReplies(page = 0) {
                 <p id="reply-text-${reply.replyId}">${reply.reply}</p>
                 <small class="text-muted">${reply.replyer} | ${new Date(reply.createdAt).toLocaleString()}</small>
                 <div>
+                    <button class="btn btn-link btn-sm text-primary" id="like-button-${reply.replyId}" onclick="toggleLike(${reply.replyId})">
+                        ${reply.liked ? '❤️ 추천 취소' : '🤍 추천'}
+                    </button>
+                    <span id="like-count-${reply.replyId}">추천 수: ${reply.totalLikes}</span>
+                    <button class="btn btn-link btn-sm text-info" onclick="showLikers(${reply.replyId})">추천자 목록</button>
+                </div>
+                <div>
                     <button class="btn btn-link btn-sm text-primary" onclick="editReply(${reply.replyId}, '${reply.reply}')">수정</button>
                     <button class="btn btn-link btn-sm text-danger" onclick="deleteReply(${reply.replyId})">삭제</button>
                 </div>
@@ -112,7 +119,7 @@ window.editReply = (replyId, currentContent) => {
 
             // 텍스트 영역을 원래 텍스트로 되돌림
             const updatedReply = document.createElement('p');
-            updatedReply.id = `comment-text-${replyId}`;
+            updatedReply.id = `reply-text-${replyId}`;
             updatedReply.textContent = newContent;
 
             textarea.replaceWith(updatedReply);
