@@ -81,36 +81,52 @@ const articleId = document.getElementById('article-id').value;
 
 window.addEventListener('DOMContentLoaded', () => {
 
-  // GET /api/articles/{id} (또는 /recommend/status 같은 API)로
-  // 이미 추천했는지 여부와 현재 추천수를 받아옴
-  fetch(`/api/articles/${articleId}`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`
+    const authorEmail = document.querySelector('#author').value;
+
+    // JWT에서 현재 사용자 이메일 추출
+    const token = localStorage.getItem('access_token');
+    const decodedToken = JSON.parse(atob(token.split('.')[1]));
+    const currentUserEmail = decodedToken.sub; // JWT의 sub 필드를 사용해 이메일 추출
+
+    // 수정/삭제 버튼 처리
+    const modifyButton = document.getElementById('modify-btn');
+    const deleteButton = document.getElementById('delete-btn');
+
+    if (authorEmail == currentUserEmail) { // 작성자가 아니면 버튼 숨기기
+    modifyButton.style.display = 'block';
+    deleteButton.style.display = 'block';
     }
-  })
-  .then(response => {
-    if (!response.ok) {
-      // 401 등 → 토큰 만료 or 미인증
-      return response.text().then(msg => { throw new Error(msg); });
-    }
+
+    // GET /api/articles/{id}로
+    // 이미 추천했는지 여부와 현재 추천수를 받아옴
+    fetch(`/api/articles/${articleId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+          // 401 등 → 토큰 만료 or 미인증
+          return response.text().then(msg => { throw new Error(msg); });
+        }
     return response.json();
-  })
-  .then(data => {
-    // 예: { id: 123, title: "...", recommendCount: 5, recommended: true/false }
-    if (data.recommendCount !== undefined) {
-      recommendCount.textContent = data.recommendCount;
-    }
-    if (data.recommended === true) {
-      recommendButton.classList.add('recommended');
-    } else {
-      recommendButton.classList.remove('recommended');
-    }
-  })
-  .catch(error => {
-    console.error('추천 상태 불러오기 실패:', error);
-    // 로그인 유도 or 에러 안내
-  });
+    })
+    .then(data => {
+        // 예: { id: 123, title: "...", recommendCount: 5, recommended: true/false }
+        if (data.recommendCount !== undefined) {
+          recommendCount.textContent = data.recommendCount;
+        }
+        if (data.recommended === true) {
+          recommendButton.classList.add('recommended');
+        } else {
+          recommendButton.classList.remove('recommended');
+        }
+    })
+    .catch(error => {
+        console.error('추천 상태 불러오기 실패:', error);
+        // 로그인 유도 or 에러 안내
+    });
 });
 
 // 버튼이 존재할 경우 이벤트 리스너 등록
