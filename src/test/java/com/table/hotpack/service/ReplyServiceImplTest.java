@@ -111,7 +111,7 @@ class ReplyServiceImplTest {
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(replyRepository.save(any(Reply.class))).thenReturn(reply);
         //when
-        ReplyResponse result= replyService.addReply(request);
+        ReplyResponse result= replyService.addReply(request, user.getUsername());
         //then
         assertThat(result.getReply()).isEqualTo("testnewreply");
         verify(articleRepository, times(1)).findById(article.getId());

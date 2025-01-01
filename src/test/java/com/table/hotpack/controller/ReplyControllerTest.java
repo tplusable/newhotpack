@@ -21,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -76,13 +77,17 @@ class ReplyControllerTest {
     void addReply_ShouldCreateReply() {
         //given
         AddReplyRequest request=new AddReplyRequest(1L, 1L, "newcontrollerreplytest");
-        when(replyService.addReply(any(AddReplyRequest.class))).thenReturn(replyResponse);
+        String principalName="testUser";
+        Principal mockPrincipal = mock(Principal.class);
+        when(mockPrincipal.getName()).thenReturn(principalName);
+        when(replyService.addReply(any(AddReplyRequest.class), eq(principalName))).thenReturn(replyResponse);
         //when
-        ResponseEntity<ReplyResponse> response=replyController.addReply(request);
+        ResponseEntity<ReplyResponse> response=replyController.addReply(request, mockPrincipal);
         //then
-        assertThat(response.getStatusCodeValue()).isEqualTo(200);
+        assertThat(response.getStatusCodeValue()).isEqualTo(201);
+        assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getReply()).isEqualTo("testcontroller");
-        verify(replyService, times(1)).addReply(any(AddReplyRequest.class));
+        verify(replyService, times(1)).addReply(any(AddReplyRequest.class), eq(principalName));
     }
 
     @Test

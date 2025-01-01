@@ -1,18 +1,32 @@
 package com.table.hotpack.domain;
 
-import jakarta.persistence.*;
-import lombok.*;
+import java.time.LocalDateTime;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
-import java.util.Date;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name="reply")
+@EntityListeners(AuditingEntityListener.class)
 public class Reply {
 
     @Id
@@ -32,7 +46,7 @@ public class Reply {
 
     @LastModifiedDate
     @Column
-    private LocalDateTime updateAt;
+    private LocalDateTime updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "article_id")
@@ -41,6 +55,10 @@ public class Reply {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    // email이 저장되는 필드
+    @Column(name = "author", nullable = false)
+    private String author;
 
     public void update(String reply) {
         this.reply= reply;
