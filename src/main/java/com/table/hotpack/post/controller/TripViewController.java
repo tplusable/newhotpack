@@ -39,16 +39,22 @@ public class TripViewController {
 
 
     // 모든 여행 정보 리스트 페이지
-    @GetMapping("/all")
-    public String viewAllTripInfos(Model model) {
-        List<TripInfoDto> tripInfos = tripInfoService.getAllTripInfos().stream()
-                .map(TripInfoDto::new)
-                .toList();
-        // 수정 가능한 리스트로 복사하여 정렬
-        List<TripInfoDto> sortableList = new ArrayList<>(tripInfos);
-        sortableList.sort((t1, t2) -> Long.compare(t2.getId(), t1.getId())); // ID 내림차순 정렬
-        model.addAttribute("tripInfos", sortableList);
-        return "tripInfoList"; // 여행 정보 목록 뷰 페이지
+//    @GetMapping("/all")
+//    public String viewAllTripInfos(Model model) {
+//        List<TripInfoDto> tripInfos = tripInfoService.getAllTripInfos().stream()
+//                .map(TripInfoDto::new)
+//                .toList();
+//        // 수정 가능한 리스트로 복사하여 정렬
+//        List<TripInfoDto> sortableList = new ArrayList<>(tripInfos);
+//        sortableList.sort((t1, t2) -> Long.compare(t2.getId(), t1.getId())); // ID 내림차순 정렬
+//        model.addAttribute("tripInfos", sortableList);
+//        return "tripInfoList"; // 여행 정보 목록 뷰 페이지
+//    }
+
+    // 내 여행 정보 리스트 페이지
+    @GetMapping("/myTrip")
+    public String viewMyTrip() {
+        return "mytour";
     }
 
     // 특정 여행 정보 페이지

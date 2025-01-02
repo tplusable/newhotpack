@@ -55,8 +55,8 @@ public class TripInfoService {
     }
 
     // 모든 여행 정보 조회
-    public List<TripInfo> getAllTripInfos() {
-        return tripInfoRepository.findAll();
+    public List<TripInfo> getMyTripInfos(String email) {
+        return tripInfoRepository.findByAuthor(email);
     }
 
     // 여행 정보 ID로 조회 (DTO 반환)

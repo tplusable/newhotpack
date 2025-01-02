@@ -45,9 +45,9 @@ public class TripInfoController {
     }
 
     // 모든 여행 정보 조회
-    @GetMapping("/all")
-    public ResponseEntity<List<TripInfoDto>> getAllTripInfos() {
-        List<TripInfo> tripInfos = tripInfoService.getAllTripInfos();
+    @GetMapping("/myTrip")
+    public ResponseEntity<List<TripInfoDto>> getAllTripInfos(Principal principal) {
+        List<TripInfo> tripInfos = tripInfoService.getMyTripInfos(principal.getName());
         List<TripInfoDto> tripInfoDtos = tripInfos.stream()
                 .map(TripInfoDto::new)
                 .toList();
