@@ -30,17 +30,35 @@ public class ReplyServiceImpl implements ReplyService{
     private final UserRepository userRepository;
     private final ReplyLikeRepository replyLikeRepository;
 
+    private ReplyLikeResponse generateReplyLikeResponse(Reply reply) {
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(currentUsername)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        boolean liked = replyLikeRepository.existsByReplyAndUser(reply, user);
+        int totalLikeds=replyLikeRepository.countByReply(reply);
+
+        return ReplyLikeResponse.builder()
+                .replyId(reply.getReplyId())
+                .liked(liked)
+                .totalLikes(totalLikeds)
+                .build();
+    }
+
     @Override
     public Page<ReplyResponse> findRepliesByArticleId(Long articleId, Pageable pageable) {
         return replyRepository.findByArticleIdOrderByCreatedAtDesc(articleId, pageable)
-                .map(ReplyResponse::fromEntity);
+                .map(reply -> {
+                    ReplyLikeResponse replyLikeResponse=generateReplyLikeResponse(reply);
+                    return ReplyResponse.fromEntity(reply, replyLikeResponse.isLiked(), replyLikeResponse.getTotalLikes());
+                });
     }
 
     @Override
     public ReplyResponse findReplyById(Long replyId) {
         Reply reply= replyRepository.findById(replyId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
-        return ReplyResponse.fromEntity(reply);
+        ReplyLikeResponse replyLikeResponse=generateReplyLikeResponse(reply);
+        return ReplyResponse.fromEntity(reply, replyLikeResponse.isLiked(), replyLikeResponse.getTotalLikes());
     }
 
     @Override
@@ -59,7 +77,8 @@ public class ReplyServiceImpl implements ReplyService{
                 .build();
 
         replyRepository.save(reply);
-        return ReplyResponse.fromEntity(reply);
+        ReplyLikeResponse replyLikeResponse=generateReplyLikeResponse(reply);
+        return ReplyResponse.fromEntity(reply, replyLikeResponse.isLiked(), replyLikeResponse.getTotalLikes());
     }
 
     @Override
@@ -69,7 +88,9 @@ public class ReplyServiceImpl implements ReplyService{
 
         authorizeReplyAuthor(reply);
         reply.update(request.getReply());
-        return ReplyResponse.fromEntity(reply);
+
+        ReplyLikeResponse replyLikeResponse=generateReplyLikeResponse(reply);
+        return ReplyResponse.fromEntity(reply, replyLikeResponse.isLiked(), replyLikeResponse.getTotalLikes());
     }
 
     @Override
