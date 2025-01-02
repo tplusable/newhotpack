@@ -11,6 +11,7 @@ import com.table.hotpack.repository.ReplyRepository;
 import com.table.hotpack.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -146,6 +147,18 @@ public class ReplyServiceImpl implements ReplyService{
                 .orElseThrow(() -> new IllegalArgumentException("Reply not found"));
         return replyLikeRepository.findAllReply(reply).stream()
                 .map(rl->rl.getUser().getNickname())
+                .collect(Collectors.toList());
+    }
+
+    public List<ReplyResponse> findTopRepliesByLikes(Long articleId, int limit) {
+        Pageable pageable= PageRequest.of(0, limit); //limit 수 만큼 페이징
+        List<Reply> topReplies=replyRepository.findTopRepliesByLikes(articleId, pageable);
+
+        return topReplies.stream()
+                .map(reply -> {
+                    ReplyLikeResponse replyLikeResponse=generateReplyLikeResponse(reply);
+                    return ReplyResponse.fromEntity(reply, replyLikeResponse.isLiked(), replyLikeResponse.getTotalLikes());
+                })
                 .collect(Collectors.toList());
     }
 

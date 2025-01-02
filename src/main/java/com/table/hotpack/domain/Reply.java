@@ -52,6 +52,7 @@ public class Reply {
     private String author;
 
     @OneToMany(mappedBy = "reply", cascade =CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<ReplyLike> replyLikes =new ArrayList<>();
 
     public void update(String reply) {

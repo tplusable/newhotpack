@@ -161,4 +161,64 @@ class ReplyControllerTest {
         verify(replyService,times(1)).getLikers(replyId);
     }
 
+    @Test
+    void getTopRepliesByLikes_ShouldReturnTopReplies() {
+        //given
+        Long articleId=1L;
+        int limit=3;
+
+        ReplyResponse reply1 =ReplyResponse.builder()
+                .replyId(1L)
+                .reply("Top reply 1")
+                .replyer("user1")
+                .totalLikes(10)
+                .liked(true)
+                .build();
+
+        ReplyResponse reply2 =ReplyResponse.builder()
+                .replyId(2L)
+                .reply("Top reply 2")
+                .replyer("user2")
+                .totalLikes(8)
+                .liked(false)
+                .build();
+
+        ReplyResponse reply3 =ReplyResponse.builder()
+                .replyId(3L)
+                .reply("Top reply 3")
+                .replyer("user3")
+                .totalLikes(5)
+                .liked(true)
+                .build();
+
+        List<ReplyResponse> topReplies=List.of(reply1, reply2, reply3);
+
+        when(replyService.findTopRepliesByLikes(articleId, limit)).thenReturn(topReplies);
+
+        //when
+        ResponseEntity<List<ReplyResponse>> response=replyController.getTopRepliesByLikes(articleId, limit);
+
+        //then
+        assertThat(response.getStatusCodeValue()).isEqualTo(200);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody()).hasSize(3);
+
+        ReplyResponse firstReply=response.getBody().get(0);
+        assertThat(firstReply.getReply()).isEqualTo("Top reply 1");
+        assertThat(firstReply.getTotalLikes()).isEqualTo(10);
+        assertThat(firstReply.isLiked()).isTrue();
+
+        ReplyResponse secondReply = response.getBody().get(1);
+        assertThat(secondReply.getReply()).isEqualTo("Top reply 2");
+        assertThat(secondReply.getTotalLikes()).isEqualTo(8);
+        assertThat(secondReply.isLiked()).isFalse();
+
+        ReplyResponse thirdReply=response.getBody().get(2);
+        assertThat(thirdReply.getReply()).isEqualTo("Top reply 3");
+        assertThat(thirdReply.getTotalLikes()).isEqualTo(5);
+        assertThat(thirdReply.isLiked()).isTrue();
+
+        verify(replyService, times(1)).findTopRepliesByLikes(articleId, limit);
+                    }
+
 }

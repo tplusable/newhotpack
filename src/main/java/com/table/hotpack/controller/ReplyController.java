@@ -1,5 +1,6 @@
 package com.table.hotpack.controller;
 
+import com.table.hotpack.domain.Reply;
 import com.table.hotpack.dto.ReplyLikeResponse;
 import com.table.hotpack.service.UserService;
 import lombok.extern.log4j.Log4j2;
@@ -82,7 +83,7 @@ public class ReplyController {
     @DeleteMapping("/{replyId}")
     public ResponseEntity<Void> deleteReply(@PathVariable Long replyId) {
         replyService.deleteReply(replyId);
-        return ResponseEntity.noContent().build();
+            return ResponseEntity.noContent().build();
     }
 
     // 댓글 추천 토글
@@ -102,6 +103,21 @@ public class ReplyController {
     public ResponseEntity<List<String>> getLikers(@PathVariable Long replyId) {
         List<String> likers=replyService.getLikers(replyId);
         return ResponseEntity.ok(likers);
+    }
+
+    @GetMapping("/article/{articleId}/top-replies")
+    public ResponseEntity<List<ReplyResponse>> getTopRepliesByLikes(
+            @PathVariable Long articleId,
+            @RequestParam(defaultValue= "3") int limit) {
+        List<ReplyResponse> topReplies=replyService.findTopRepliesByLikes(articleId, limit);
+
+        //디버깅로그
+        topReplies.forEach(reply -> {
+            System.out.println("Reply Id: "+reply.getReplyId());
+            System.out.println("Total Likes: "+reply.getTotalLikes());
+        });
+
+        return ResponseEntity.ok(topReplies);
     }
 
 }

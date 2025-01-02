@@ -168,3 +168,37 @@ window.deleteReply = (replyId) => {
         });
     }
 };
+
+//추천 상위 댓글을 가져와서 표시하는 함수
+function loadTopReplies() {
+    fetch(`/api/replies/article/${articleId}/top-replies?limit=3`, {
+        method: 'GET',
+        headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('access_token'),
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("data:", data);
+        const topRepliesSection = document.getElementById('top-replies');
+        topRepliesSection.innerHTML = '<h4>추천 상위 댓글</h4>';
+
+        data.forEach(reply => {
+            console.log("reply: ",reply);
+            const totalLikes=reply.totalLikes || 0;
+            const replyElement = document.createElement('div');
+            replyElement.className = 'border p-3 mb-2';
+            replyElement.innerHTML = `
+                <p>${reply.reply}</p>
+                <small class="text-muted">${reply.replyer} | 추천 수: ${totalLikes}</small>
+            `;
+            topRepliesSection.appendChild(replyElement);
+        });
+    })
+    .catch(error => console.error('Error fetching top replies:', error));
+}
+
+// 페이지 로드 시 상위 댓글 불러오기
+document.addEventListener('DOMContentLoaded', () => {
+    loadTopReplies();
+});
