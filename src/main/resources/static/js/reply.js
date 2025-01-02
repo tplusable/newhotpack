@@ -1,4 +1,3 @@
-const articleId = document.getElementById('article-id').value;
 const repliesList = document.getElementById('replies-list');
 const pagination = document.getElementById('pagination');
 const replyContent = document.getElementById('reply-content');
@@ -7,7 +6,8 @@ let currentPage = 0;
 
 // 댓글 로드 함수
 function loadReplies(page = 0) {
-    fetch(`/api/replies/article/${articleId}?page=${page}&size=10`, {
+    articleId = document.getElementById('article-id').value;
+    fetch(`/replies/article/${articleId}?page=${page}&size=10`, {
         method: 'GET',
         headers: {
             Authorization: 'Bearer ' + localStorage.getItem('access_token'),
