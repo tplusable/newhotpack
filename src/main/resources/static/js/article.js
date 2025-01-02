@@ -75,8 +75,24 @@ if (modifyButton) {
 const createButton = document.getElementById('create-btn');
 
 if (createButton) {
-    // 등록 버튼을 클릭하면 /api/articles로 요청
     createButton.addEventListener('click', event => {
+        // 로그인 여부 확인
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            alert('로그인이 필요합니다.');
+            location.href = '/login'; // 로그인 페이지로 이동
+            return;
+        }
+
+        // 로그인 되어 있는 경우, 새 글 작성 페이지로 이동
+        location.href = '/new-article';
+    });
+}
+
+const createArticleButton = document.getElementById('createArticle-btn');
+if (createArticleButton) {
+    // 등록 버튼을 클릭하면 /api/articles로 요청
+    createArticleButton.addEventListener('click', event => {
         let body = JSON.stringify({
             title: document.getElementById('title').value,
             content: document.getElementById('content').value
