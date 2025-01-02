@@ -28,7 +28,7 @@ function loadReplies(page = 0) {
                     <button class="btn btn-link btn-sm text-primary" id="like-button-${reply.replyId}" onclick="toggleLike(${reply.replyId})">
                         ${reply.liked ? '❤️ 추천 취소' : '🤍 추천'}
                     </button>
-                    <span id="like-count-${reply.replyId}">추천 수: ${reply.totalLikes}</span>
+                    <span id="like-count-${reply.replyId}">추천 수: ${reply.totalLikes || 0 }</span>
                     <button class="btn btn-link btn-sm text-info" onclick="showLikers(${reply.replyId})">추천자 목록</button>
                 </div>
                 <div>
