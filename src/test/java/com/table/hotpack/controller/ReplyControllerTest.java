@@ -219,6 +219,6 @@ class ReplyControllerTest {
         assertThat(thirdReply.isLiked()).isTrue();
 
         verify(replyService, times(1)).findTopRepliesByLikes(articleId, limit);
-                    }
+    }
 
 }

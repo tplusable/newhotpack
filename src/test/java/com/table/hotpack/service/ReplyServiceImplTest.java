@@ -26,6 +26,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.security.Security;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -118,6 +119,27 @@ class ReplyServiceImplTest {
         assertThat(result.getContent().get(0).getReply()).isEqualTo("testreply");
         verify(replyRepository, times(1)).findByArticleIdWithPaging(reply.getReplyId(), pagable);
 
+    }
+
+    @Test
+    void findRepliesByArticleId_ShouldWorkNotLoggedIn() {
+        //given
+        PageRequest pageable=PageRequest.of(0,10);
+        Page<Reply> replies = new PageImpl<>(List.of(reply));
+        when(replyRepository.findByArticleIdOrderByCreatedAtDesc(article.getId(), pageable)).thenReturn(replies);
+        when(replyLikeRepository.countByReply(reply)).thenReturn(5);
+
+        //SecurityContextHolder를 비워 비로그인 상태를 시뮬레이션
+        SecurityContextHolder.clearContext();
+
+        //when
+        Page<ReplyResponse> result = replyService.findRepliesByArticleId(article.getId(), pageable);
+
+        //then
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getReply()).isEqualTo(reply.getReply());
+        assertThat(result.getContent().get(0).getTotalLikes()).isEqualTo(5);
+        assertThat(result.getContent().get(0).isLiked()).isFalse();
     }
 
     @Test

@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,17 +33,25 @@ public class ReplyServiceImpl implements ReplyService{
     private final ReplyLikeRepository replyLikeRepository;
 
     private ReplyLikeResponse generateReplyLikeResponse(Reply reply) {
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByEmail(currentUsername)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        boolean liked = replyLikeRepository.existsByReplyAndUser(reply, user);
-        int totalLikeds=replyLikeRepository.countByReply(reply);
+        String currentUsername=null;
+        boolean liked=false;
+
+        //로그인한 사용자인 경우에만 liked 여부 확인
+        if (SecurityContextHolder.getContext().getAuthentication() != null &&
+                SecurityContextHolder.getContext().getAuthentication().getName() != null) {
+            currentUsername=SecurityContextHolder.getContext().getAuthentication().getName();
+            User user =userRepository.findByEmail(currentUsername)
+                    .orElseThrow(()-> new IllegalArgumentException("User not found"));
+            liked=replyLikeRepository.existsByReplyAndUser(reply, user);
+        }
+        int totalLikes = replyLikeRepository.countByReply(reply);
 
         return ReplyLikeResponse.builder()
                 .replyId(reply.getReplyId())
                 .liked(liked)
-                .totalLikes(totalLikeds)
+                .totalLikes(totalLikes)
                 .build();
+
     }
 
     @Override
