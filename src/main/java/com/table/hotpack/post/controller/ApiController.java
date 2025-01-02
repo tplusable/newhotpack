@@ -26,8 +26,8 @@ public class ApiController {
 
     @Value("${API_KEY}")
     private String apiKey;
-    @Value("${myapp.appkey}")
-    private String appkey;
+//    @Value("${myapp.appkey}")
+//    private String appkey;
 
     private static final Map<Integer, String> areaCodeMap = new HashMap<>();
     static {
