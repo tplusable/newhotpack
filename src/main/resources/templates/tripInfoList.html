@@ -14,8 +14,8 @@
 <div class="container">
   <div class="row-6" th:each="trip : ${tripInfos}">
     <div class="card">
-      <div class="card-header" th:text="${trip.id}">
-      </div>
+      <!--<div class="card-header" th:text="${trip.id}">-->
+      <!--</div>-->
       <div class="card-body">
         <h5 class="card-title" th:text="${trip.areaName}">Area Name</h5>
         <p class="card-text" th:text="'여행 지역: ' + ${trip.areaName}">여행 지역</p>

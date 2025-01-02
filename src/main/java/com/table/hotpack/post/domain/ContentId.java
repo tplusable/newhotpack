@@ -29,4 +29,14 @@ public class ContentId {
         this.dayIndex = dayIndex;
         this.tripInfo = tripInfo;
     }
+
+     // getter 메소드 추가
+    public String getContentId() {
+        return contentId;
+    }
+
+    // setter 메소드 추가 (필요한 경우)
+    public void setContentId(String contentId) {
+        this.contentId = contentId;
+    }
 }

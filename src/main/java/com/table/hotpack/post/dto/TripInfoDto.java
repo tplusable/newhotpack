@@ -46,4 +46,10 @@ public class TripInfoDto {
 
     }
 
+
+    // getter 메소드
+    public Map<String, List<String>> getContentIdsByDate() {
+        return contentIdsByDate;
+    }
+
 }

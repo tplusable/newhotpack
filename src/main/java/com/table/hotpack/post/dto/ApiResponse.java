@@ -13,19 +13,24 @@ public class ApiResponse {
     private String contentid;
     private String btitle;
     private String author;
+    private String homepage;
+    private String overview;
+
 
     // 기본 생성자
     public ApiResponse() {}
 
     // 파라미터화된 생성자
-    public ApiResponse(String title, String tel, String addr1, String firstimage, String mapx, String mapy,String contentid) {
+    public ApiResponse(String title, String tel, String addr1, String firstimage, String mapx, String mapy, String contentid, String homepage, String overview) {
         this.title = title;
         this.tel = tel;
         this.addr1 = addr1;
         this.firstimage = firstimage;
         this.mapx = mapx;
         this.mapy = mapy;
-        this.contentid=contentid;
+        this.contentid = contentid;
+        this.homepage = homepage;
+        this.overview = overview;
     }
 
     /*// Getter 및 Setter 메소드
@@ -48,7 +53,8 @@ public class ApiResponse {
     public void setMapy(String mapy) { this.mapy = mapy; }*/
 
     public String getContentId() { return contentid; }
-    public void setContentId(String contentid) { this.contentid = contentid; }
+    public void setContentId(String contentId) { this.contentid = contentid; }
+
 
 
     @Override
@@ -61,6 +67,8 @@ public class ApiResponse {
                 ", mapx='" + mapx + '\'' +
                 ", mapy='" + mapy + '\'' +
                 ", contentid='" + contentid + '\''+
+                ", homepage='" + homepage + '\''+
+                ", overview='" + overview + '\''+
                 '}';
     }
 

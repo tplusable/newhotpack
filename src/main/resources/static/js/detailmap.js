@@ -1,57 +1,75 @@
-document.addEventListener('DOMContentLoaded', () => {
-              const mapContainer = document.getElementById('map'); // 지도 표시용 컨테이너
-              const map = new kakao.maps.Map(mapContainer, {
-                center: new kakao.maps.LatLng(37.5665, 126.9780), // 초기 좌표 (서울)
-                level: 5 // 초기 줌 레벨
-              });
+document.addEventListener('DOMContentLoaded', function() {
+    // 모든 'content-detail' 클래스를 가진 <li> 요소를 가져옵니다.
+    var contentDetails = document.querySelectorAll('.content-detail');
 
-              // JSON 형태로 받은 touristSpotsByDate
-              const contentIdsByDate = JSON.parse(document.getElementById('contentIdsByDate').textContent);
+    // 마커 위치 정보를 담을 배열
+    var markers = [];
 
-              const id = [[${tripInfo.id}]]; // tripInfo.id 사용
+    // 마커들의 위도, 경도를 합산할 변수
+        var totalMapX = 0;
+        var totalMapY = 0;
 
-              // 서버에서 특정 contentId의 데이터를 가져오는 함수
-              async function fetchTouristSpot(contentId) {
-                try {
-                  const response = await fetch(`/trip/view/${id}/${contentId}`);
-                  if (!response.ok) throw new Error('Failed to fetch tourist spot data');
-                  return await response.json();
-                } catch (error) {
-                  console.error(error);
-                  return null;
-                }
-              }
+    // 각 <li> 요소를 순회하며 데이터를 추출
+    contentDetails.forEach(function(detail) {
+        // 'data-*' 속성 값 추출
+        var mapX = parseFloat(detail.getAttribute('data-mapx')); // X좌표 (경도)
+        var mapY = parseFloat(detail.getAttribute('data-mapy')); // Y좌표 (위도)
 
-              // 지도에 마커를 추가하는 함수
-              function addMarker(lat, lng, title) {
-                const position = new kakao.maps.LatLng(lat, lng);
-                const marker = new kakao.maps.Marker({ position });
-                marker.setMap(map);
-
-                // 마커 클릭 이벤트
-                const infowindow = new kakao.maps.InfoWindow({
-                  content: `<div style="padding:5px;">${title}</div>`
-                });
-                kakao.maps.event.addListener(marker, 'click', () => {
-                  infowindow.open(map, marker);
-                });
-
-                return marker;
-              }
-
-              // 선택된 contentId에 따라 지도에 데이터를 표시
-              async function displayTouristSpots(contentIds) {
-                for (const day in contentIds) {
-                  for (const contentId of contentIds[day]) {
-                    const spotData = await fetchTouristSpot(contentId);
-                    if (spotData) {
-                      const { mapy, mapx, title } = spotData;
-                      addMarker(parseFloat(mapy), parseFloat(mapx), title);
-                    }
-                  }
-                }
-              }
-
-              // Fetch and display tourist spots
-              displayTouristSpots(contentIdsByDate);
+        // 유효한 좌표가 있는 경우에만 마커 추가
+        if (mapX && mapY) {
+            markers.push({
+                mapx: mapX,
+                mapy: mapY
             });
+
+            // 위도와 경도를 합산
+            totalMapX += mapX;
+            totalMapY += mapY;
+        }
+    });
+
+    console.log("Markers:", markers);
+
+     // 마커들의 평균 위치 계산
+        var avgMapX = totalMapX / markers.length;  // 평균 경도
+        var avgMapY = totalMapY / markers.length;  // 평균 위도
+
+        // 지도 생성 (카카오맵 예시)
+        var mapContainer = document.getElementById('map'),
+            mapOption = {
+                center: new kakao.maps.LatLng(avgMapY, avgMapX), // 마커들의 평균 위치로 초기 지도 중심 설정
+                level: 3 // 초기 확대 레벨
+            };
+
+    var map = new kakao.maps.Map(mapContainer, mapOption);
+
+    // markers 배열을 사용하여 지도에 마커 추가
+    markers.forEach(function(markerData) {
+        var position = new kakao.maps.LatLng(markerData.mapy, markerData.mapx);
+        var marker = new kakao.maps.Marker({
+            position: position,
+        });
+        marker.setMap(map);
+
+
+    });
+
+     // polyline을 그리기 위한 경로 설정
+        var path = markers.map(function(markerData) {
+            return new kakao.maps.LatLng(markerData.mapy, markerData.mapx);
+        });
+
+        // polyline 옵션 설정
+        var polyline = new kakao.maps.Polyline({
+            path: path, // polyline의 경로 (마커 배열 순서대로 연결)
+            strokeWeight: 5, // 선의 두께
+            strokeColor: '#FF0000', // 선의 색상 (빨강)
+            strokeOpacity: 0.7, // 선의 불투명도
+            strokeStyle: 'solid' // 선의 스타일 (실선)
+        });
+
+        // polyline 지도에 추가
+        polyline.setMap(map);
+
+
+});
