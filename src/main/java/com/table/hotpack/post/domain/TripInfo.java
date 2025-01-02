@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -17,7 +18,9 @@ public class TripInfo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;  // 여행 정보 ID
+    private Long id;
+
+    // 여행 정보 ID
 
     private String areaName;  // 여행 지역
 
@@ -28,9 +31,12 @@ public class TripInfo {
     @OneToMany(mappedBy = "tripInfo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ContentId> contentIds;  // 해당 여행에 포함된 콘텐츠 ID들
 
-    public TripInfo(String areaName, LocalDate startDate, LocalDate endDate) {
-        this.areaName = areaName;
-        this.startDate = startDate;
-        this.endDate = endDate;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
     }
+
 }

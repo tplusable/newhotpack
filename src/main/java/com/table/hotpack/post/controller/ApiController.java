@@ -140,8 +140,8 @@ public class ApiController {
                             "addr1", addr1,
                             "firstimage", firstimage,
                             "mapx", mapx, // mapx 추가
-                                "mapy", mapy,
-                            "contentid",contentid// mapy 추가
+                            "mapy", mapy,
+                            "contentid", contentid// mapy 추가
                     ));
                 }
             }

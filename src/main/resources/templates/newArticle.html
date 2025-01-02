@@ -20,6 +20,21 @@
                 <header class="mb-4">
                     <input type="text" class="form-control" placeholder="제목" id="title" th:value="${article.title}">
                 </header>
+
+                <!-- Select Form 추가 -->
+                <div class="mb-4">
+                    <label for="category" class="form-label">내 여행 일정</label>
+                    <select class="form-control" id="category" name="category">
+                        <option th:each="tripInfo : ${tripInfos}"
+                                th:value="${tripInfo.id}"
+                                th:text="'지역: ' + ${tripInfo.areaName} + ', 시작: ' + ${tripInfo.startDate} + ', 종료: ' + ${tripInfo.endDate} + ', '+${tripInfo.relativeTime}">
+                            <!-- ID를 값으로, 지역명을 표시 -->
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <div id="map" style="width: 100%; height: 600px;"></div> <!-- 지도 크기 지정 -->
+                </div>
                 <section class="mb-5">
                     <textarea class="form-control h-25" rows="10" placeholder="내용" id="content" th:text="${article.content}"></textarea>
                 </section>

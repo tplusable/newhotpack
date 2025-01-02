@@ -1,3 +1,25 @@
+const timeElements = document.querySelectorAll(".relative-time");
+    timeElements.forEach((el) => {
+        const createdAt = new Date(el.getAttribute("data-created-at"));
+        const now = new Date();
+        const diffInMinutes = Math.floor((now - createdAt) / 60000); // 차이를 분 단위로 계산
+
+        let relativeTime;
+        if (diffInMinutes < 1) {
+            relativeTime = "방금 전";
+        } else if (diffInMinutes < 60) {
+            relativeTime = `${diffInMinutes}분 전`;
+        } else if (diffInMinutes < 1440) {
+            relativeTime = `${Math.floor(diffInMinutes / 60)}시간 전`;
+        } else if (diffInMinutes < 10080) {
+            relativeTime = `${Math.floor(diffInMinutes / 1440)}일 전`;
+        } else {
+            relativeTime = createdAt.toLocaleDateString(); // 날짜로 표시
+        }
+
+        el.textContent = relativeTime;
+    });
+
 // 삭제 기능
 const deleteButton = document.getElementById('delete-btn');
 

@@ -217,3 +217,27 @@ main {
   border-radius: 10px;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 }
+#daysContainer {
+  margin: 20px 0;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  overflow-y: auto; /* 필요한 경우 스크롤 추가 */
+}
+
+#daysContainer .day-button {
+  display: inline-block;
+  margin: 5px;
+  padding: 10px 15px;
+  background-color: #3498db; /* 파란색 */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#daysContainer .day-button:hover {
+  background-color: #1b6b99; /* 더 진한 파란색 */
+}

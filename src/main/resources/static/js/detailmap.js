@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var mapContainer = document.getElementById('map'),
             mapOption = {
                 center: new kakao.maps.LatLng(avgMapY, avgMapX), // 마커들의 평균 위치로 초기 지도 중심 설정
-                level: 3 // 초기 확대 레벨
+                level: 10 // 초기 확대 레벨
             };
 
     var map = new kakao.maps.Map(mapContainer, mapOption);

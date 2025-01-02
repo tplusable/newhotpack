@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+
   // "+ 추가" 버튼 클릭 이벤트 등록
   function setupAddButtons() {
     document.querySelectorAll('.add-button').forEach(button => {
