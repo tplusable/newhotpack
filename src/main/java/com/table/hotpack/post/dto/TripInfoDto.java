@@ -16,7 +16,7 @@ import java.util.Map;
 public class TripInfoDto {
 
     private Long id;  // 여행 정보 ID
-    private Long userId;  // 여행 정보 ID
+    private String author;  // 사용자 ID
     private String areaName;  // 여행 지역
     private LocalDate startDate;  // 시작 날짜
     private LocalDate endDate;  // 종료 날짜
@@ -26,6 +26,7 @@ public class TripInfoDto {
     // TripInfo 엔티티를 DTO로 변환하는 생성자
     public TripInfoDto(TripInfo tripInfo) {
         this.id = tripInfo.getId();
+        this.author = tripInfo.getAuthor();
         this.areaName = tripInfo.getAreaName();
         this.startDate = tripInfo.getStartDate();
         this.endDate = tripInfo.getEndDate();

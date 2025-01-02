@@ -18,9 +18,10 @@ public class TripInfo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id;    // 여행 정보 ID
 
-    // 여행 정보 ID
+    @Column(name = "author", nullable = false)
+    private String author;
 
     private String areaName;  // 여행 지역
 

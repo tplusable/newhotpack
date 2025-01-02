@@ -185,7 +185,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function sendPostData(postData) {
     fetch('/trip/save', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json',
+       'Authorization': `Bearer ${localStorage.getItem("access_token")}`},
       body: JSON.stringify(postData)
     })
       .then(response => {

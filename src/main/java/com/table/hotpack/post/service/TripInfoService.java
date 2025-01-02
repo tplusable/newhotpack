@@ -21,8 +21,9 @@ public class TripInfoService {
 
     // 여행 정보 저장
     @Transactional
-    public TripInfo saveTripInfoWithContentIds(TripInfoDto tripInfoDto) {
+    public TripInfo saveTripInfoWithContentIds(TripInfoDto tripInfoDto, String userEmail) {
         TripInfo tripInfo = new TripInfo();
+        tripInfo.setAuthor(userEmail);
         tripInfo.setAreaName(tripInfoDto.getAreaName());
         tripInfo.setStartDate(tripInfoDto.getStartDate());
         tripInfo.setEndDate(tripInfoDto.getEndDate());
