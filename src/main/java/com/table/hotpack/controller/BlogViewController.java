@@ -21,8 +21,14 @@ public class BlogViewController {
 
     private final BlogService blogService;
 
+    @GetMapping("/")
+    public String mainPage() {
+        return "main";
+    }
+
     @GetMapping("/articles")
     public String getArticles(Model model) {
+
         List<ArticleListViewResponse> articles = blogService.findAll()
                 .stream()
                 .map(ArticleListViewResponse::new)
@@ -37,6 +43,7 @@ public class BlogViewController {
         Article article = blogService.findById(id);
         model.addAttribute("article", new ArticleViewResponse(article));
 
+        model.addAttribute("recommendCount", blogService.getRecommendCount(id));
         return "article";
     }
 
@@ -57,4 +64,10 @@ public class BlogViewController {
     public String getMyArticles() {
         return "myArticleList";
     }
+
+    @GetMapping("myRecommends")
+    public String getMyRecommends() {
+        return "myRecommendsList";
+    }
+
 }

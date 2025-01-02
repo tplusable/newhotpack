@@ -1,22 +1,29 @@
 package com.table.hotpack.controller;
 
 import com.table.hotpack.domain.Article;
+import com.table.hotpack.domain.User;
 import com.table.hotpack.dto.*;
+import com.table.hotpack.repository.RecommendRepository;
 import com.table.hotpack.service.BlogService;
+import com.table.hotpack.service.UserService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
 public class BlogApiController {
 
     private final BlogService blogService;
+    private final UserService userService;
+    private final RecommendRepository recommendRepository;
 
     @PostMapping("/api/articles")
     public ResponseEntity<Article> addArticle(@RequestBody AddArticleRequest request, Principal principal) {
@@ -26,23 +33,33 @@ public class BlogApiController {
                 .body(savedArticle);
     }
 
-    @GetMapping("/api/articles")
-    public ResponseEntity<List<ArticleResponse>> findAllArticles() {
-        List<ArticleResponse> articles = blogService.findAll()
-                .stream()
-                .map(ArticleResponse::new)
-                .toList();
-
-        return ResponseEntity.ok()
-                .body(articles);
-    }
+//    @GetMapping("/api/articles")
+//    public ResponseEntity<List<ArticleResponse>> findAllArticles() {
+//        List<ArticleResponse> articles = blogService.findAll()
+//                .stream()
+//                .map(ArticleResponse::new)
+//                .toList();
+//
+//        return ResponseEntity.ok()
+//                .body(articles);
+//    }
 
     @GetMapping("/api/articles/{id}")
-    public ResponseEntity<ArticleResponse> findArticle(@PathVariable("id") long id) {
+    public ResponseEntity<ArticleResponse> findArticle(@PathVariable("id") long id, Principal principal) {
         Article article = blogService.findById(id);
 
+        int recommendCount = recommendRepository.countByArticle(article);
+
+        boolean recommended = false;
+        if (principal != null) {
+            User user = userService.findByEmail(principal.getName());
+            if (user != null) {
+                recommended = recommendRepository.findByArticleAndUser(article, user).isPresent();
+            }
+        }
+
         return ResponseEntity.ok()
-                .body(new ArticleResponse(article));
+                .body(new ArticleResponse(article, recommendCount, recommended));
     }
 
     @DeleteMapping("/api/articles/{id}")
@@ -60,6 +77,34 @@ public class BlogApiController {
 
         return ResponseEntity.ok()
                 .body(updatedArticle);
+    }
+
+    // 추천/취소 토글
+    @PostMapping("/api/articles/{id}/recommend")
+    public ToggleRecommendResponse toggleRecommendResponse(@PathVariable("id") Long id,
+                                                           Principal principal) {
+        User user = userService.findByEmail(principal.getName());
+
+        blogService.toggleRecommend(id, user);
+        int newCount = blogService.getRecommendCount(id);
+        boolean isNowRecommended = blogService.isRecommended(id, user);
+
+        return new ToggleRecommendResponse(newCount, isNowRecommended);
+    }
+
+    // 응답용 DTO
+    record ToggleRecommendResponse(int recommendCount, boolean recommended) {}
+
+    // 추천한 글 목록 조회
+    @GetMapping("/api/user/recommended-articles")
+    public ResponseEntity<List<ArticleListViewResponse>> getUserRecommendedArticles(Principal principal) {
+        // 내가 추천한 Article 목록
+        List<ArticleListViewResponse> articles = blogService.getUserRecommendedArticles(principal.getName())
+                .stream()
+                .map(ArticleListViewResponse::new)
+                .toList();
+
+        return ResponseEntity.ok(articles);
     }
 
     @GetMapping("/api/user/articles")

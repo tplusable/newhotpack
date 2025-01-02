@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>여행 계획</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header th:replace="layouts/header::header"></header>
+<main>
+    <h1>여행 계획을 세워보세요!</h1>
+    <button type="button" id="mypage-btn" class="btn btn-secondary"
+            onclick="location.href='/getAreaList'">내 여행일정 만들러 가기</button>
+    <button type="button" id="articleList-btn" class="btn btn-secondary"
+            onclick="location.href='/articles'">전체 글 보기</button>
+</main>
+<script src="/js/token.js"></script>
+<script src="/js/header.js"></script>
+</body>
+</html>

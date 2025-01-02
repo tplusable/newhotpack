@@ -4,13 +4,12 @@ body {
 }
 
 header {
-  display: inline-flex;
-  max-width: 1100px
+  display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  background-color: #ffffff; /* Darker blue for header */
-  color: white;
+  background-color: #ffffff;
+  color: black;
 }
 
 .logo img {
@@ -66,22 +65,39 @@ main {
 
 }
 
-.auth-buttons{
-    position: absolute;
-    right: 20px;
+.auth-buttons {
+  display: flex;
+  gap: 10px;
 }
 
-.auth-buttons a {
-  margin-left: 15px;
-  padding: 10px 20px;
-  border-radius: 5px;
-  color: white;
-  background-color: #3498db; /* Light blue for buttons */
+.auth-buttons a, .auth-buttons span {
   text-decoration: none;
+  font-size: 14px;
+  padding: 10px 15px;
+  border-radius: 5px;
 }
 
-.auth-buttons a:hover {
-  background-color: #2980b9; /* Darker blue on hover */
+.signup-btn, .login-btn {
+  background-color: #3498db; /* Light blue */
+  color: white;
+}
+
+.signup-btn:hover, .login-btn:hover {
+  background-color: #2980b9; /* Darker blue */
+}
+
+#logout-btn {
+  background-color: #e74c3c; /* Red for logout */
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 10px 15px;
+  border-radius: 5px;
+}
+
+#logout-btn:hover {
+  background-color: #c0392b; /* Darker red */
 }
 
 /* 메인 컨테이너 */
