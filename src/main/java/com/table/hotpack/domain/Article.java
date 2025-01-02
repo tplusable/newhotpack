@@ -36,6 +36,7 @@ public class Article {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    // email이 저장되는 필드
     @Column(name = "author", nullable = false)
     private String author;
 

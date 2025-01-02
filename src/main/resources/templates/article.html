@@ -68,9 +68,33 @@
                 <button type="button" id="delete-btn"
                         class="btn btn-secondary btn-sm">삭제</button>
             </article>
+
+            <!-- Reply Section -->
+             <section class="mt-5">
+                <h3>댓글</h3>
+                <!-- Reply Input Form -->
+                 <div class="mb-3">
+                    <textarea class="form-control" id="reply-content" rows="3" placeholder="댓글을 입력하세요"></textarea>
+                    <button type="button" id="submit-reply" class="btn btn-primary mt-2">작성</button>
+                 </div>
+
+                 <!-- Replies List-->
+                  <div id="replies-list">
+                    <!-- Replies will be dynamically loaded here -->
+                  </div>
+
+                  <!-- Pagination -->
+                   <nav id="pagination" class="mt-3">
+                        <ul class="pagination">
+                            <!-- Pagination buttons will be dynamically added here -->
+                        </ul>
+                   </nav>
+             </section>
         </div>
     </div>
 </div>
 
 <script src="/js/article.js"></script>
+<!--<script src="/js/reply.js"></script>-->
+<script src="/js/replyLike.js"></script>
 </body>
