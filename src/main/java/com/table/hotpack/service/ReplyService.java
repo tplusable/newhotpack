@@ -15,4 +15,5 @@ public interface ReplyService {
     void deleteReply(Long replyId);
     ReplyLikeResponse toggleLike(Long replyId, String username);
     List<String> getLikers(Long replyId);
+    List<ReplyResponse> findTopRepliesByLikes(Long articleId, int limit);
 }
