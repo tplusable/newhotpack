@@ -71,7 +71,7 @@ if (modifyButton) {
     });
 }
 
-// 생성 기능
+// 로그인을 안하면 글 등록 버튼을 누르면 로그인 페이지로 이동
 const createButton = document.getElementById('create-btn');
 
 if (createButton) {
@@ -89,6 +89,7 @@ if (createButton) {
     });
 }
 
+// 생성 기능
 const createArticleButton = document.getElementById('createArticle-btn');
 if (createArticleButton) {
     // 등록 버튼을 클릭하면 /api/articles로 요청

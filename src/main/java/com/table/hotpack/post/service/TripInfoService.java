@@ -54,7 +54,7 @@ public class TripInfoService {
         return tripInfoRepository.save(tripInfo);
     }
 
-    // 모든 여행 정보 조회
+    // 나의 모든 여행 정보 조회
     public List<TripInfo> getMyTripInfos(String email) {
         return tripInfoRepository.findByAuthor(email);
     }
