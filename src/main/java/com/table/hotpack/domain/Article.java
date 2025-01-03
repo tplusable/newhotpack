@@ -1,10 +1,8 @@
 package com.table.hotpack.domain;
 
+import com.table.hotpack.post.domain.TripInfo;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -14,6 +12,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 public class Article {
 
@@ -27,6 +26,10 @@ public class Article {
 
     @Column(name = "content", nullable = false)
     private String content;
+
+    @ManyToOne
+    @JoinColumn(name = "trip_info_id")
+    private TripInfo tripInfo;
 
     @CreatedDate
     @Column(name = "created_at")

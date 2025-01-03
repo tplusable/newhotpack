@@ -44,15 +44,13 @@ public class TripInfoController {
         return ResponseEntity.ok(tripInfoDto);  // 200 OK와 함께 반환
     }
 
-    // 모든 여행 정보 조회
+    // 나의 모든 여행 정보 조회
     @GetMapping("/myTrip")
     public ResponseEntity<List<TripInfoDto>> getAllTripInfos(Principal principal) {
-        List<TripInfo> tripInfos = tripInfoService.getMyTripInfos(principal.getName());
-        List<TripInfoDto> tripInfoDtos = tripInfos.stream()
+        List<TripInfoDto> tripInfoDtos = tripInfoService.getMyTripInfos(principal.getName()).stream()
                 .map(TripInfoDto::new)
+                .sorted((t1, t2) -> Long.compare(t2.getId(), t1.getId()))
                 .toList();
         return ResponseEntity.ok(tripInfoDtos);
     }
-
-
 }

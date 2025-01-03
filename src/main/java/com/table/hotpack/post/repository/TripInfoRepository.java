@@ -8,5 +8,7 @@ import java.util.List;
 
 public interface TripInfoRepository extends JpaRepository<TripInfo, Long> {
     List<TripInfo> findByAuthor(String author);
+
+    List<TripInfo> findByAuthorOrderByIdDesc(String author);
 }
 

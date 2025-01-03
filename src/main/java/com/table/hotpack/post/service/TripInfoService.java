@@ -56,7 +56,16 @@ public class TripInfoService {
 
     // 나의 모든 여행 정보 조회
     public List<TripInfo> getMyTripInfos(String email) {
-        return tripInfoRepository.findByAuthor(email);
+        return tripInfoRepository.findByAuthorOrderByIdDesc(email);
+    }
+
+    public TripInfo getTripInfoIfOwned(Long tripInfoId, String author) {
+        TripInfo tripInfo = tripInfoRepository.findById(tripInfoId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid TripInfo ID"));
+        if (!tripInfo.getAuthor().equals(author)) {
+            throw new SecurityException("Access denied");
+        }
+        return tripInfo;
     }
 
     // 여행 정보 ID로 조회 (DTO 반환)
