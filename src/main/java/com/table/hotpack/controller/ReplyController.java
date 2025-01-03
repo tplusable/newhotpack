@@ -31,13 +31,13 @@ import java.util.List;
 
 @Log4j2
 @RestController
-//@RequestMapping("/api/replies")
+@RequestMapping("/api/replies")
 @RequiredArgsConstructor
 public class ReplyController {
     private final ReplyService replyService;
     private final UserService userService;
 
-    @GetMapping("/replies/article/{articleId}")
+    @GetMapping("/article/{articleId}")
     public ResponseEntity<Page<ReplyResponse>> getRepliesByArticleId(
             @PathVariable("articleId") Long articleId,
             @RequestParam(name = "page", defaultValue ="0") int page,
@@ -46,7 +46,7 @@ public class ReplyController {
         return ResponseEntity.ok(replies);
     }
 
-    @PostMapping("/api/replies/article/{articleId}")
+    @PostMapping("/article/{articleId}")
     public ResponseEntity<ReplyResponse> addReply(@RequestBody AddReplyRequest request, Principal principal) {
         log.info(request.getArticleId());
         log.info(request.getUserId());
@@ -72,7 +72,7 @@ public class ReplyController {
         return ResponseEntity.status(HttpStatus.CREATED).body(reply);
     }
 
-    @PutMapping("/api/replies/{replyId}")
+    @PutMapping("/{replyId}")
     public ResponseEntity<ReplyResponse> updateReply(
             @PathVariable("replyId") Long replyId,
             @RequestBody UpdateReplyRequest request) {
@@ -80,14 +80,14 @@ public class ReplyController {
         return ResponseEntity.ok(reply);
     }
 
-    @DeleteMapping("/api/replies/{replyId}")
+    @DeleteMapping("/{replyId}")
     public ResponseEntity<Void> deleteReply(@PathVariable("replyId") Long replyId) {
         replyService.deleteReply(replyId);
             return ResponseEntity.noContent().build();
     }
 
     // 댓글 추천 토글
-    @PostMapping("/api/replies/{replyId}/like")
+    @PostMapping("/{replyId}/like")
     public ResponseEntity<ReplyLikeResponse> toggleLike(
             @PathVariable("replyId") Long replyId,
             Principal principal) {
@@ -99,7 +99,7 @@ public class ReplyController {
         return ResponseEntity.ok(response); // 업데이트된 추천 수 반환
     }
 
-    @GetMapping("/replies/{replyId}/likers")
+    @GetMapping("/{replyId}/likers")
     public ResponseEntity<List<String>> getLikers(@PathVariable("replyId") Long replyId) {
         List<String> likers=replyService.getLikers(replyId);
         return ResponseEntity.ok(likers);
@@ -108,7 +108,7 @@ public class ReplyController {
     @GetMapping("/article/{articleId}/top-replies")
     public ResponseEntity<List<ReplyResponse>> getTopRepliesByLikes(
             @PathVariable Long articleId,
-            @RequestParam(defaultValue= "3") int limit) {
+            @RequestParam(defaultValue= "1") int limit) {
         List<ReplyResponse> topReplies=replyService.findTopRepliesByLikes(articleId, limit);
 
         //디버깅로그

@@ -41,7 +41,7 @@ public class ReplyServiceImpl implements ReplyService{
                 SecurityContextHolder.getContext().getAuthentication().getName() != null) {
             currentUsername=SecurityContextHolder.getContext().getAuthentication().getName();
             User user =userRepository.findByEmail(currentUsername)
-                    .orElseThrow(()-> new IllegalArgumentException("User not found"));
+                    .orElse(null);
             liked=replyLikeRepository.existsByReplyAndUser(reply, user);
         }
         int totalLikes = replyLikeRepository.countByReply(reply);
