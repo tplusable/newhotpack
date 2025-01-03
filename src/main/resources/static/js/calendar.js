@@ -4,21 +4,34 @@ let selectedDateStart = null;
 let selectedDateEnd = null;
 
 function toggleCalendar(inputId) {
-    // 각 입력 필드에 맞는 달력 표시
+    // 모든 달력을 숨김
+    document.querySelectorAll('.calendar').forEach(calendar => {
+        calendar.style.display = 'none';
+    });
+
+    // 해당 입력 필드에 연결된 달력 ID 가져오기
     const calendarId = 'calendar-' + inputId;
     const calendar = document.getElementById(calendarId);
-    const calendarStyle = calendar.style.display;
 
-    // 달력 보임/숨김 처리
-    calendar.style.display = calendarStyle === 'none' || calendarStyle === '' ? 'block' : 'none';
+    // 현재 달력 상태 가져오기
+    const isHidden = calendar.style.display === 'none' || calendar.style.display === '';
 
-    // 해당 달력에 맞는 년도, 월 렌더링
-    if (inputId === 'startDate') {
-        renderCalendar(currentDateStart.getFullYear(), currentDateStart.getMonth(), 'startDate');
-    } else {
-        renderCalendar(currentDateEnd.getFullYear(), currentDateEnd.getMonth(), 'endDate');
+    // 클릭한 달력 보임/숨김 처리
+    if (isHidden) {
+        calendar.style.display = 'block';
+        if (inputId === 'startDate') {
+            renderCalendar(currentDateStart.getFullYear(), currentDateStart.getMonth(), 'startDate');
+        } else {
+            renderCalendar(currentDateEnd.getFullYear(), currentDateEnd.getMonth(), 'endDate');
+        }
     }
 }
+
+document.addEventListener('click', (event) => {
+    if (!event.target.closest('.date-container')) {
+        document.querySelectorAll('.calendar').forEach(cal => cal.style.display = 'none');
+    }
+});
 
 function renderCalendar(year, month, inputId) {
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -117,3 +130,7 @@ function updateLabel(inputId) {
         label.textContent = inputId === 'startDate' ? '출발일 선택' : '도착일 선택';
     }
 }
+
+
+
+

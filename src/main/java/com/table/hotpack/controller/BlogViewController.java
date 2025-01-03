@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Controller
@@ -33,12 +36,41 @@ public class BlogViewController {
 
     @GetMapping("/articles")
     public String getArticles(Model model) {
+        Optional<Article> topArticleOpt = blogService.findBestRecommendedArticle();
 
-        List<ArticleListViewResponse> articles = blogService.findAll()
-                .stream()
-                .map(ArticleListViewResponse::new)
-                .toList();
-        model.addAttribute("articles", articles);
+        if (topArticleOpt.isPresent()) {
+            Article toparticle = topArticleOpt.get();
+            model.addAttribute("topArticle", toparticle);
+            model.addAttribute("topArticleRecommendCount", blogService.getRecommendCount(toparticle.getId()));
+
+            List<Article> otherArticles = blogService.findOtherArticleExcluding(toparticle.getId());
+            model.addAttribute("articles", otherArticles);
+
+            // 나머지 글들의 추천 수를 맵으로 추가
+            Map<Long, Long> recommendCounts = otherArticles.stream()
+                    .collect(Collectors.toMap(
+                            Article::getId,
+                            article -> blogService.getRecommendCount(article.getId())
+                    ));
+            model.addAttribute("recommendCounts", recommendCounts);
+        } else {
+            List<Article> articles = blogService.findAllByOrderByCreatedDateDesc();
+            model.addAttribute("articles", articles);
+
+            // 모든 글들의 추천 수를 맵으로 추가
+            Map<Long, Long> recommendCounts = articles.stream()
+                    .collect(Collectors.toMap(
+                            Article::getId,
+                            article -> blogService.getRecommendCount(article.getId())
+                    ));
+            model.addAttribute("recommendCounts", recommendCounts);
+        }
+
+//        List<ArticleListViewResponse> articles = blogService.findAll()
+//                .stream()
+//                .map(ArticleListViewResponse::new)
+//                .toList();
+//        model.addAttribute("articles", articles);
 
         return "articleList";
     }
@@ -54,7 +86,9 @@ public class BlogViewController {
 
 
     @GetMapping("/new-article")
-    public String newArticle(@RequestParam(value = "id", required = false) Long id, Model model) {
+    public String newArticle(@RequestParam(value = "id", required = false) Long id,
+                             Model model,
+                             Principal principal) {
         if (id == null) {
             model.addAttribute("article", new ArticleViewResponse());
         } else {
@@ -62,14 +96,14 @@ public class BlogViewController {
             model.addAttribute("article", new ArticleViewResponse(article));
         }
 
-        // 모든 TripInfo 목록을 가져와서 카테고리로 사용
-        List<TripInfoDto> tripInfos = tripInfoService.getAllTripInfos().stream()
-                .map(TripInfoDto::new)
-                .toList();
-
-        List<TripInfoDto> sortableList = new ArrayList<>(tripInfos);
-        sortableList.sort((t1, t2) -> Long.compare(t2.getId(), t1.getId())); // ID 내림차순 정렬
-        model.addAttribute("tripInfos", sortableList);
+//        // 로그인한 유저의 TripInfo 목록을 가져와서 카테고리로 사용
+//        List<TripInfoDto> tripInfos = tripInfoService.getMyTripInfos(principal.getName()).stream()
+//                .map(TripInfoDto::new)
+//                .toList();
+//
+//        List<TripInfoDto> sortableList = new ArrayList<>(tripInfos);
+//        sortableList.sort((t1, t2) -> Long.compare(t2.getId(), t1.getId())); // ID 내림차순 정렬
+//        model.addAttribute("tripInfos", sortableList);
 
         return "newArticle";
     }

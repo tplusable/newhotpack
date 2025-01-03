@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
           await sendPostData(postData); // 전송 완료를 기다림
           alert('여행 정보가 저장되었습니다!');
-          window.location.href = "/trip/view/all"; // 저장 후 페이지 이동
+          window.location.href = "/trip/view/myTrip"; // 저장 후 페이지 이동
         } catch (error) {
           console.error('데이터 전송 실패:', error);
           alert('데이터 전송 중 문제가 발생했습니다.');
@@ -185,7 +185,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function sendPostData(postData) {
     fetch('/trip/save', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json',
+       'Authorization': `Bearer ${localStorage.getItem("access_token")}`},
       body: JSON.stringify(postData)
     })
       .then(response => {

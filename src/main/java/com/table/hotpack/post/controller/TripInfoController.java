@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,8 +23,10 @@ public class TripInfoController {
 
     // 여행 정보 저장
     @PostMapping("/save")
-    public ResponseEntity<TripInfoDto> saveTripInfo(@RequestBody TripInfoDto tripInfoDto) {
-        TripInfo tripInfo = tripInfoService.saveTripInfoWithContentIds(tripInfoDto);
+    public ResponseEntity<TripInfoDto> saveTripInfo(@RequestBody TripInfoDto tripInfoDto, Principal principal) {
+        String userEmail = principal.getName();
+
+        TripInfo tripInfo = tripInfoService.saveTripInfoWithContentIds(tripInfoDto, userEmail);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new TripInfoDto(tripInfo));
     }
@@ -42,9 +45,9 @@ public class TripInfoController {
     }
 
     // 모든 여행 정보 조회
-    @GetMapping("/all")
-    public ResponseEntity<List<TripInfoDto>> getAllTripInfos() {
-        List<TripInfo> tripInfos = tripInfoService.getAllTripInfos();
+    @GetMapping("/myTrip")
+    public ResponseEntity<List<TripInfoDto>> getAllTripInfos(Principal principal) {
+        List<TripInfo> tripInfos = tripInfoService.getMyTripInfos(principal.getName());
         List<TripInfoDto> tripInfoDtos = tripInfos.stream()
                 .map(TripInfoDto::new)
                 .toList();

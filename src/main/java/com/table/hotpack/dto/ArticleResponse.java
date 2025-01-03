@@ -9,10 +9,10 @@ public class ArticleResponse {
     private final String title;
     private final String content;
 
-    private final int recommendCount;
+    private final Long recommendCount;
     private final boolean recommended;
 
-    public ArticleResponse(Article article, int recommendCount, boolean recommended) {
+    public ArticleResponse(Article article, Long recommendCount, boolean recommended) {
         this.id = article.getId();
         this.title = article.getTitle();
         this.content = article.getContent();

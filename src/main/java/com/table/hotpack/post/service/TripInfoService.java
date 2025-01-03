@@ -21,8 +21,9 @@ public class TripInfoService {
 
     // 여행 정보 저장
     @Transactional
-    public TripInfo saveTripInfoWithContentIds(TripInfoDto tripInfoDto) {
+    public TripInfo saveTripInfoWithContentIds(TripInfoDto tripInfoDto, String userEmail) {
         TripInfo tripInfo = new TripInfo();
+        tripInfo.setAuthor(userEmail);
         tripInfo.setAreaName(tripInfoDto.getAreaName());
         tripInfo.setStartDate(tripInfoDto.getStartDate());
         tripInfo.setEndDate(tripInfoDto.getEndDate());
@@ -53,9 +54,9 @@ public class TripInfoService {
         return tripInfoRepository.save(tripInfo);
     }
 
-    // 모든 여행 정보 조회
-    public List<TripInfo> getAllTripInfos() {
-        return tripInfoRepository.findAll();
+    // 나의 모든 여행 정보 조회
+    public List<TripInfo> getMyTripInfos(String email) {
+        return tripInfoRepository.findByAuthor(email);
     }
 
     // 여행 정보 ID로 조회 (DTO 반환)
