@@ -66,12 +66,6 @@ public class BlogViewController {
             model.addAttribute("recommendCounts", recommendCounts);
         }
 
-//        List<ArticleListViewResponse> articles = blogService.findAll()
-//                .stream()
-//                .map(ArticleListViewResponse::new)
-//                .toList();
-//        model.addAttribute("articles", articles);
-
         return "articleList";
     }
 
@@ -87,8 +81,7 @@ public class BlogViewController {
 
     @GetMapping("/new-article")
     public String newArticle(@RequestParam(value = "id", required = false) Long id,
-                             Model model,
-                             Principal principal) {
+                             Model model) {
         if (id == null) {
             model.addAttribute("article", new ArticleViewResponse());
         } else {

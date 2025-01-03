@@ -10,15 +10,15 @@ import lombok.NoArgsConstructor;
 @Getter
 public class AddArticleRequest {
     private String title;
-
     private String content;
+    private Long tripInfoId;
 
-    public Article toEntity(String author, String nickname) {
-        return Article.builder()
-                .title(title)
-                .content(content)
-                .author(author)
-                .nickname(nickname)
-                .build();
-    }
+//    public Article toEntity(String author, String nickname) {
+//        return Article.builder()
+//                .title(title)
+//                .content(content)
+//                .author(author)
+//                .nickname(nickname)
+//                .build();
+//    }
 }

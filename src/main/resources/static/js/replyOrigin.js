@@ -31,7 +31,7 @@ function renderReply(reply) {
 // 댓글 로드 함수
 function loadReplies(page = 0) {
     articleId = document.getElementById('article-id').value;
-    fetch(`/api/replies/article/${articleId}?page=${page}&size=10`, {
+    fetch(`/replies/article/${articleId}?page=${page}&size=10`, {
         method: 'GET',
         headers: {
             Authorization: 'Bearer ' + localStorage.getItem('access_token'),
@@ -42,24 +42,7 @@ function loadReplies(page = 0) {
         // 댓글 렌더링
         repliesList.innerHTML = '';
         data.content.forEach(reply => {
-            const replyElement = document.createElement('div');
-                //            const formattedDate= reply.createAt ? new Date(reply.createdAt).toLocaleString() : "invalidDate"
-                replyElement.className = 'border p-3 mb-2';
-                replyElement.innerHTML = `
-                    <p id="reply-text-${reply.replyId}">${reply.reply}</p>
-                    <small class="text-muted">${reply.replyer} | ${new Date(reply.createdAt).toLocaleString()}</small>
-                    <div>
-                        <button class="btn btn-link btn-sm text-primary" id="like-button-${reply.replyId}" onclick="toggleLike(${reply.replyId})">
-                            ${reply.liked ? '❤️ 추천 취소' : '🤍 추천'}
-                        </button>
-                        <span id="like-count-${reply.replyId}">추천 수: ${reply.totalLikes || 0 }</span>
-                        <button class="btn btn-link btn-sm text-info" onclick="showLikers(${reply.replyId})">추천자 목록</button>
-                    </div>
-                    <div>
-                        <button class="btn btn-link btn-sm text-primary" onclick="editReply(${reply.replyId}, '${reply.reply}')">수정</button>
-                        <button class="btn btn-link btn-sm text-danger" onclick="deleteReply(${reply.replyId})">삭제</button>
-                    </div>
-                `;
+
             repliesList.appendChild(replyElement);
         });
 
@@ -195,7 +178,7 @@ window.deleteReply = (replyId) => {
 
 //추천 상위 댓글을 가져와서 표시하는 함수
 function loadTopReplies() {
-    fetch(`/api/replies/article/${articleId}/top-replies?limit=1`, {
+    fetch(`/replies/article/${articleId}/top-replies?limit=3`, {
         method: 'GET',
         headers: {
             Authorization: 'Bearer ' + localStorage.getItem('access_token'),
@@ -205,27 +188,17 @@ function loadTopReplies() {
     .then(data => {
         console.log("data:", data);
         const topRepliesSection = document.getElementById('top-replies');
-        topRepliesSection.innerHTML = '<h4>추천 많은 댓글</h4>';
+        topRepliesSection.innerHTML = '<h4>추천 상위 댓글</h4>';
 
         data.forEach(reply => {
+            console.log("reply: ",reply);
+            const totalLikes=reply.totalLikes || 0;
             const replyElement = document.createElement('div');
-                //            const formattedDate= reply.createAt ? new Date(reply.createdAt).toLocaleString() : "invalidDate"
-                replyElement.className = 'border p-3 mb-2';
-                replyElement.innerHTML = `
-                    <p id="reply-text-${reply.replyId}">${reply.reply}</p>
-                    <small class="text-muted">${reply.replyer} | ${new Date(reply.createdAt).toLocaleString()}</small>
-                    <div>
-                        <button class="btn btn-link btn-sm text-primary" id="like-button-${reply.replyId}" onclick="toggleLike(${reply.replyId})">
-                            ${reply.liked ? '❤️ 추천 취소' : '🤍 추천'}
-                        </button>
-                        <span id="like-count-${reply.replyId}">추천 수: ${reply.totalLikes || 0 }</span>
-                        <button class="btn btn-link btn-sm text-info" onclick="showLikers(${reply.replyId})">추천자 목록</button>
-                    </div>
-                    <div>
-                        <button class="btn btn-link btn-sm text-primary" onclick="editReply(${reply.replyId}, '${reply.reply}')">수정</button>
-                        <button class="btn btn-link btn-sm text-danger" onclick="deleteReply(${reply.replyId})">삭제</button>
-                    </div>
-                `;
+            replyElement.className = 'border p-3 mb-2';
+            replyElement.innerHTML = `
+                <p>${reply.reply}</p>
+                <small class="text-muted">${reply.replyer} | 추천 수: ${totalLikes}</small>
+            `;
             topRepliesSection.appendChild(replyElement);
         });
     })
