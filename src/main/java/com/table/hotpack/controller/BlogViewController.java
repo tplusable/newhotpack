@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Controller
@@ -33,12 +36,41 @@ public class BlogViewController {
 
     @GetMapping("/articles")
     public String getArticles(Model model) {
+        Optional<Article> topArticleOpt = blogService.findBestRecommendedArticle();
 
-        List<ArticleListViewResponse> articles = blogService.findAll()
-                .stream()
-                .map(ArticleListViewResponse::new)
-                .toList();
-        model.addAttribute("articles", articles);
+        if (topArticleOpt.isPresent()) {
+            Article toparticle = topArticleOpt.get();
+            model.addAttribute("topArticle", toparticle);
+            model.addAttribute("topArticleRecommendCount", blogService.getRecommendCount(toparticle.getId()));
+
+            List<Article> otherArticles = blogService.findOtherArticleExcluding(toparticle.getId());
+            model.addAttribute("articles", otherArticles);
+
+            // 나머지 글들의 추천 수를 맵으로 추가
+            Map<Long, Long> recommendCounts = otherArticles.stream()
+                    .collect(Collectors.toMap(
+                            Article::getId,
+                            article -> blogService.getRecommendCount(article.getId())
+                    ));
+            model.addAttribute("recommendCounts", recommendCounts);
+        } else {
+            List<Article> articles = blogService.findAllByOrderByCreatedDateDesc();
+            model.addAttribute("articles", articles);
+
+            // 모든 글들의 추천 수를 맵으로 추가
+            Map<Long, Long> recommendCounts = articles.stream()
+                    .collect(Collectors.toMap(
+                            Article::getId,
+                            article -> blogService.getRecommendCount(article.getId())
+                    ));
+            model.addAttribute("recommendCounts", recommendCounts);
+        }
+
+//        List<ArticleListViewResponse> articles = blogService.findAll()
+//                .stream()
+//                .map(ArticleListViewResponse::new)
+//                .toList();
+//        model.addAttribute("articles", articles);
 
         return "articleList";
     }

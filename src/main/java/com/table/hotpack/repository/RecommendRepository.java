@@ -16,5 +16,7 @@ public interface RecommendRepository extends JpaRepository<Recommend, Long> {
     Optional<Recommend> findByArticleAndUser(Article article, User user);
 
     // 게시글의 전체 추천수 세기
-    int countByArticle(Article article);
+    Long countByArticle(Article article);
+
+    Long countByArticleId(Long articleId);
 }

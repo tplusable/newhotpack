@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -89,9 +90,30 @@ public class BlogService {
     }
 
     // 해당 게시글의 추천수
-    public int getRecommendCount(Long id) {
+    public Long getRecommendCount(Long id) {
         Article article = findById(id);
         return recommendRepository.countByArticle(article);
+    }
+
+    // 추천수 가장 높은 글 조회
+    public Optional<Article> findBestRecommendedArticle() {
+        return articleRepository.findAll().stream()
+                .max(Comparator.comparingLong(article -> recommendRepository.countByArticleId(article.getId())));
+    }
+
+    // 추천수가 가장 높은 글을 제외한 나머지 글 최신순으로 조회
+    public List<Article> findOtherArticleExcluding(Long topArticleId) {
+        return articleRepository.findAll().stream()
+                .filter(article -> !article.getId().equals(topArticleId))
+                .sorted(Comparator.comparing(Article::getCreatedAt).reversed())
+                .collect(Collectors.toList());
+    }
+
+    // 추천수가 높은 글이 없을 경우, 모든 글을 최신순으로 조회
+    public List<Article> findAllByOrderByCreatedDateDesc() {
+        return articleRepository.findAll().stream()
+                .sorted(Comparator.comparing(Article::getCreatedAt).reversed())
+                .collect(Collectors.toList());
     }
 
     // 특정 유저가 해당 게시글을 추천했는지 여부

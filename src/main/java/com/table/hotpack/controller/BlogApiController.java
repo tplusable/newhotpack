@@ -48,7 +48,7 @@ public class BlogApiController {
     public ResponseEntity<ArticleResponse> findArticle(@PathVariable("id") long id, Principal principal) {
         Article article = blogService.findById(id);
 
-        int recommendCount = recommendRepository.countByArticle(article);
+        Long recommendCount = recommendRepository.countByArticle(article);
 
         boolean recommended = false;
         if (principal != null) {
@@ -86,14 +86,14 @@ public class BlogApiController {
         User user = userService.findByEmail(principal.getName());
 
         blogService.toggleRecommend(id, user);
-        int newCount = blogService.getRecommendCount(id);
+        Long newCount = blogService.getRecommendCount(id);
         boolean isNowRecommended = blogService.isRecommended(id, user);
 
         return new ToggleRecommendResponse(newCount, isNowRecommended);
     }
 
     // 응답용 DTO
-    record ToggleRecommendResponse(int recommendCount, boolean recommended) {}
+    record ToggleRecommendResponse(Long recommendCount, boolean recommended) {}
 
     // 추천한 글 목록 조회
     @GetMapping("/api/user/recommended-articles")
