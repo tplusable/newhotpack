@@ -44,7 +44,8 @@ public class TripInfoService {
                 ContentId contentIdEntity = new ContentId();
                 contentIdEntity.setContentId(contentId);
                 contentIdEntity.setDayIndex(dayIndex);
-                contentIdEntity.setTripInfo(tripInfo); // TripInfo와 ContentId 연결
+                contentIdEntity.setTripInfo(tripInfo);
+                // TripInfo와 ContentId 연결
 
                 contentIdEntities.add(contentIdEntity); // 생성한 ContentId 객체를 리스트에 추가
             }
