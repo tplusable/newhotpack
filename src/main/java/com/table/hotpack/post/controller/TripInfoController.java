@@ -7,16 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
 import java.security.Principal;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/trip")  // API 전용 경로로 변경
+@RequestMapping("/trip")
 public class TripInfoController {
 
     private final TripInfoService tripInfoService;
@@ -31,27 +27,16 @@ public class TripInfoController {
                 .body(new TripInfoDto(tripInfo));
     }
 
-//    // 여행 정보 조회 (ID 기준)
-//    @GetMapping("/{id}")
-//    public ResponseEntity<TripInfoDto> getTripInfo(@PathVariable("id") Long id) {
-//        TripInfoDto tripInfoDto = tripInfoService.getTripInfoDtoById(id);
-//
-//        // tripInfoDto가 null일 경우 404 오류 반환
-//        if (tripInfoDto == null) {
-//            return ResponseEntity.notFound().build();  // 404 Not Found 반환
-//        }
-//
-//        return ResponseEntity.ok(tripInfoDto);  // 200 OK와 함께 반환
-//    }
-
-    // 특정 여행 정보 상세 조회 API
+    // 여행 정보 조회 (ID 기준)
     @GetMapping("/{id}")
-    public ResponseEntity<TripInfoDto> getTripInfoById(@PathVariable("id") Long id, Principal principal) {
-        TripInfoDto tripInfoDto = tripInfoService.getTripInfoDtoByIdAndAuthor(id, principal.getName());
+    public ResponseEntity<TripInfoDto> getTripInfo(@PathVariable("id") Long id) {
+        TripInfoDto tripInfoDto = tripInfoService.getTripInfoDtoById(id);
+
         if (tripInfoDto == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().build();  // 404 Not Found 반환
         }
-        return ResponseEntity.ok(tripInfoDto);
+
+        return ResponseEntity.ok(tripInfoDto);  // 200 OK와 함께 반환
     }
 
     // 나의 모든 여행 정보 조회

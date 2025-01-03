@@ -1,376 +1,301 @@
+// myTourArticle.js
+
 // 페이지 로드 시 실행되는 함수
-function fetchMyTourList() {
-    fetch('/trip/myTrip', {
-        method: 'GET',
-        headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('access_token'),
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Failed to load myTrip');
-        }
-        return response.json();
-    })
-    .then(data => {
-        const select = document.getElementById('tripInfo'); // select 요소 가져오기
-        // select 초기화
-        select.innerHTML = '<option value="" disabled selected>선택하세요</option>';
+document.addEventListener('DOMContentLoaded', fetchMyTourList);
 
-        // 데이터가 없을 경우 처리
-        if (data.length === 0) {
-            const option = document.createElement('option');
-            option.value = "";
-            option.textContent = "여행 정보가 없습니다.";
-            option.disabled = true;
-            select.appendChild(option);
-            return;
-        }
-
-        // 데이터 순회하며 옵션 생성
-        data.forEach(tripInfoDto => {
-            const option = document.createElement('option');
-            option.value = tripInfoDto.id;
-            option.textContent = `나의 ${tripInfoDto.areaName} 여행 ${formatDate(tripInfoDto.startDate)} - ${formatDate(tripInfoDto.endDate)}`;
-            select.appendChild(option);
-        });
-
-        // 선택 시 상세 정보를 현재 페이지에 표시하는 이벤트 리스너 추가
-        select.addEventListener('change', function() {
-            const selectedId = this.value;
-            if (selectedId) {
-                fetchTripDetails(selectedId);
-            }
-        });
-    })
-    .catch(error => {
-        console.error('Error loading myTrip:', error);
-        alert('로그인이 필요합니다.');
-        location.replace('/login');
-    });
-}
-
-window.onload = fetchMyTourList;
-
-// 쿠키 조회 함수
+// 쿠키 조회 함수 (토큰 재발급 시 필요)
 function getCookie(key) {
-    var result = null;
-    var cookie = document.cookie.split(';');
-    cookie.some(function (item) {
-        item = item.trim(); // 공백 제거
-        var dic = item.split('=');
-        if (key === dic[0]) {
-            result = decodeURIComponent(dic[1]);
+    let result = null;
+    const cookies = document.cookie.split(';');
+    cookies.some(cookie => {
+        const [k, v] = cookie.trim().split('=');
+        if (k === key) {
+            result = decodeURIComponent(v);
             return true;
         }
+        return false;
     });
     return result;
 }
 
-// 공통 HTTP 요청 함수
+// 공통 HTTP 요청 함수 (콜백 기반)
 function httpRequest(method, url, body, success, fail) {
+    console.log(`API 요청: ${method} ${url}`);
+    if (body) {
+        console.log('Request Body:', body);
+    }
+
+    const headers = {
+        'Content-Type': 'application/json',
+    };
+
+    const accessToken = localStorage.getItem('access_token');
+    if (accessToken) {
+        headers['Authorization'] = 'Bearer ' + accessToken;
+    }
+
     fetch(url, {
         method: method,
-        headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('access_token'),
-            'Content-Type': 'application/json'
-        },
-        body: body ? JSON.stringify(body) : null // body가 있을 경우 JSON 문자열로 변환
+        headers: headers,
+        body: body ? JSON.stringify(body) : null
     })
-    .then(response => {
-        if (response.status === 200 || response.status === 201 || response.status === 204) {
-            // 데이터가 있는 경우 JSON 파싱 후 success 호출
-            if (response.status !== 204) { // 204 No Content인 경우
-                return response.json().then(data => success(data));
+    .then(async response => {
+        if (response.status === 401) {
+            const refreshToken = getCookie('refresh_token');
+            if (refreshToken) {
+                // 토큰 재발급 시도
+                const tokenResponse = await fetch('/api/token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ refreshToken: refreshToken })
+                });
+
+                if (tokenResponse.ok) {
+                    const tokenData = await tokenResponse.json();
+                    localStorage.setItem('access_token', tokenData.accessToken);
+                    // 재발급 받은 토큰으로 원래 요청 재시도
+                    headers['Authorization'] = 'Bearer ' + tokenData.accessToken;
+                    return fetch(url, {
+                        method: method,
+                        headers: headers,
+                        body: body ? JSON.stringify(body) : null
+                    });
+                } else {
+                    fail(new Error('Failed to refresh token'));
+                    return;
+                }
             } else {
-                return success();
+                fail(new Error('No refresh token available'));
+                return;
             }
         }
-        const refresh_token = getCookie('refresh_token');
-        if (response.status === 401 && refresh_token) {
-            // 토큰 재발급 시도
-            return fetch('/api/token', {
-                method: 'POST',
-                headers: {
-                    Authorization: 'Bearer ' + localStorage.getItem('access_token'),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    refreshToken: refresh_token
-                })
-            })
-            .then(res => {
-                if (res.ok) {
-                    return res.json();
-                }
-                throw new Error('Failed to refresh token');
-            })
-            .then(result => {
-                // 재발급 성공 시 로컬 스토리지 교체 후 요청 재시도
-                localStorage.setItem('access_token', result.accessToken);
-                httpRequest(method, url, body, success, fail);
-            })
-            .catch(error => fail());
+
+        if (response.ok) {
+            // 응답이 JSON인지 확인
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.indexOf('application/json') !== -1) {
+                return response.json();
+            } else {
+                // JSON이 아닌 경우 에러 처리
+                const text = await response.text();
+                throw new Error(`Unexpected response type: ${contentType}\nResponse Text: ${text}`);
+            }
         } else {
-            return fail();
+            // 응답이 정상적이지 않은 경우
+            const errorText = await response.text();
+            throw new Error(`HTTP error! status: ${response.status}\nResponse Text: ${errorText}`);
+        }
+    })
+    .then(data => {
+        console.log(data);
+        if (data) {
+            success(data);
         }
     })
     .catch(error => {
-        console.error('HTTP Request Error:', error);
-        fail();
+        fail(error);
     });
+}
+
+// 로딩 스피너 제어 함수
+function showLoading() {
+    document.getElementById('loading-spinner').style.display = 'block';
+}
+
+function hideLoading() {
+    document.getElementById('loading-spinner').style.display = 'none';
 }
 
 // 날짜 형식을 원하는 형태로 변환하는 함수 (예: 2024-05-01 → 2024.05.01)
 function formatDate(input) {
     if (!input) return "정보 없음";
-    // input이 날짜 문자열인지 확인
     if (typeof input === 'string' && !isNaN(Date.parse(input))) {
         const date = new Date(input);
         const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1
+        const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
         return `${year}.${month}.${day}`;
     }
     return input;
 }
 
-// 함수: 특정 여행 정보 상세 가져오기
-function fetchTripDetails(id) {
-    httpRequest('GET', `/trip/${id}`, null, function(tripInfo) {
-        const detailsContainer = document.getElementById('trip-details');
+// 페이지 로드 시 사용자의 여행 목록을 가져와 select 요소에 추가
+function fetchMyTourList() {
+    showLoading();
 
-        // 기존 상세 정보와 지도를 초기화
-        detailsContainer.innerHTML = '';
-        const mapContainer = document.getElementById('map');
-        mapContainer.innerHTML = '';
-
-        // tripInfo가 없는 경우 처리
-        if (!tripInfo) {
-            detailsContainer.innerHTML = '<p>여행 정보를 불러올 수 없습니다.</p>';
-            return;
-        }
-
-        // 콘텐츠 ID 추출 (중복 제거)
-        let allContentIds = [];
-        for (let day in tripInfo.contentIdsByDate) {
-            allContentIds = allContentIds.concat(tripInfo.contentIdsByDate[day]);
-        }
-        allContentIds = [...new Set(allContentIds)]; // 중복 제거
-
-        // 콘텐츠 상세 정보 가져오기
-        fetchContentDetails(allContentIds)
-            .then(contentDetails => {
-                // 콘텐츠를 날짜별로 매핑
-                const contentByDate = {};
-                for (let day in tripInfo.contentIdsByDate) {
-                    contentByDate[day] = tripInfo.contentIdsByDate[day].map(id => contentDetails[id] || {
-                        contentid: id,
-                        title: "정보 없음",
-                        tel: "정보 없음",
-                        addr1: "정보 없음",
-                        firstimage: "/img/logo.png",
-                        mapx: "정보 없음",
-                        mapy: "정보 없음",
-                        homepage: "정보 없음",
-                        overview: "정보 없음"
-                    });
-                }
-
-                // 상세 여행 정보 HTML 생성
-                const tripDetailsHtml = `
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">${tripInfo.areaName || '정보 없음'}</h5>
-                            <p class="card-text">여행 지역: ${tripInfo.areaName || '정보 없음'}</p>
-                            <p class="card-text">시작일: ${formatDate(tripInfo.startDate)}</p>
-                            <p class="card-text">종료일: ${formatDate(tripInfo.endDate)}</p>
-                        </div>
-                    </div>
-                    <h2>날짜별 콘텐츠 정보</h2>
-                    <ul>
-                        ${Object.entries(contentByDate).map(([day, contents]) => `
-                            <li>
-                                <strong>날짜: ${day}</strong>
-                                <ul>
-                                    ${contents.map(content => `
-                                        <li class="content-detail" data-id="${content.contentid}" data-title="${content.title}" data-mapx="${content.mapx}" data-mapy="${content.mapy}">
-                                            <p>
-                                                제목: ${content.title || '정보 없음'}<br>
-                                                전화번호: ${content.tel || '정보 없음'}<br>
-                                                주소: ${content.addr1 || '정보 없음'}<br>
-                                                이미지: <img src="${content.firstimage || '/img/logo.png'}" alt="이미지"><br>
-                                                홈페이지: ${content.homepage && content.homepage !== "정보 없음" ? `<a href="${content.homepage}" target="_blank">${content.homepage}</a>` : '정보 없음'}<br>
-                                                개요: ${content.overview || '정보 없음'}<br>
-                                            </p>
-                                        </li>
-                                    `).join('')}
-                                </ul>
-                            </li>
-                        `).join('')}
-                    </ul>
-                `;
-
-                detailsContainer.innerHTML = tripDetailsHtml;
-
-                // 지도 초기화 및 표시
-                initializeMap(contentDetails);
-            })
-            .catch(error => {
-                console.error('Error fetching content details:', error);
-                detailsContainer.innerHTML += '<p>콘텐츠 정보를 불러오는 데 실패했습니다.</p>';
-            });
-    }, function() {
-        alert("여행 정보를 가져올 수 없습니다.");
-    });
+    httpRequest('GET', '/trip/myTrip', null, successLoadMyTrip, failLoadMyTrip);
 }
 
-// 함수: 콘텐츠 상세 정보 가져오기
-function fetchContentDetails(contentIds) {
-    // 콘텐츠 ID별로 API 호출
-    const fetchPromises = contentIds.map(id => {
-        return fetch(`/trip/${id}`, {
-            method: 'GET',
-            headers: {
-                Authorization: 'Bearer ' + localStorage.getItem('access_token'),
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                // API 호출 실패 시 기본값 반환
-                return {
-                    contentid: id,
-                    title: "정보 없음",
-                    tel: "정보 없음",
-                    addr1: "정보 없음",
-                    firstimage: "/img/logo.png",
-                    mapx: "정보 없음",
-                    mapy: "정보 없음",
-                    homepage: "정보 없음",
-                    overview: "정보 없음"
-                };
-            }
-            return response.json();
-        })
-        .catch(error => {
-            console.error(`Error fetching content ID ${id}:`, error);
-            return {
-                contentid: id,
-                title: "정보 없음",
-                tel: "정보 없음",
-                addr1: "정보 없음",
-                firstimage: "/img/logo.png",
-                mapx: "정보 없음",
-                mapy: "정보 없음",
-                homepage: "정보 없음",
-                overview: "정보 없음"
-            };
-        });
-    });
+function successLoadMyTrip(data) {
+    hideLoading();
+    const select = document.getElementById('tripInfo');
+    select.innerHTML = '<option value="" disabled selected>선택하세요</option>';
 
-    // 모든 API 호출이 완료될 때까지 기다림
-    return Promise.all(fetchPromises).then(results => {
-        const contentMap = {};
-        results.forEach(content => {
-            contentMap[content.contentid] = content;
-        });
-        return contentMap;
-    });
-}
-
-// Kakao Maps API를 사용하여 지도 초기화 및 표시
-function initializeMap(contentDetails) {
-    // 마커 위치 정보를 담을 배열
-    var markers = [];
-
-    // 마커들의 위도, 경도를 합산할 변수
-    var totalMapX = 0;
-    var totalMapY = 0;
-
-    // 각 콘텐츠의 데이터를 순회하며 마커 위치 추출
-    contentDetails.forEach(function(content) {
-        var mapX = parseFloat(content.mapx); // X좌표 (경도)
-        var mapY = parseFloat(content.mapy); // Y좌표 (위도)
-
-        // 유효한 좌표가 있는 경우에만 마커 추가
-        if (!isNaN(mapX) && !isNaN(mapY)) {
-            markers.push({
-                mapx: mapX,
-                mapy: mapY,
-                title: content.title || '정보 없음'
-            });
-
-            // 위도와 경도를 합산
-            totalMapX += mapX;
-            totalMapY += mapY;
-        }
-    });
-
-    console.log("Markers:", markers);
-
-    // 마커들이 없으면 초기 지도를 서울 시청으로 설정
-    if (markers.length === 0) {
-        var defaultMapX = 126.9780;
-        var defaultMapY = 37.5665;
-
-        var mapContainer = document.getElementById('map'),
-            mapOption = {
-                center: new kakao.maps.LatLng(defaultMapY, defaultMapX), // 서울 시청 위치
-                level: 10 // 초기 확대 레벨
-            };
-
-        var map = new kakao.maps.Map(mapContainer, mapOption);
+    if (data.length === 0) {
+        const option = document.createElement('option');
+        option.value = "";
+        option.textContent = "여행 정보가 없습니다.";
+        option.disabled = true;
+        select.appendChild(option);
         return;
     }
 
-    // 마커들의 평균 위치 계산
-    var avgMapX = totalMapX / markers.length;  // 평균 경도
-    var avgMapY = totalMapY / markers.length;  // 평균 위도
-
-    // 지도 생성 (카카오맵 예시)
-    var mapContainer = document.getElementById('map'),
-        mapOption = {
-            center: new kakao.maps.LatLng(avgMapY, avgMapX), // 마커들의 평균 위치로 초기 지도 중심 설정
-            level: 10 // 초기 확대 레벨
-        };
-
-    var map = new kakao.maps.Map(mapContainer, mapOption);
-
-    // markers 배열을 사용하여 지도에 마커 추가
-    markers.forEach(function(markerData) {
-        var position = new kakao.maps.LatLng(markerData.mapy, markerData.mapx);
-        var marker = new kakao.maps.Marker({
-            position: position,
-        });
-        marker.setMap(map);
-
-        // 정보 창 생성
-        var infowindow = new kakao.maps.InfoWindow({
-            content: `<div style="padding:5px;"><strong>${markerData.title}</strong></div>`
-        });
-
-        // 마커에 클릭 이벤트 추가
-        kakao.maps.event.addListener(marker, 'click', function() {
-            infowindow.open(map, marker);
-        });
+    data.forEach(tripInfoDto => {
+        const option = document.createElement('option');
+        option.value = tripInfoDto.id;
+        option.textContent = `나의 ${tripInfoDto.areaName} 여행 ${formatDate(tripInfoDto.startDate)} - ${formatDate(tripInfoDto.endDate)}`;
+        select.appendChild(option);
     });
 
-    // polyline을 그리기 위한 경로 설정
-    var path = markers.map(function(markerData) {
-        return new kakao.maps.LatLng(markerData.mapy, markerData.mapx);
+    // 선택 시 상세 정보를 표시하는 이벤트 리스너 추가
+    select.addEventListener('change', function() {
+        const selectedId = this.value;
+        if (selectedId) {
+            fetchTripDetails(selectedId);
+        }
     });
+}
 
-    // polyline 옵션 설정
-    var polyline = new kakao.maps.Polyline({
-        path: path, // polyline의 경로 (마커 배열 순서대로 연결)
-        strokeWeight: 5, // 선의 두께
-        strokeColor: '#FF0000', // 선의 색상 (빨강)
-        strokeOpacity: 0.7, // 선의 불투명도
-        strokeStyle: 'solid' // 선의 스타일 (실선)
+function failLoadMyTrip(error) {
+    hideLoading();
+    console.error('Error loading myTrip:', error);
+    alert('로그인이 필요합니다.');
+    // 로그인 페이지로 리디렉션
+    window.location.href = '/login';
+}
+
+// 에러 메시지 모달 표시 함수 (선택 사항)
+function showError(message) {
+    // 에러 모달이 존재하는지 확인
+    const errorModal = $('#errorModal');
+    if (errorModal.length) {
+        document.getElementById('errorModalBody').textContent = message;
+        errorModal.modal('show');
+    } else {
+        // 모달이 없으면 alert으로 대체
+        alert(message);
+    }
+}
+
+// 특정 여행 정보 상세 가져오기
+function fetchTripDetails(id) {
+    showLoading();
+
+    httpRequest('GET', `/trip/${id}`, null, successLoadTripDetails, failLoadTripDetails);
+}
+
+function successLoadTripDetails(tripInfo) {
+    hideLoading();
+    const detailsContainer = document.getElementById('trip-details');
+
+    // 기존 상세 정보 초기화
+    detailsContainer.innerHTML = '';
+
+    if (!tripInfo) {
+        detailsContainer.innerHTML = '<p>여행 정보를 불러올 수 없습니다.</p>';
+        return;
+    }
+
+    // 여행 상세 정보 표시 (예시)
+    detailsContainer.innerHTML = `
+        <h2>${tripInfo.areaName} 여행 상세</h2>
+        <p>작성자: ${tripInfo.author}</p>
+        <p>기간: ${formatDate(tripInfo.startDate)} - ${formatDate(tripInfo.endDate)}</p>
+        <p>생성일: ${formatDate(tripInfo.createdAt)}</p>
+    `;
+
+    // 콘텐츠 상세 정보 가져오기
+    fetchContentDetails(tripInfo.contentIdsByDate, contentMap => {
+        displayContentDetails(contentMap, detailsContainer);
+    }, error => {
+        console.error('Error fetching content details:', error);
+        alert('콘텐츠 정보를 가져오는 데 실패했습니다.');
     });
+}
 
-    // polyline 지도에 추가
-    polyline.setMap(map);
+function failLoadTripDetails(error) {
+    hideLoading();
+    console.error('Error loading trip details:', error);
+    alert('여행 정보를 가져오는 데 실패했습니다.');
+}
+
+// 콘텐츠 상세 정보 가져오기
+function fetchContentDetails(contentIdsByDate, success, fail) {
+    const contentIds = [];
+    for (const day in contentIdsByDate) {
+        contentIds.push(...contentIdsByDate[day]);
+    }
+
+    const contentMap = {};
+    let completed = 0;
+    const total = contentIds.length;
+
+    if (total === 0) {
+        success(contentMap);
+        return;
+    }
+
+    contentIds.forEach(contentId => {
+        httpRequest('GET', `/content/${contentId}`, null, data => {
+            contentMap[contentId] = data;
+            completed++;
+            if (completed === total) {
+                success(contentMap);
+            }
+        }, error => {
+            console.error(`Error fetching content ID ${contentId}:`, error);
+            contentMap[contentId] = null; // 또는 필요한 방식으로 처리
+            completed++;
+            if (completed === total) {
+                success(contentMap);
+            }
+        });
+    });
+}
+
+// 콘텐츠 상세 정보 표시 함수
+function displayContentDetails(contentMap, container) {
+    const contentDetailsContainer = document.createElement('div');
+    contentDetailsContainer.id = 'content-details';
+    contentDetailsContainer.innerHTML = '<h3>여행 콘텐츠 목록</h3>';
+
+    for (const contentId in contentMap) {
+        const content = contentMap[contentId];
+        if (content) {
+            const contentDiv = document.createElement('div');
+            contentDiv.classList.add('content-item');
+            contentDiv.innerHTML = `
+                <h4>${content.title}</h4>
+                <p>전화번호: ${content.tel || "정보 없음"}</p>
+                <p>주소: ${content.addr1 || "정보 없음"}</p>
+                <img src="${content.firstimage}" alt="${content.title}" style="max-width:200px;">
+                <p>홈페이지: <a href="${content.homepage}" target="_blank">${content.homepage || "정보 없음"}</a></p>
+                <p>개요: ${content.overview || "정보 없음"}</p>
+                <hr>
+            `;
+            contentDetailsContainer.appendChild(contentDiv);
+        } else {
+            const errorDiv = document.createElement('div');
+            errorDiv.classList.add('content-item');
+            errorDiv.innerHTML = `
+                <h4>콘텐츠 ID: ${contentId}</h4>
+                <p>정보를 가져올 수 없습니다.</p>
+                <hr>
+            `;
+            contentDetailsContainer.appendChild(errorDiv);
+        }
+    }
+
+    container.appendChild(contentDetailsContainer);
+}
+
+// 에러 핸들링을 위한 failLoadContentDetails 함수 정의
+function failLoadContentDetails(error) {
+    hideLoading();
+    console.error('Error loading content details:', error);
+    alert('콘텐츠 정보를 가져오는 데 실패했습니다.');
+    // 선택 사항: showError 함수를 사용하여 모달로 에러 표시
+    showError('콘텐츠 정보를 가져오는 데 실패했습니다.');
 }
