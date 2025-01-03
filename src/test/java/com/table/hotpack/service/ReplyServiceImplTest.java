@@ -12,19 +12,26 @@ import com.table.hotpack.repository.ArticleRepository;
 import com.table.hotpack.repository.ReplyLikeRepository;
 import com.table.hotpack.repository.ReplyRepository;
 import com.table.hotpack.repository.UserRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.security.Security;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -73,6 +80,30 @@ class ReplyServiceImplTest {
         reply= Reply.builder()
                 .replyer(user.getNickname())
                 .reply("testreply").build();
+
+        //Mock Repository 동작 정의
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+    }
+
+    // 초기화 작업 (모든 테스트 메서드 전에 실행)
+    @BeforeEach
+    void setUpSecurityContext() {
+        // Mock Authentication 객체 생성
+        Authentication authentication = Mockito.mock(Authentication.class);
+        SecurityContext securityContext=Mockito.mock(SecurityContext.class);
+
+        //Mock SecurityContext 동작 정의
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(user.getEmail()); // 현재 사용자의 이메일 반환(테스트에서 사용할 사용자 이메일)
+
+        // SecurityContextHolder에 설정
+        SecurityContextHolder.setContext(securityContext);
+    }
+
+    // 테스트 완료 후 정리 작업(모든 테스트 메서드 후에 실행)
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext(); // SecurityContext 초기화
     }
 
     @Test
@@ -88,6 +119,27 @@ class ReplyServiceImplTest {
         assertThat(result.getContent().get(0).getReply()).isEqualTo("testreply");
         verify(replyRepository, times(1)).findByArticleIdWithPaging(reply.getReplyId(), pagable);
 
+    }
+
+    @Test
+    void findRepliesByArticleId_ShouldWorkNotLoggedIn() {
+        //given
+        PageRequest pageable=PageRequest.of(0,10);
+        Page<Reply> replies = new PageImpl<>(List.of(reply));
+        when(replyRepository.findByArticleIdOrderByCreatedAtDesc(article.getId(), pageable)).thenReturn(replies);
+        when(replyLikeRepository.countByReply(reply)).thenReturn(5);
+
+        //SecurityContextHolder를 비워 비로그인 상태를 시뮬레이션
+        SecurityContextHolder.clearContext();
+
+        //when
+        Page<ReplyResponse> result = replyService.findRepliesByArticleId(article.getId(), pageable);
+
+        //then
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getReply()).isEqualTo(reply.getReply());
+        assertThat(result.getContent().get(0).getTotalLikes()).isEqualTo(5);
+        assertThat(result.getContent().get(0).isLiked()).isFalse();
     }
 
     @Test
@@ -181,6 +233,66 @@ class ReplyServiceImplTest {
         //then
         assertThat(likers).containsExactly(user.getNickname(), anotherUser.getNickname());
         verify(replyLikeRepository, times(1)).findAllReply(reply);
+    }
+
+    @Test
+    void findTopRepliesByLikes_ShouldReturnTopReplies() {
+        //given
+        int limit=3;
+        Reply reply1=Reply.builder()
+                .replyer("user1")
+                .reply("Top reply 1")
+                .build();
+        Reply reply2=Reply.builder()
+                .replyer("user2")
+                .reply("Top reply 2")
+                .build();
+        Reply reply3=Reply.builder()
+                .replyer("user3")
+                .reply("Top reply 3")
+                .build();
+
+        when(replyRepository.findTopRepliesByLikes(article.getId(), PageRequest.of(0, limit)))
+                .thenReturn(List.of(reply1, reply2, reply3));
+
+        when(replyLikeRepository.countByReply(reply1)).thenReturn(10);
+        when(replyLikeRepository.countByReply(reply2)).thenReturn(8);
+        when(replyLikeRepository.countByReply(reply3)).thenReturn(5);
+
+        when(replyLikeRepository.existsByReplyAndUser(reply1,user)).thenReturn(true);
+        when(replyLikeRepository.existsByReplyAndUser(reply2, user)).thenReturn(false);
+        when(replyLikeRepository.existsByReplyAndUser(reply3, user)).thenReturn(true);
+
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+
+        //when
+        List<ReplyResponse> topReplies=replyService.findTopRepliesByLikes(article.getId(), limit);
+
+        //then
+        assertThat(topReplies).hasSize(3);
+
+        ReplyResponse firstReply = topReplies.get(0);
+        assertThat(firstReply.getReply()).isEqualTo("Top reply 1");
+        assertThat(firstReply.getTotalLikes()).isEqualTo(10);
+        assertThat(firstReply.isLiked()).isTrue();
+
+        ReplyResponse secondReply = topReplies.get(1);
+        assertThat(secondReply.getReply()).isEqualTo("Top reply 2");
+        assertThat(secondReply.getTotalLikes()).isEqualTo(8);
+        assertThat(secondReply.isLiked()).isFalse();
+
+        ReplyResponse thirdReply = topReplies.get(2);
+        assertThat(thirdReply.getReply()).isEqualTo("Top reply 3");
+        assertThat(thirdReply.getTotalLikes()).isEqualTo(5);
+        assertThat(thirdReply.isLiked()).isTrue();
+
+        verify(replyRepository, times(1)).findTopRepliesByLikes(article.getId(), PageRequest.of(0, limit));
+        verify(replyLikeRepository, times(1)).countByReply(reply1);
+        verify(replyLikeRepository, times(1)).countByReply(reply2);
+        verify(replyLikeRepository, times(1)).countByReply(reply3);
+        verify(replyLikeRepository, times(1)).existsByReplyAndUser(reply1, user);
+        verify(replyLikeRepository, times(1)).existsByReplyAndUser(reply2, user);
+        verify(replyLikeRepository, times(1)).existsByReplyAndUser(reply3, user);
     }
 
 }

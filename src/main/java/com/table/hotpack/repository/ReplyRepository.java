@@ -26,4 +26,9 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
     List<Reply> findByUser(User user);
     @Query("SELECT r FROM Reply r WHERE r.user.id= :userId")
     List<Reply> findByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT r FROM Reply r LEFT JOIN r.replyLikes rl "+
+            "GROUP BY r " +
+            "ORDER BY COUNT(rl) DESC, r.createdAt DESC")
+    List<Reply> findTopRepliesByLikes(@Param("articleId") Long article, Pageable pageable);
 }
