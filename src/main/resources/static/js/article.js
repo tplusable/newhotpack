@@ -96,7 +96,9 @@ if (createArticleButton) {
     createArticleButton.addEventListener('click', event => {
         let body = JSON.stringify({
             title: document.getElementById('title').value,
-            content: document.getElementById('content').value
+            content: document.getElementById('content').value,
+            tripInfoId: parseInt(document.getElementById('tripInfo').value, 10) // 숫자로 변환
+
         });
 
         function success() {

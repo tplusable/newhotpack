@@ -19,7 +19,7 @@ function getCookie(key) {
 }
 
 // 공통 HTTP 요청 함수 (콜백 기반)
-function httpRequest(method, url, body, success, fail) {
+function httpRequestTour(method, url, body, success, fail) {
     console.log(`API 요청: ${method} ${url}`);
     if (body) {
         console.log('Request Body:', body);
@@ -125,7 +125,7 @@ function formatDate(input) {
 function fetchMyTourList() {
     showLoading();
 
-    httpRequest('GET', '/trip/myTrip', null, successLoadMyTrip, failLoadMyTrip);
+    httpRequestTour('GET', '/trip/myTrip', null, successLoadMyTrip, failLoadMyTrip);
 }
 
 function successLoadMyTrip(data) {
@@ -183,7 +183,7 @@ function showError(message) {
 function fetchTripDetails(id) {
     showLoading();
 
-    httpRequest('GET', `/trip/${id}`, null, successLoadTripDetails, failLoadTripDetails);
+    httpRequestTour('GET', `/trip/${id}`, null, successLoadTripDetails, failLoadTripDetails);
 }
 
 function successLoadTripDetails(tripInfo) {
@@ -238,7 +238,7 @@ function fetchContentDetails(contentIdsByDate, success, fail) {
     }
 
     contentIds.forEach(contentId => {
-        httpRequest('GET', `/content/${contentId}`, null, data => {
+        httpRequestTour('GET', `/content/${contentId}`, null, data => {
             contentMap[contentId] = data;
             completed++;
             if (completed === total) {
@@ -289,13 +289,4 @@ function displayContentDetails(contentMap, container) {
     }
 
     container.appendChild(contentDetailsContainer);
-}
-
-// 에러 핸들링을 위한 failLoadContentDetails 함수 정의
-function failLoadContentDetails(error) {
-    hideLoading();
-    console.error('Error loading content details:', error);
-    alert('콘텐츠 정보를 가져오는 데 실패했습니다.');
-    // 선택 사항: showError 함수를 사용하여 모달로 에러 표시
-    showError('콘텐츠 정보를 가져오는 데 실패했습니다.');
 }
