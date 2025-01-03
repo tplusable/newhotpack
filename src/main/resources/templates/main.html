@@ -5,17 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>여행 계획</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mainpage.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
 </head>
 <body>
-<header th:replace="layouts/header::header"></header>
-<main>
-    <h1>여행 계획을 세워보세요!</h1>
-    <button type="button" id="mypage-btn" class="btn btn-secondary"
-            onclick="location.href='/getAreaList'">내 여행일정 만들러 가기</button>
-    <button type="button" id="articleList-btn" class="btn btn-secondary"
-            onclick="location.href='/articles'">전체 글 보기</button>
-</main>
+<div class="full" style="height: 100vh; overflow: hidden;">
+    <header th:fragment="header"
+            style="display: flex;
+             align-items: center;
+             justify-content: space-between;
+             padding: 0 20px;">
+
+        <!-- 왼쪽 로고 -->
+        <div style="display: flex; align-items: center;">
+            <a href="/" style="display: flex; align-items: center; text-decoration: none;">
+                <div class="logo">
+                    <img src="/img/logo.png" alt="로고" style="height: 40px;" />
+                </div>
+                <div class="logoText" style="margin-left: 5px;">
+                    <img src="/img/logoText.png" alt="로고 텍스트" style="height: 20px; width: auto;" />
+                </div>
+            </a>
+        </div>
+
+        <!-- 오른쪽 인증(로그인/회원가입) 버튼 영역 -->
+        <div id="auth-buttons" class="auth-buttons"></div>
+    </header>
+    <main class="app-container d-flex justify-content-center align-items-center">
+        <div class="app-view-container d-flex justify-content-between align-items-center">
+            <!-- Carousel -->
+            <div id="carouselExampleSlidesOnly" class="carousel-slide" data-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="/img/logo.png" alt="로고" class="d-block w-100">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/img/tour1.png" class="d-block w-100" alt="...">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/img/tour2.jpg" class="d-block w-100" alt="...">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/img/tour3.jpg" class="d-block w-100" alt="...">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/img/tour4.jpg" class="d-block w-100" alt="...">
+                    </div>
+                </div>
+            </div>
+            <!-- Text Center Section -->
+            <div class="text-center" style="margin-left: 20px;">
+                <h1 h1 style="font-size: 24px;">여행 계획을 세워보세요!</h1>
+                <button type="button" id="mypage-btn" class="btn btn-secondary my-3"
+                        onclick="location.href='/getAreaList'">내 여행일정 만들러 가기</button>
+                <button type="button" id="articleList-btn" class="btn btn-secondary"
+                        onclick="location.href='/articles'">전체 글 보기</button>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
 <script src="/js/token.js"></script>
 <script src="/js/header.js"></script>
 </body>
+<footer>
+    <p>© 2024 HOTPACK. All rights reserved.</p>
+</footer>
 </html>

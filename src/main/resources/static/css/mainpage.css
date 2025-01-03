@@ -1,0 +1,73 @@
+.full {
+    width: 70%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+
+/* app-container에서 중앙에 위치하도록 설정 */
+.app-container {
+    display: flex;
+    justify-content: center; /* 가로 중앙 정렬 */
+    align-items: center; /* 세로 중앙 정렬 */
+    width: 100%;
+    height: 100%;
+}
+
+/* app-view-container에서 carousel과 텍스트를 가로로 나열 */
+.app-view-container {
+    display: flex;
+    justify-content: space-between; /* 항목들을 가로로 나열 */
+    align-items: center; /* 세로로 중앙 정렬 */
+    width: 60%; /* 적당한 너비를 설정 (전체 화면의 80%) */
+}
+
+.carousel-slide{
+}
+
+.carousel-item {
+    width: 350px;
+    height: 350px;
+    overflow: hidden; /* 이미지가 넘치지 않도록 설정 */
+}
+
+
+.carousel-item img{
+    width: 350px !important;
+    height: 350px !important;
+    object-fit: cover !important;
+    border-radius: 15px; /* 둥근 모서리 적용 */
+}
+
+.container {
+              max-width: 600px;
+              margin: 0 auto;
+              background: white;
+                        padding: 20px;
+                        border-radius: 8px;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    }
+.button {
+              display: inline-block;
+               padding: 10px 20px;
+               margin: 10px 0;
+               background-color: #007BFF;
+               color: white;
+               border: none;
+               border-radius: 5px;
+               cursor: pointer;
+               text-align: center;
+               font-size: 16px;
+               transition: background-color 0.3s;
+                    }
+.button:hover {
+    background-color: #0056b3;
+}
+.result {
+    display: block;
+    margin: 10px 0;
+    font-weight: bold;
+    color: #555;
+}
