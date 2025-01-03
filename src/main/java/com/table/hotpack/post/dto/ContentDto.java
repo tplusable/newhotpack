@@ -1,9 +1,6 @@
 package com.table.hotpack.post.dto;
 
-import lombok.Data;
-
-@Data
-public class ApiResponse {
+public class ContentDto {
     private String title;
     private String tel;
     private String addr1;
@@ -11,17 +8,14 @@ public class ApiResponse {
     private String mapx;
     private String mapy;
     private String contentid;
-    private String btitle;
-    private String author;
     private String homepage;
     private String overview;
 
-
     // 기본 생성자
-    public ApiResponse() {}
+    public ContentDto() {}
 
-    // 파라미터화된 생성자
-    public ApiResponse(String title, String tel, String addr1, String firstimage, String mapx, String mapy, String contentid, String homepage, String overview) {
+    // 모든 필드를 초기화하는 생성자
+    public ContentDto(String title, String tel, String addr1, String firstimage, String mapx, String mapy, String contentid, String homepage, String overview) {
         this.title = title;
         this.tel = tel;
         this.addr1 = addr1;
@@ -33,7 +27,7 @@ public class ApiResponse {
         this.overview = overview;
     }
 
-    /*// Getter 및 Setter 메소드
+    // Getters and Setters
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
 
@@ -50,27 +44,14 @@ public class ApiResponse {
     public void setMapx(String mapx) { this.mapx = mapx; }
 
     public String getMapy() { return mapy; }
-    public void setMapy(String mapy) { this.mapy = mapy; }*/
+    public void setMapy(String mapy) { this.mapy = mapy; }
 
-    public String getContentId() { return contentid; }
-    public void setContentId(String contentId) { this.contentid = contentId; }
+    public String getContentid() { return contentid; }
+    public void setContentid(String contentid) { this.contentid = contentid; }
 
+    public String getHomepage() { return homepage; }
+    public void setHomepage(String homepage) { this.homepage = homepage; }
 
-
-
-    @Override
-    public String toString() {
-        return "ApiResponse{" +
-                "title='" + title + '\'' +
-                ", tel='" + tel + '\'' +
-                ", addr1='" + addr1 + '\'' +
-                ", firstimage='" + firstimage + '\'' +
-                ", mapx='" + mapx + '\'' +
-                ", mapy='" + mapy + '\'' +
-                ", contentid='" + contentid + '\''+
-                ", homepage='" + homepage + '\''+
-                ", overview='" + overview + '\''+
-                '}';
-    }
-
+    public String getOverview() { return overview; }
+    public void setOverview(String overview) { this.overview = overview; }
 }

@@ -2,9 +2,6 @@ package com.table.hotpack.post.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.table.hotpack.post.domain.ContentId;
-import com.table.hotpack.post.domain.TripInfo;
-import com.table.hotpack.post.dto.ApiResponse;
 import com.table.hotpack.post.dto.TripInfoDto;
 import com.table.hotpack.post.service.ApiService;
 import com.table.hotpack.post.service.TripInfoService;
@@ -13,13 +10,11 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,20 +31,6 @@ public class TripViewController {
     private final TripInfoService tripInfoService;
     private final ApiService apiService;
     private final OkHttpClient client = new OkHttpClient();
-
-
-    // 모든 여행 정보 리스트 페이지
-//    @GetMapping("/all")
-//    public String viewAllTripInfos(Model model) {
-//        List<TripInfoDto> tripInfos = tripInfoService.getAllTripInfos().stream()
-//                .map(TripInfoDto::new)
-//                .toList();
-//        // 수정 가능한 리스트로 복사하여 정렬
-//        List<TripInfoDto> sortableList = new ArrayList<>(tripInfos);
-//        sortableList.sort((t1, t2) -> Long.compare(t2.getId(), t1.getId())); // ID 내림차순 정렬
-//        model.addAttribute("tripInfos", sortableList);
-//        return "tripInfoList"; // 여행 정보 목록 뷰 페이지
-//    }
 
     // 내 여행 정보 리스트 페이지
     @GetMapping("/myTrip")

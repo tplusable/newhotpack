@@ -59,6 +59,12 @@ public class TripInfoService {
         return tripInfoRepository.findByAuthorOrderByIdDesc(email);
     }
 
+    // ID와 유저를 기준으로 TripInfoDto 반환
+    public TripInfoDto getTripInfoDtoByIdAndAuthor(Long id, String author) {
+        return tripInfoRepository.findByIdAndAuthor(id, author)
+                .map(TripInfoDto::new)
+                .orElse(null);
+    }
     public TripInfo getTripInfoIfOwned(Long tripInfoId, String author) {
         TripInfo tripInfo = tripInfoRepository.findById(tripInfoId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid TripInfo ID"));
