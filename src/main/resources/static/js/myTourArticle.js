@@ -261,13 +261,38 @@ function displayContentDetails(contentMap, container) {
     contentDetailsContainer.id = 'content-details';
     contentDetailsContainer.innerHTML = '<h3>여행 콘텐츠 목록</h3>';
 
+    // Group the content by date
+    const contentByDate = {};
+
     for (const contentId in contentMap) {
         const content = contentMap[contentId];
         if (content) {
+            const contentDate = formatDate(content.date);  // Assuming `content.date` is the date field
+
+            if (!contentByDate[contentDate]) {
+                contentByDate[contentDate] = [];
+            }
+            contentByDate[contentDate].push(content);
+        }
+    }
+
+    // Loop through each date group and display content
+    for (const date in contentByDate) {
+        const dateSection = document.createElement('div');
+        dateSection.classList.add('date-section');
+
+        const dateTitle = document.createElement('h4');
+        dateTitle.textContent = `날짜: ${date}`;
+        dateSection.appendChild(dateTitle);
+
+        const contentList = document.createElement('div');
+        contentList.classList.add('content-list');
+
+        contentByDate[date].forEach(content => {
             const contentDiv = document.createElement('div');
             contentDiv.classList.add('content-item');
             contentDiv.innerHTML = `
-                <h4>${content.title}</h4>
+                <h5>${content.title}</h5>
                 <p>전화번호: ${content.tel || "정보 없음"}</p>
                 <p>주소: ${content.addr1 || "정보 없음"}</p>
                 <img src="${content.firstimage}" alt="${content.title}" style="max-width:200px;">
@@ -275,17 +300,11 @@ function displayContentDetails(contentMap, container) {
                 <p>개요: ${content.overview || "정보 없음"}</p>
                 <hr>
             `;
-            contentDetailsContainer.appendChild(contentDiv);
-        } else {
-            const errorDiv = document.createElement('div');
-            errorDiv.classList.add('content-item');
-            errorDiv.innerHTML = `
-                <h4>콘텐츠 ID: ${contentId}</h4>
-                <p>정보를 가져올 수 없습니다.</p>
-                <hr>
-            `;
-            contentDetailsContainer.appendChild(errorDiv);
-        }
+            contentList.appendChild(contentDiv);
+        });
+
+        dateSection.appendChild(contentList);
+        contentDetailsContainer.appendChild(dateSection);
     }
 
     container.appendChild(contentDetailsContainer);

@@ -1,0 +1,143 @@
+main {
+    width: 100% !important; /* 가로 100% 설정 */
+    padding-right: 15px !important;
+    padding-left: 15px !important;
+    margin-right: auto !important;
+    margin-left: auto !important; /* main을 화면 중앙에 배치 */
+    display: flex !important;
+    justify-content: center !important; /* 가로로 중앙 정렬 */
+    height: 100vh !important; /* 화면 전체 높이에 맞게 설정 */
+}
+
+
+label {
+display: block;
+background-color: #007BFF;
+color: white;
+padding: 10px;
+border-radius: 5px;
+text-align: center;
+cursor: pointer;
+}
+
+.listbutton {
+flex: 0.5;
+background-color: #007BFF;  /* 배경색 설정 */
+color: white;                /* 텍스트 색상 설정 */
+padding: 10px 20px;         /* 상하, 좌우 여백 설정 */
+border: none;                /* 기본 테두리 제거 */
+border-radius: 25px;        /* 둥글게 만들기 (값을 조정하여 둥글기를 변경) */
+font-size: 16px;            /* 폰트 크기 설정 */
+cursor: pointer;             /* 마우스 커서 변경 */
+transition: background-color 0.3s; /* 색상 전환 효과 */
+}
+
+.listbutton:hover {
+background-color: #0056b3;  /* 마우스를 올릴 때의 배경색 설정 */
+}
+
+
+.custom-select {
+    flex: 1;
+    position: relative;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ffffff;
+    color: black;
+    appearance: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.custom-select:after {
+    content: '▼';
+    position: absolute;
+    right: 10px;
+    top: 15px;
+    pointer-events: none;
+    color: white;
+    font-size: 16px;
+    color: #CCCCCC;
+}
+
+
+
+#travelForm {
+      background-color: white;
+      border-radius: 45px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      max-width: 800px;
+      margin: 40px auto;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 10px;
+}
+
+input[type="text"] {
+ width: 100%;
+  padding: 10px;
+  border: none; /* 테두리 없애기 */
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold; /* 글자 두껍게 */
+  color: black; /* 텍스트 색상 블랙 */
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.date-selection {
+    margin-top: 200px !important
+    }
+
+.date-container {
+  flex: 1;
+  position: relative; /* calendar 위치의 기준점 */
+  display: inline-block; /* 내부 요소 정렬 */
+}
+.calendar {
+    display: none;
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    padding: 10px;
+    width: 220px;
+    z-index: 100;
+}
+
+.calendar-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 10px;
+}
+
+.calendar-days {
+display: grid;
+grid-template-columns: repeat(7, 1fr);
+gap: 5px;
+}
+
+    .calendar-days span {
+    text-align: center;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    }
+
+    .calendar-days span:hover {
+    background-color: #007BFF;
+    color: white;
+    }
+
+    .calendar-days span.selected {
+    background-color: #007BFF;
+    color: white;
+    }
+
+
