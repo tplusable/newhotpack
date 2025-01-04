@@ -89,14 +89,7 @@ public class BlogViewController {
             model.addAttribute("article", new ArticleViewResponse(article));
         }
 
-//        // 로그인한 유저의 TripInfo 목록을 가져와서 카테고리로 사용
-//        List<TripInfoDto> tripInfos = tripInfoService.getMyTripInfos(principal.getName()).stream()
-//                .map(TripInfoDto::new)
-//                .toList();
-//
-//        List<TripInfoDto> sortableList = new ArrayList<>(tripInfos);
-//        sortableList.sort((t1, t2) -> Long.compare(t2.getId(), t1.getId())); // ID 내림차순 정렬
-//        model.addAttribute("tripInfos", sortableList);
+
 
         return "newArticle";
     }

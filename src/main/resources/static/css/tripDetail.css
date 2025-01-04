@@ -1,0 +1,172 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* 전체 화면 높이 */
+}
+
+.full {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;  /* header와 containerpage가 세로로 배치되도록 설정 */
+    height: 100vh;
+}
+.containerpage {
+  display: flex;
+  flex-direction: row;  /* 가로로 배치 */
+  flex-grow: 1;
+  }
+
+.containerbundle{
+    display: flex;
+    flex-direction: column;  /* 세로로 배치 */
+    flex: 1.5;
+ }
+
+.list-page {
+  flex-grow: 1;  /* 남은 공간을 모두 차지 */
+    overflow-y: auto;  /* 세로로 스크롤이 가능하도록 설정 */
+    margin-bottom: 10px;
+    height: 0;
+}
+
+.map-page {
+  flex: 3;
+  position: sticky; /* 화면 상단에 고정 */
+  padding: 10px;
+  height: 100%;
+}
+h2 {
+    font-size: 1.5rem;
+    color: #007bff;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    }
+
+    ul {
+    padding-left: 20px;
+    }
+
+    ul li {
+    margin-bottom: 10px;
+    }
+
+    .content-detail {
+    border-radius: 8px;
+    padding: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex; /* Flexbox로 세로 배치 */
+    flex-direction: column; /* 항목들이 세로로 배치 */
+    gap: 1rem; /* 항목 간격 */
+    margin-bottom: 1.5rem;
+    }
+    .content-detail > div:first-child {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.5rem;
+    width: 100%;
+    }
+    /* 이미지 스타일 */
+    .content-detail .content-image {
+        max-width: 100px;
+        height: 100px;
+        border-radius: 8px;
+    }
+    /* 2열: 아코디언 */
+    .content-detail .accordion {
+      width: 100%; /* 부모 flexbox 내에서 전체 너비 */
+    }
+
+
+    /* 제목 스타일 */
+    .content-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    /* 전화번호 스타일 */
+    .content-tel {
+        font-size: 1.1rem;
+        color: #555;
+        margin-bottom: 10px;
+    }
+
+    /* 주소 스타일 */
+    .content-address {
+        font-size: 1.1rem;
+        color: #555;
+        margin-bottom: 10px;
+    }
+
+
+    /* 홈페이지 링크 스타일 */
+    .content-homepage {
+        color: #007bff;  /* 링크 색상 */
+        text-decoration: underline;  /* 밑줄 */
+        padding: 5px 10px;  /* 여백 (위아래 5px, 좌우 10px) */
+        background-color: #f8f9fa;  /* 배경색 */
+        border-radius: 5px;
+        display: inline-block;  /* 블록처럼 취급되지만 내용 크기만큼 크기 */
+        text-align: center;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+
+        /* 글씨 크기 설정 */
+        font-size: 16px;  /* 글씨 크기 16px */
+
+        /* 링크의 너비와 높이 설정 (필요한 경우) */
+        width: 100px;  /* 링크의 너비 150px */
+        height: 40px;  /* 링크의 높이 40px */
+
+        /* 텍스트 중앙 정렬 (세로) */
+        line-height: 30px;  /* 링크 내부 텍스트 세로 중앙 정렬 */
+
+        position: absolute;
+        right: 20px;
+    }
+
+    .content-homepage:hover {
+        text-decoration: underline;
+    }
+
+    .btn-secondary {
+    padding: 10px;
+      background-color: #000;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      text-align: center;
+      display: block;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    .btn-secondary:hover {
+    background-color: #5a6268;
+    }
+
+    .date-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    }
+
+    .date-item {
+    background-color: #007bff;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    }*/
+
+

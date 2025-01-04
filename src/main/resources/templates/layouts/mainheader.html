@@ -2,19 +2,16 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/css/style.css">
+    <title>Title</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<header th:fragment="header"
+<header th:fragment="mainheader"
         style="display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 20px 30px;
-        margin-right: auto;
-        margin-left: auto;
-        height: 80px;
-        top: 30px;
-        width: 90%;">
+             align-items: center;
+             justify-content: space-between;
+             padding: 20px 30px;
+             height: 80px;">
 
     <!-- 왼쪽 로고 -->
     <div style="display: flex; align-items: center;">
@@ -27,13 +24,6 @@
             </div>
         </a>
     </div>
-
-    <!-- 가운데 메뉴(nav) -->
-    <nav style="display: flex; gap: 20px;">
-        <a href="/" style="text-decoration: none; color: black;">홈</a>
-        <a href="/getAreaList" style="text-decoration: none; color: black;">계획 만들기</a>
-        <a href="/articles" style="text-decoration: none; color: black;">계획보기</a>
-    </nav>
 
     <!-- 오른쪽 인증(로그인/회원가입) 버튼 영역 -->
     <div id="auth-buttons" class="auth-buttons"></div>

@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -146,6 +148,44 @@ public class TripViewController {
                     firstimage = "/img/logo.png";  // 기본 이미지 설정
                 }
 
+
+                /*String homepageLink = "";
+                if (homepage != null && !homepage.isEmpty()) {
+                    // homepage가 이미 <a> 태그 형식일 경우 그대로 사용
+                    if (homepage.contains("<a ") && homepage.contains("</a>")) {
+                        homepageLink = homepage;  // 이미 <a> 태그 형식이면 그대로 사용
+                    } else {
+                        // URL 형식인지 체크 (http:// 또는 https://로 시작하고 뒤에 경로도 허용)
+                        if (homepage.matches("^https?://[a-zA-Z0-9.-]+(?:/[^\s]*)?$")) {
+                            homepageLink = "<a href=\"" + homepage + "\" target=\"_self\">" + homepage + "</a>";
+                        }
+                    }
+                } else {
+                    homepageLink = "정보없음";  // homepage 값이 없으면 "정보없음" 출력
+                }*/
+
+                String homepageLink = "";
+                if (homepage != null && !homepage.isEmpty()) {
+                    // <a> 태그 안에서 href 속성에 있는 URL만 추출
+                    String urlRegex = "https?://[a-zA-Z0-9.-]+(?:/[^\"]*)?";
+                    Pattern pattern = Pattern.compile(urlRegex);
+                    Matcher matcher = pattern.matcher(homepage);
+
+                    if (matcher.find()) {
+                        homepageLink = "<a href=\"" + matcher.group() + "\" target=\"_blank\">홈페이지</a>";
+                    } else {
+                        homepageLink = "정보 없음";  // URL을 찾지 못한 경우 "정보 없음"
+                    }
+                } else {
+                    homepageLink = "정보 없음";  // homepage 값이 없으면 "정보 없음"
+                }
+
+
+
+
+                // homepageLink가 제대로 생성되었는지 확인
+                System.out.println("Processed homepage link: " + homepageLink);  // 가공된 homepage 값을 콘솔에 출력
+
                 // Map으로 반환
                 return Map.of(
                         "title", title,
@@ -155,7 +195,7 @@ public class TripViewController {
                         "mapx", mapx,
                         "mapy", mapy,
                         "contentid", contentId,
-                        "homepage", homepage,
+                        "homepage",  homepageLink,
                         "overview", overview
                 );
             } else {

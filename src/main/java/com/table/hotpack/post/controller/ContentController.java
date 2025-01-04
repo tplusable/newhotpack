@@ -2,6 +2,7 @@ package com.table.hotpack.post.controller;
 
 import com.table.hotpack.post.dto.ContentDto;
 import com.table.hotpack.post.service.ContentService;
+import com.zaxxer.hikari.util.FastList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ public class ContentController {
     @GetMapping("/{id}")
     public ResponseEntity<ContentDto> getContentById(@PathVariable("id") String contentId) {
         ContentDto content = contentService.getContentById(contentId);
+
         if (content != null) {
             return ResponseEntity.ok(content);
         } else {

@@ -1,35 +1,4 @@
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #ffffff;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    height: 100vh; /* 전체 화면 높이 */
-    overflow: hidden;
-}
-
-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 30px;
-    margin-right: auto;
-    margin-left: auto;
-    height: 80px;
-    top: 30px;
-    width: 90%;
-
-}
-
-.logo img {
-  height: 40px;
-}
-.logoText img {
-  height: 20px;
-}
-
- footer {
+footer {
      text-align: center;
      margin-top: 20px;
      position: fixed;
@@ -60,15 +29,16 @@ header {
 }
 
 #logout-btn {
-  background-color: #e74c3c; /* Red for logout */
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 10px 15px;
-  border-radius: 5px;
+  background-color: #e74c3c !important; /* Red for logout */
+  color: white !important;
+  border: none !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  padding: 10px 15px !important;
+  border-radius: 5px !important;
 }
 
 #logout-btn:hover {
-  background-color: #c0392b; /* Darker red */
+  background-color: #c0392b !important; /* Darker red */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important; /* Slight shadow */
 }
