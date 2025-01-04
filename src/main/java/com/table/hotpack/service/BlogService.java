@@ -75,7 +75,7 @@ public class BlogService {
         authorizeArticleAuthor(article);
         article.update(request.getTitle(), request.getContent());
 
-        return article;
+        return articleRepository.save(article);
     }
 
     public List<Article> getUserArticles(String email) {

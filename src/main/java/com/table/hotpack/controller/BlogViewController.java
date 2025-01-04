@@ -79,19 +79,34 @@ public class BlogViewController {
     }
 
 
+    @GetMapping("/articles/{id}/edit")
+    public String showEditPage(@PathVariable("id") long id, Model model) {
+        // 게시글 정보 가져오기
+        Article article = blogService.findById(id);
+        model.addAttribute("article", article);
+        return "editArticle"; // editArticle.html로 이동
+    }
+
+
+
     @GetMapping("/new-article")
-    public String newArticle(@RequestParam(value = "id", required = false) Long id,
-                             Model model) {
+    public String newArticle(@RequestParam(value = "id", required = false) Long id, Model model) {
+        // id가 null이면 새 글 작성, id가 있으면 기존 글 수정
         if (id == null) {
             model.addAttribute("article", new ArticleViewResponse());
         } else {
-            Article article = blogService.findById(id);
-            model.addAttribute("article", new ArticleViewResponse(article));
+            // id가 null이 아니면 해당 ID로 게시글 조회
+            Article article = blogService.findById(id);  // id로 게시글을 찾음
+            if (article != null) {
+                model.addAttribute("article", new ArticleViewResponse(article)); // ArticleViewResponse 객체에 넣어 모델에 추가
+            } else {
+                // 만약 해당 게시글이 존재하지 않으면 오류 페이지로 리다이렉트 또는 에러 메시지 처리
+                model.addAttribute("error", "게시글을 찾을 수 없습니다.");
+                return "error";  // error 페이지로 리다이렉트
+            }
         }
 
-
-
-        return "newArticle";
+        return "newArticle"; // 새 글 작성 페이지로 이동
     }
 
     @GetMapping("/myArticles")
