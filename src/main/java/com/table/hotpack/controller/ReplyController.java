@@ -1,6 +1,7 @@
 package com.table.hotpack.controller;
 
 import com.table.hotpack.domain.Reply;
+import com.table.hotpack.domain.User;
 import com.table.hotpack.dto.ReplyLikeResponse;
 import com.table.hotpack.service.UserService;
 import lombok.extern.log4j.Log4j2;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,8 +43,12 @@ public class ReplyController {
     public ResponseEntity<Page<ReplyResponse>> getRepliesByArticleId(
             @PathVariable("articleId") Long articleId,
             @RequestParam(name = "page", defaultValue ="0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size) {
-        Page<ReplyResponse> replies = replyService.findRepliesByArticleId(articleId, PageRequest.of(page, size));
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @AuthenticationPrincipal User currentUser) {
+
+        String currentUsername = currentUser != null ? currentUser.getUsername() : null;
+
+        Page<ReplyResponse> replies = replyService.findRepliesByArticleIdWithAuthorCheck(articleId, PageRequest.of(page, size), currentUsername);
         return ResponseEntity.ok(replies);
     }
 
@@ -109,6 +115,8 @@ public class ReplyController {
     public ResponseEntity<List<ReplyResponse>> getTopRepliesByLikes(
             @PathVariable Long articleId,
             @RequestParam(defaultValue= "1") int limit) {
+
+
         List<ReplyResponse> topReplies=replyService.findTopRepliesByLikes(articleId, limit);
 
         //디버깅로그

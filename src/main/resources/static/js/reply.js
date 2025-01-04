@@ -55,10 +55,11 @@ function loadReplies(page = 0) {
                         <span id="like-count-${reply.replyId}">추천 수: ${reply.totalLikes || 0 }</span>
                         <button class="btn btn-link btn-sm text-info" onclick="showLikers(${reply.replyId})">추천자 목록</button>
                     </div>
+                    ${reply.isAuthor ? `
                     <div>
                         <button class="btn btn-link btn-sm text-primary" onclick="editReply(${reply.replyId}, '${reply.reply}')">수정</button>
                         <button class="btn btn-link btn-sm text-danger" onclick="deleteReply(${reply.replyId})">삭제</button>
-                    </div>
+                    </div>` : ''}
                 `;
             repliesList.appendChild(replyElement);
         });
@@ -221,10 +222,11 @@ function loadTopReplies() {
                         <span id="like-count-${reply.replyId}">추천 수: ${reply.totalLikes || 0 }</span>
                         <button class="btn btn-link btn-sm text-info" onclick="showLikers(${reply.replyId})">추천자 목록</button>
                     </div>
+                    ${reply.isAuthor ? `
                     <div>
                         <button class="btn btn-link btn-sm text-primary" onclick="editReply(${reply.replyId}, '${reply.reply}')">수정</button>
                         <button class="btn btn-link btn-sm text-danger" onclick="deleteReply(${reply.replyId})">삭제</button>
-                    </div>
+                    </div>` : ''}
                 `;
             topRepliesSection.appendChild(replyElement);
         });
