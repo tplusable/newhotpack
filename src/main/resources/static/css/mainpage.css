@@ -17,6 +17,7 @@ main {
     margin-left: auto;/* main을 화면 중앙에 배치 */
     display: flex;
     justify-content: center; /* 가로로 중앙 정렬 */ /* 세로로 중앙 정렬 */
+    flex-grow: 1;
     height: 100vh; /* 화면 전체 높이에 맞게 설정 */
 }
 .full {
@@ -25,6 +26,8 @@ main {
     padding-left: 15px;
     margin-right: auto;
     margin-left: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 
@@ -40,7 +43,7 @@ main {
     display: flex;
     justify-content: space-between; /* 항목들을 가로로 나열 */
     align-items: center; /* 세로로 중앙 정렬 */
-    width: 60%; /* 적당한 너비를 설정 (전체 화면의 80%) */
+    gap: 40px;
 }
 
 .carousel-slide{

@@ -13,35 +13,45 @@
 
 <div class="full" style="height: 100vh; overflow: hidden;">
     <header th:replace="layouts/header::header"></header>
-    <main class="app-container">
-        <div class="app-view-my">
-            <h1>마이페이지</h1>
-            <p>Email: <span id="email">Loading...</span></p>
-            <p>Nickname: <span id="nickname">Loading...</span></p>
-        </div>
-        <div class="app-view-button"><
-            <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
-                <button type="button" id="mytravel-btn" class="btn btn-secondary"
-                        onclick="location.href='trip/view/mytrip'">나의 여행일정</button>
-                <button type="button" id="getMyArticles-btn" class="btn btn-secondary"
-                        onClick="location.href='/myArticles'">내가 쓴 글</button>
-                <button type="button" class="btn btn-secondary">내가 쓴 댓글</button>
-                <button type="button" id-="getMyRecommends-btn" class="btn btn-secondary"
-                        onclick="location.href='/myRecommends'">내가 추천한 글</button>
-                <button type="button" id="updateUser-btn" class="btn btn-secondary"
-                        onclick="location.href='/updateUser'">회원정보 수정</button>
+    <main>
+        <div class="app-detail">
+            <div class="app-view-left">
+                <div class="app-view-my">
+                    <h1>마이페이지</h1>
+                    <p>Email: <span id="email">Loading...</span></p>
+                    <p>Nickname: <span id="nickname">Loading...</span></p>
+                </div>
+                <div class="app-view-button">
+                    <button type="button" id="test-btn" class="btn btn-secondary"
+                            onclick="location.href='/trip/view/myTrip'">나의 여행 일정</button>
+                    <div class="btn-group-vertical" role="group" aria-label="Vertical button group" style="width: 100%;">
+                        <button type="button" id="getMyArticles-btn" class="btn btn-secondary">
+                            내가 쓴 글
+                        </button>
+                        <button type="button" class="btn btn-secondary">내가 쓴 댓글</button>
+                        <button type="button" id="getMyRecommends-btn" class="btn btn-secondary">
+                            내가 추천한 글
+                        </button>
+                    </div>
+                    <button type="button" id="updateUser-btn" class="btn btn-secondary"
+                            onclick="location.href='/updateUser'">회원정보 수정</button>
+                </div>
+            </div>
+
+            <div class="app-view-content">
+                <!-- 콘텐츠 내용 -->
             </div>
         </div>
-        <div class="app-view-content">
-
-
-        </div>
     </main>
+    <footer>
+        <p>© 2024 HOTPACK. All rights reserved.</p>
+    </footer>
 </div>
+<script src="/js/token.js"></script>
 <script src="/js/mypage.js"></script>
 <script src="/js/header.js"></script>
+<script src="/js/myArticle.js"></script>
+<script src="/js/myRecommendsList.js"></script>
+<script src="/js/mypagemytour.js"></script>
 </body>
-<footer>
-    <p>© 2024 HOTPACK. All rights reserved.</p>
-</footer>
 </html>

@@ -1,10 +1,10 @@
-// 페이지 로드시
-window.onload = fetchMyRecommendedArticles;
+// 페이지 로드 시, 버튼 클릭 이벤트 리스너 설정
+document.getElementById("getMyRecommends-btn").addEventListener("click", fetchMyRecommendedArticles);
 
 /** 내가 추천한 글 목록을 가져와 화면에 렌더링 */
 function fetchMyRecommendedArticles() {
     function success() {
-        // 여기서 실제로 목록을 가져옴
+        // 글 목록을 가져옴
         fetch('/api/user/recommended-articles', {
             method: 'GET',
             headers: {
@@ -18,35 +18,36 @@ function fetchMyRecommendedArticles() {
             return response.json(); // [{id, title, content}, ...]
         })
         .then(data => {
-            const container = document.getElementById('recommended-articles-container');
+            const container = document.querySelector('.app-view-content');
 
+            // 글 목록이 없으면 메시지 표시
             if (data.length === 0) {
                 container.innerHTML = `<p>추천한 글이 없습니다.</p>`;
                 return;
             }
 
             // 글 목록 렌더링
+            let articlesHTML = '';
             data.forEach(article => {
-                const card = document.createElement('div');
-                card.className = 'card mb-3';
-
-                // 긴 내용 잘라내기
+                // 긴 내용 자르기
                 const maxLength = 100;
                 const truncatedContent = (article.content.length > maxLength)
                     ? article.content.substring(0, maxLength) + '...'
                     : article.content;
 
-                card.innerHTML = `
-                    <div class="card-header">${article.id}</div>
-                    <div class="card-body">
-                        <h5 class="card-title">${article.title}</h5>
-                        <p class="card-text">${truncatedContent}</p>
-                        <a href="/articles/${article.id}"
-                           class="btn btn-primary">보러가기</a>
+                articlesHTML += `
+                    <div class="card mb-3">
+                        <div class="card-header">${article.id}</div>
+                        <div class="card-body">
+                            <h5 class="card-title">${article.title}</h5>
+                            <p class="card-text">${truncatedContent}</p>
+                            <a href="/articles/${article.id}" class="btn btn-primary">보러가기</a>
+                        </div>
                     </div>
                 `;
-                container.appendChild(card);
             });
+
+            container.innerHTML = articlesHTML;  // 렌더링된 글 목록을 app-view-content에 삽입
         })
         .catch(error => {
             console.error('Error loading recommended articles:', error);

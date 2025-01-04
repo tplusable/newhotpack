@@ -45,6 +45,7 @@ public class TripViewController {
     public String viewTripInfo(@PathVariable("id") Long id, Model model) {
         TripInfoDto tripInfoDto = tripInfoService.getTripInfoDtoById(id);
 
+
         // 만약 tripInfoDto가 null이면 404 오류를 반환하거나 다른 처리
         if (tripInfoDto == null) {
             // 예를 들어, null일 경우 404 오류 페이지로 리다이렉트
