@@ -65,6 +65,8 @@ dependencies {
 	// Jackson XML 의존성
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2'
 
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+
 	// markdown
 	implementation 'org.commonmark:commonmark:0.21.0'
 }
