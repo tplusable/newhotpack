@@ -1,26 +1,6 @@
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #ffffff;
-    margin: 0;
+.full {
     display: flex;
     flex-direction: column;
-    height: 100vh; /* 전체 화면 높이 */
-    overflow: hidden;
-}
-
-main {
-    width: 100%;
-    padding-right: 15px;
-    padding-left: 15px;
-    margin-right: auto;
-    margin-left: auto;/* main을 화면 중앙에 배치 */
-    display: flex;
-    justify-content: center; /* 가로로 중앙 정렬 */ /* 세로로 중앙 정렬 */
-    height: 100vh; /* 화면 전체 높이에 맞게 설정 */
-}
-
-.full {
     width: 70%;
     padding-right: 15px;
     padding-left: 15px;
@@ -28,11 +8,19 @@ main {
     margin-left: auto;
 }
 
-.app-container {
-    display: flex;
-    justify-content: center; /* 가로 중앙 정렬 */
+main {
     width: 100%;
-    height: 100%;
+    margin-right: auto;
+    margin-left: auto;/* main을 화면 중앙에 배치 */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;/* 화면 전체 높이에 맞게 설정 */
+    align-items: center;
+    justify-content: center;/* 가로로 중앙 정렬 */ /* 세로로 중앙 정렬 */
+    height: 100vh;
+    overflow: hidden;
+    max-width: 1200px; /* 최대 너비 설정 */
+    padding: 20px;
 }
 
 .app-view-container {
