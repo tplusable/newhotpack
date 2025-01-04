@@ -1,0 +1,62 @@
+.full {
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+main {
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;/* main을 화면 중앙에 배치 */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;/* 화면 전체 높이에 맞게 설정 */
+    align-items: center;
+    justify-content: center;/* 가로로 중앙 정렬 */ /* 세로로 중앙 정렬 */
+    height: 100vh;
+    overflow: hidden;
+    max-width: 1200px; /* 최대 너비 설정 */
+    padding: 20px;
+}
+
+.app-view-container {
+    display: flex;
+    justify-content: space-between; /* 항목들을 가로로 나열 */
+    align-items: center; /* 세로로 중앙 정렬 */
+    width: 60%; /* 적당한 너비를 설정 (전체 화면의 80%) */
+}
+h1, h2 {
+    text-align: center;
+    color: #007BFF;
+}
+
+.custom-style {
+    float: right !important; /* 오른쪽 정렬 */
+    margin-left: auto !important;
+}
+
+.custom-style :hover {
+    background-color: #0056b3;
+}
+
+.pagination {
+    justify-content: center;
+}
+
+.pagination .page-link {
+    background-color: #fff;
+    border: 1px solid #007BFF;
+}
+
+.pagination .page-link:hover {
+    background-color: #007BFF;
+}
+
+.pagination .active .page-link {
+    background-color: #007BFF;
+    border-color: #007BFF;
+}

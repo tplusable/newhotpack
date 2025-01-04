@@ -7,16 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
 import java.security.Principal;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/trip")  // API 전용 경로로 변경
+@RequestMapping("/trip")
 public class TripInfoController {
 
     private final TripInfoService tripInfoService;
@@ -36,7 +32,6 @@ public class TripInfoController {
     public ResponseEntity<TripInfoDto> getTripInfo(@PathVariable("id") Long id) {
         TripInfoDto tripInfoDto = tripInfoService.getTripInfoDtoById(id);
 
-        // tripInfoDto가 null일 경우 404 오류 반환
         if (tripInfoDto == null) {
             return ResponseEntity.notFound().build();  // 404 Not Found 반환
         }
@@ -44,15 +39,13 @@ public class TripInfoController {
         return ResponseEntity.ok(tripInfoDto);  // 200 OK와 함께 반환
     }
 
-    // 모든 여행 정보 조회
+    // 나의 모든 여행 정보 조회
     @GetMapping("/myTrip")
     public ResponseEntity<List<TripInfoDto>> getAllTripInfos(Principal principal) {
-        List<TripInfo> tripInfos = tripInfoService.getMyTripInfos(principal.getName());
-        List<TripInfoDto> tripInfoDtos = tripInfos.stream()
+        List<TripInfoDto> tripInfoDtos = tripInfoService.getMyTripInfos(principal.getName()).stream()
                 .map(TripInfoDto::new)
+                .sorted((t1, t2) -> Long.compare(t2.getId(), t1.getId()))
                 .toList();
         return ResponseEntity.ok(tripInfoDtos);
     }
-
-
 }

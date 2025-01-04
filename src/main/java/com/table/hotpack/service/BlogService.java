@@ -5,6 +5,9 @@ import com.table.hotpack.domain.Recommend;
 import com.table.hotpack.domain.User;
 import com.table.hotpack.dto.AddArticleRequest;
 import com.table.hotpack.dto.UpdateArticleRequest;
+import com.table.hotpack.post.domain.TripInfo;
+import com.table.hotpack.post.repository.TripInfoRepository;
+import com.table.hotpack.post.service.TripInfoService;
 import com.table.hotpack.repository.ArticleRepository;
 import com.table.hotpack.repository.RecommendRepository;
 import com.table.hotpack.repository.UserRepository;
@@ -24,6 +27,7 @@ public class BlogService {
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository; // 사용자 조회를 위해 필요
     private final RecommendRepository recommendRepository;
+    private final TripInfoService tripInfoService;
 
 
     public Article save(AddArticleRequest request, String userName) {
@@ -31,7 +35,19 @@ public class BlogService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + userName));
 
         String nickname = user.getNickname(); // nickname 가져오기
-        return articleRepository.save(request.toEntity(userName, nickname));
+
+        Article article = Article.builder()
+                .title(request.getTitle())
+                .content(request.getContent())
+                .author(userName)
+                .nickname(nickname)
+                .build();
+
+        if (request.getTripInfoId() != null) {
+            TripInfo tripInfo = tripInfoService.getTripInfoIfOwned(request.getTripInfoId(), userName);
+            article.setTripInfo(tripInfo);
+        }
+        return articleRepository.save(article);
     }
 
     public List<Article> findAll() {

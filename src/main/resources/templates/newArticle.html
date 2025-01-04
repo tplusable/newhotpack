@@ -4,9 +4,74 @@
     <meta charset="UTF-8">
     <title>블로그 글</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <style>
+        /* 기존 스타일 유지 */
+        h2 {
+            font-size: 1.5rem;
+            color: #007bff;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 10px;
+        }
+
+        .content-detail {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-detail img {
+            max-width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            border-radius: 8px;
+            padding: 10px 20px;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .date-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .date-item {
+            background-color: #007bff;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* 지도 섹션 스타일 */
+        #map {
+            width: 100%;
+            height: 600px;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-<div class="p-5 mb-5 text-center</> bg-light">
+<div class="p-5 mb-5 text-center bg-light">
     <h1 class="mb-3">My Blog</h1>
     <h4 class="mb-3">블로그에 오신 것을 환영합니다.</h4>
 </div>
@@ -21,20 +86,21 @@
                     <input type="text" class="form-control" placeholder="제목" id="title" th:value="${article.title}">
                 </header>
 
-                <!-- Select Form 추가 -->
-<!--                <div class="mb-4">-->
-<!--                    <label for="category" class="form-label">내 여행 일정</label>-->
-<!--                    <select class="form-control" id="category" name="category">-->
-<!--                        <option th:each="tripInfo : ${tripInfos}"-->
-<!--                                th:value="${tripInfo.id}"-->
-<!--                                th:text="'지역: ' + ${tripInfo.areaName} + ', 시작: ' + ${tripInfo.startDate} + ', 종료: ' + ${tripInfo.endDate} + ', '+${tripInfo.relativeTime}">-->
-<!--                            &lt;!&ndash; ID를 값으로, 지역명을 표시 &ndash;&gt;-->
-<!--                        </option>-->
-<!--                    </select>-->
-<!--                </div>-->
-<!--                <div class="col-md-6">-->
-<!--                    <div id="map" style="width: 100%; height: 600px;"></div> &lt;!&ndash; 지도 크기 지정 &ndash;&gt;-->
-<!--                </div>-->
+                <div class="form-group">
+                    <label for="tripInfo">여행 정보 선택</label>
+                    <select class="form-control" id="tripInfo" name="tripInfoId" required>
+                        <option value="" disabled selected>선택하세요</option>
+                        <!-- 옵션은 JavaScript를 통해 동적으로 추가됩니다 -->
+                    </select>
+                </div>
+
+                <!-- 여행 상세 정보를 표시할 컨테이너 -->
+                <div id="trip-details" class="mt-5">
+                    <!-- 여행 상세 정보는 여기에 동적으로 추가 -->
+                </div>
+
+                <!-- 지도 표시 -->
+                <div id="map"></div>
                 <section class="mb-5">
                     <textarea class="form-control h-25" rows="10" placeholder="내용" id="content" th:text="${article.content}"></textarea>
                 </section>
@@ -45,5 +111,15 @@
     </div>
 </div>
 
+<!-- 로딩 스피너 추가 -->
+<div id="loading-spinner" class="spinner-border text-primary" role="status" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
+    <span class="sr-only">Loading...</span>
+</div>
+
 <script src="/js/article.js"></script>
+<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a2608814fa4fc80c1c244684819fa4dd&libraries=drawing"></script>
+<script src="/js/myTourArticle.js"></script>
 </body>
+</html>
+
+

@@ -12,4 +12,5 @@ public class TripInfoViewResponse {
     private String areaName;
     private String startDate;
     private String endDate;
-    private Map<String, List<String>> contentIdsByDate;}
+    private Map<String, List<String>> contentIdsByDate;
+}

@@ -53,7 +53,8 @@ public class ApiResponse {
     public void setMapy(String mapy) { this.mapy = mapy; }*/
 
     public String getContentId() { return contentid; }
-    public void setContentId(String contentId) { this.contentid = contentid; }
+    public void setContentId(String contentId) { this.contentid = contentId; }
+
 
 
 

@@ -96,7 +96,9 @@ if (createArticleButton) {
     createArticleButton.addEventListener('click', event => {
         let body = JSON.stringify({
             title: document.getElementById('title').value,
-            content: document.getElementById('content').value
+            content: document.getElementById('content').value,
+            tripInfoId: parseInt(document.getElementById('tripInfo').value, 10) // 숫자로 변환
+
         });
 
         function success() {
@@ -121,27 +123,27 @@ let articleId;
 
 window.addEventListener('DOMContentLoaded', () => {
     articleId = document.getElementById('article-id').value;
-    const authorEmail = document.querySelector('#author').value;
+         const authorEmail = document.querySelector('#author').value;
 
-    // 로그인 토큰 확인
-    const token = localStorage.getItem('access_token');
+         // 로그인 토큰 확인
+         const token = localStorage.getItem('access_token');
 
-    let currentUserEmail = null;
-    // 토큰이 있으면 이메일 추출
-    if (token) {
-        const decodedToken = JSON.parse(atob(token.split('.')[1]));
-        currentUserEmail = decodedToken.sub; // JWT의 sub 필드를 사용해 이메일 추출
-    }
+         let currentUserEmail = null;
+         // 토큰이 있으면 이메일 추출
+         if (token) {
+             const decodedToken = JSON.parse(atob(token.split('.')[1]));
+             currentUserEmail = decodedToken.sub; // JWT의 sub 필드를 사용해 이메일 추출
+         }
 
-    // 수정/삭제 버튼 처리
-    const modifyButton = document.getElementById('modify-btn');
-    const deleteButton = document.getElementById('delete-btn');
+         // 수정/삭제 버튼 처리
+         const modifyButton = document.getElementById('modify-btn');
+         const deleteButton = document.getElementById('delete-btn');
 
-    // 작성자일 경우만 버튼 표시
-    if (authorEmail === currentUserEmail) {
-        modifyButton.style.display = 'block';
-        deleteButton.style.display = 'block';
-    }
+         // 작성자일 경우만 버튼 표시
+         if (authorEmail === currentUserEmail) {
+             modifyButton.style.display = 'block';
+             deleteButton.style.display = 'block';
+         }
 
     // GET /api/articles/{id} 요청 시, 토큰이 없으면 Authorization 헤더 생략
     let headers = { 'Content-Type': 'application/json' };

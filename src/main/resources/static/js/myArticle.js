@@ -1,3 +1,7 @@
+// 버튼 클릭 이벤트 설정
+document.getElementById("getMyArticles-btn").addEventListener("click", fetchMyArticle);
+
+/** 내가 쓴 글 목록을 가져와 화면에 렌더링 */
 function fetchMyArticle() {
     function success() {
         fetch('/api/user/articles', {
@@ -13,7 +17,7 @@ function fetchMyArticle() {
             return response.json();
         })
         .then(data => {
-            const container = document.getElementById('articles-container');
+            const container = document.querySelector('.app-view-content'); // 변경된 부분
 
             // 글이 없을 경우 메시지 표시
             if (data.length === 0) {
@@ -22,26 +26,27 @@ function fetchMyArticle() {
             }
 
             // 글 목록 렌더링
+            let articlesHTML = '';
             data.forEach(article => {
-                const card = document.createElement('div');
-                card.className = 'card mb-3';
-
-                // 긴 내용 잘라내기
+                // 긴 내용 자르기
                 const maxLength = 100;
                 const truncatedContent = article.content.length > maxLength
                     ? article.content.substring(0, maxLength) + '...'
                     : article.content;
 
-                card.innerHTML = `
-                    <div class="card-header">${article.id}</div>
-                    <div class="card-body">
-                        <h5 class="card-title">${article.title}</h5>
-                        <p class="card-text">${truncatedContent}</p>
-                        <a href="/articles/${article.id}" class="btn btn-primary">보러가기</a>
+                articlesHTML += `
+                    <div class="card mb-3">
+                        <div class="card-header">${article.id}</div>
+                        <div class="card-body">
+                            <h5 class="card-title">${article.title}</h5>
+                            <p class="card-text">${truncatedContent}</p>
+                            <a href="/articles/${article.id}" class="btn btn-primary">보러가기</a>
+                        </div>
                     </div>
                 `;
-                container.appendChild(card);
             });
+
+            container.innerHTML = articlesHTML;  // 렌더링된 글 목록을 app-view-content에 삽입
         })
         .catch(error => {
             console.error('Error loading articles:', error);
@@ -49,71 +54,76 @@ function fetchMyArticle() {
             location.replace('/login');
         });
     }
+
     function fail() {
         alert("데이터를 가져올 수 없습니다. 로그인 페이지로 이동합니다.");
         location.replace('/login');
     }
+
+    // 먼저 httpRequest로 토큰 유효성 검사/재발급 처리
     httpRequest('GET', '/api/user/articles', null, success, fail);
 }
 
-// HTML 페이지 로드 후 데이터 가져오기
-window.onload = fetchMyArticle;
-
-// 쿠키를 가져오는 함수
 function getCookie(key) {
-    var result = null;
-    var cookie = document.cookie.split(';');
-    cookie.some(function (item) {
-        item = item.replace(' ', '');
-
-        var dic = item.split('=');
-
+    let result = null;
+    const cookieArr = document.cookie.split(';');
+    cookieArr.some(function(item) {
+        item = item.trim();
+        let dic = item.split('=');
         if (key === dic[0]) {
             result = dic[1];
             return true;
         }
     });
-
     return result;
 }
 
-// HTTP 요청을 보내는 함수
 function httpRequest(method, url, body, success, fail) {
     fetch(url, {
         method: method,
-        headers: { // 로컬 스토리지에서 액세스 토큰 값을 가져와 헤더에 추가
+        headers: {
             Authorization: 'Bearer ' + localStorage.getItem('access_token'),
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         },
-        body: body,
-    }).then(response => {
+        body: body
+    })
+    .then(response => {
         if (response.status === 200 || response.status === 201) {
             return success();
         }
         const refresh_token = getCookie('refresh_token');
         if (response.status === 401 && refresh_token) {
-            fetch('/api/token', {
+            // 토큰 재발급 시도
+            return fetch('/api/token', {
                 method: 'POST',
                 headers: {
                     Authorization: 'Bearer ' + localStorage.getItem('access_token'),
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    refreshToken: getCookie('refresh_token'),
-                }),
+                body: JSON.stringify({ refreshToken: refresh_token })
             })
-                .then(res => {
-                    if (res.ok) {
-                        return res.json();
-                    }
-                })
-                .then(result => { // 재발급이 성공하면 로컬 스토리지값을 새로운 액세스 토큰으로 교체
-                    localStorage.setItem('access_token', result.accessToken);
-                    httpRequest(method, url, body, success, fail);
-                })
-                .catch(error => fail());
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Failed to refresh token');
+                }
+                return res.json();
+            })
+            .then(result => {
+                // 새 토큰 교체
+                localStorage.setItem('access_token', result.accessToken);
+                // 재귀 호출 → 원래 요청 다시 시도
+                return httpRequest(method, url, body, success, fail);
+            })
+            .catch(error => {
+                console.error(error);
+                return fail();
+            });
         } else {
             return fail();
         }
+    })
+    .catch(error => {
+        console.error(error);
+        return fail();
     });
 }

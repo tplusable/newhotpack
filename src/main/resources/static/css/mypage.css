@@ -1,0 +1,66 @@
+/*body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh; *//* 전체 화면 높이 *//*
+    overflow: hidden;
+}*/
+.full {
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+main {
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;/* main을 화면 중앙에 배치 */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;/* 화면 전체 높이에 맞게 설정 */
+    align-items: center;
+    justify-content: center;/* 가로로 중앙 정렬 */ /* 세로로 중앙 정렬 */
+    height: 100vh;
+    overflow: hidden;
+    max-width: 1200px; /* 최대 너비 설정 */
+    padding: 20px;
+}
+
+
+.app-detail {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.app-view-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-right: 20px; /* 좌측과 우측 콘텐츠 사이의 간격 */
+}
+
+.app-view-my {
+    margin-bottom: 20px; /* 버튼 그룹과의 간격 */
+}
+
+.app-view-content {
+    flex-grow: 1; /* 남은 공간을 차지 */
+    background-color: #f4f4f4;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.app-view-button{
+    display: flex;
+    flex-direction: column; /* 버튼들을 세로로 나열 */
+    gap: 10px;
+}
