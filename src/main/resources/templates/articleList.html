@@ -7,39 +7,39 @@
     <style>
         /* 텍스트 자르기 위한 클래스 정의 */
         .truncate {
-            display: -webkit-box;            /* Flexbox 모델을 사용 */
-            -webkit-box-orient: vertical;    /* 세로 방향으로 박스 정렬 */
-            -webkit-line-clamp: 3;           /* 최대 3줄까지만 표시 */
-            overflow: hidden;                /* 넘치는 텍스트 숨기기 */
+        display: -webkit-box;            /* Flexbox 모델을 사용 */
+        -webkit-box-orient: vertical;    /* 세로 방향으로 박스 정렬 */
+        -webkit-line-clamp: 3;           /* 최대 3줄까지만 표시 */
+        overflow: hidden;                /* 넘치는 텍스트 숨기기 */
         }
 
         /* 반응형 디자인: 화면 크기에 따라 줄 수 조정 */
         @media (max-width: 768px) {
-            .truncate {
-                -webkit-line-clamp: 2;       /* 작은 화면에서는 2줄로 제한 */
-            }
+        .truncate {
+        -webkit-line-clamp: 2;       /* 작은 화면에서는 2줄로 제한 */
+        }
         }
         /* 추천수가 높은 글을 강조하기 위한 스타일 */
         .top-article {
-            border: 2px solid #ffc107;
-            cursor: pointer; /* 마우스 포인터 변경 */
-            text-decoration: none;
-            color: inherit;
+        border: 2px solid #ffc107;
+        cursor: pointer; /* 마우스 포인터 변경 */
+        text-decoration: none;
+        color: inherit;
         }
         .recommendation-count {
-            font-size: 0.9em;
-            color: #28a745;
-            margin-left: 10px;
+        font-size: 0.9em;
+        color: #28a745;
+        margin-left: 10px;
         }
 
         /* 카드 전체를 클릭하게 하기 위한 스타일 */
         .card-link {
-            text-decoration: none;
-            color: inherit;
+        text-decoration: none;
+        color: inherit;
         }
         .card-link:hover {
-            text-decoration: none;
-            color: inherit;
+        text-decoration: none;
+        color: inherit;
         }
     </style>
 </head>
