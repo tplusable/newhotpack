@@ -1,6 +1,7 @@
 package com.table.hotpack.controller;
 
 import com.table.hotpack.domain.Article;
+import com.table.hotpack.domain.User;
 import com.table.hotpack.dto.ArticleListViewResponse;
 import com.table.hotpack.dto.ArticleViewResponse;
 import com.table.hotpack.post.controller.TripInfoController;
@@ -9,6 +10,10 @@ import com.table.hotpack.post.service.TripInfoService;
 import com.table.hotpack.service.BlogService;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.log4j.Log4j2;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Log4j2
 @RequiredArgsConstructor
 @Controller
 public class BlogViewController {
@@ -72,6 +78,17 @@ public class BlogViewController {
     @GetMapping("/articles/{id}")
     public String getArticle(@PathVariable("id") Long id, Model model) {
         Article article = blogService.findById(id);
+
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()
+                && !"anonymousUser".equals(authentication.getPrincipal())) {
+            String currentUsername= authentication.getName();
+            log.info("Current user: {}", currentUsername);
+            model.addAttribute("currentUser", currentUsername);
+        } else {
+            log.info("User is not logged in.");
+        }
+
         model.addAttribute("article", new ArticleViewResponse(article));
 
         model.addAttribute("recommendCount", blogService.getRecommendCount(id));
