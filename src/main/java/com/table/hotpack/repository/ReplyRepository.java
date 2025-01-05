@@ -34,4 +34,7 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
 
     @Query("SELECT r FROM Reply r WHERE r.user =:userId")
     List<Reply> findMyRepliesByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT r FROM Reply r WHERE r.author = :email ORDER BY r.createdAt DESC")
+    List<Reply> findByAuthor(@Param("email") String email);
 }
