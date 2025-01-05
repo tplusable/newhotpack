@@ -174,7 +174,6 @@ function showError(message) {
         document.getElementById('errorModalBody').textContent = message;
         errorModal.modal('show');
     } else {
-        // 모달이 없으면 alert으로 대체
         alert(message);
     }
 }
