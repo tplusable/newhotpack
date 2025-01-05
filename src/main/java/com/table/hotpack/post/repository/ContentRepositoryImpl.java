@@ -12,6 +12,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Repository
 public class ContentRepositoryImpl implements ContentRepository {
@@ -63,9 +65,23 @@ public class ContentRepositoryImpl implements ContentRepository {
                     firstimage = "/img/logo.png";  // 기본 이미지 설정
                 }
 
-                System.out.println("파싱된 데이터: title=" + title + ", contentId=" + contentId);
+                String homepageLink = "";
+                if (homepage != null && !homepage.isEmpty()) {
+                    // <a> 태그에서 href 속성 값을 추출하는 정규식
+                    String urlRegex = "href=\"(https?://[^\"]+)\"";
+                    Pattern pattern = Pattern.compile(urlRegex);
+                    Matcher matcher = pattern.matcher(homepage);
 
-                return new ContentDto(title, tel, addr1, firstimage, mapx, mapy, contentId, homepage, overview);
+                    if (matcher.find()) {
+                        homepageLink = matcher.group(1);  // URL만 추출
+                    } else {
+                        homepageLink = "정보 없음";  // URL을 찾지 못한 경우 "정보 없음"
+                    }
+                } else {
+                    homepageLink = "정보 없음";  // homepage 값이 없으면 "정보 없음"
+                }
+
+                return new ContentDto(title, tel, addr1, firstimage, mapx, mapy, contentId, homepageLink, overview);
             } else {
                 System.err.println("API 응답에서 item이 비어있거나 잘못된 형식입니다.");
                 return null;
