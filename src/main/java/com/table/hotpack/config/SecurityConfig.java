@@ -63,6 +63,7 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/signup", "/oauth2/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/articles/**").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/replies/**").permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/mypage").authenticated()
                         .requestMatchers("/api/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll()
