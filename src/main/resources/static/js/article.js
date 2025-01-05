@@ -78,6 +78,8 @@ function fetchContentDetails(contentIdsByDate) {
         return; // 요소가 없으면 실행 중단
     }
 
+    let isFirstMarker = true;
+
     Object.entries(contentIdsByDate).forEach(([day, contentIds]) => {
         const daySection = document.createElement('div');
         daySection.classList.add('day-section');
@@ -106,6 +108,8 @@ function fetchContentDetails(contentIdsByDate) {
                     <button class="btn btn-primary btn-sm" onclick="showContentDetails('${content.contentid}')">관광지 정보 상세 보기</button>
                 `;
                 contentList.appendChild(contentDiv);
+
+
             })
             .catch(error => {
                 console.error(`Failed to fetch content details for ID: ${contentId}`, error);
@@ -115,7 +119,10 @@ function fetchContentDetails(contentIdsByDate) {
         daySection.appendChild(contentList);
         contentDetailsContainer.appendChild(daySection);
     });
+
 }
+
+
 
 
 function showContentDetails(contentId) {
@@ -145,6 +152,81 @@ function showContentDetails(contentId) {
     });
 }
 
+// 마커 생성 및 동선 그리기 함수
+function createMapWithMarkers(contentIdsByDate) {
+    const markers = []; // 마커 정보 저장 배열
+    let totalMapX = 0;  // 경도 합
+    let totalMapY = 0;  // 위도 합
+
+    // contentIdsByDate에서 마커 위치 정보를 추출
+    Object.entries(contentIdsByDate).forEach(([day, contentIds]) => {
+        contentIds.forEach(contentId => {
+            fetch(`/content/${contentId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(content => {
+                const mapX = parseFloat(content.mapx);
+                const mapY = parseFloat(content.mapy);
+
+                // 유효한 좌표일 경우 마커 추가
+                if (mapX && mapY) {
+                    markers.push({ mapx: mapX, mapy: mapY });
+
+                    totalMapX += mapX;
+                    totalMapY += mapY;
+                }
+
+                // 모든 contentId에 대해 마커를 추가하고 동선을 그리기
+                if (markers.length === Object.values(contentIdsByDate).flat().length) {
+                    const avgMapX = totalMapX / markers.length;
+                    const avgMapY = totalMapY / markers.length;
+
+                    // 카카오 맵 초기화
+                    const mapContainer = document.getElementById('map');
+                    const mapOption = {
+                        center: new kakao.maps.LatLng(avgMapY, avgMapX), // 평균 위치로 지도 중심 설정
+                        level: 10 // 지도 확대 레벨
+                    };
+                    const map = new kakao.maps.Map(mapContainer, mapOption);
+
+                    // 마커들을 지도에 추가
+                    markers.forEach(markerData => {
+                        const position = new kakao.maps.LatLng(markerData.mapy, markerData.mapx);
+                        const marker = new kakao.maps.Marker({
+                            position: position,
+                        });
+                        marker.setMap(map);
+                    });
+
+                    // 마커들을 이어주는 동선 (Polyline) 그리기
+                    if (markers.length > 1) {
+                        const path = markers.map(markerData => new kakao.maps.LatLng(markerData.mapy, markerData.mapx));
+
+                        const polyline = new kakao.maps.Polyline({
+                            path: path, // 마커 순서대로 연결
+                            strokeWeight: 5, // 선의 두께
+                            strokeColor: '#FF0000', // 빨간색
+                            strokeOpacity: 0.7, // 선의 불투명도
+                            strokeStyle: 'solid' // 실선
+                        });
+
+                        polyline.setMap(map); // 지도에 polyline 추가
+                    }
+                }
+
+            })
+            .catch(error => {
+                console.error(`Failed to fetch content details for ID: ${contentId}`, error);
+            });
+        });
+    });
+}
+
 // 페이지 로드 시 여행 계획 불러오기
 window.addEventListener('DOMContentLoaded', () => {
     let id = document.getElementById('article-id').value;
@@ -169,6 +251,12 @@ window.addEventListener('DOMContentLoaded', () => {
         } else {
             console.error('No contentIdsByDate found in response');
         }
+        if (data.contentIdsByDate) {
+                    // contentIdsByDate 값을 기반으로 마커 생성 및 동선 그리기
+                    createMapWithMarkers(data.contentIdsByDate);
+                } else {
+                    console.error('No contentIdsByDate found in response');
+                }
     })
     .catch(error => {
         console.error('Failed to fetch trip info:', error);
@@ -199,6 +287,39 @@ timeElements.forEach((el) => {
     el.textContent = relativeTime;
 });
 
+// 수정 기능
+const modifyButton = document.getElementById('modify-btn');
+if (modifyButton) {
+    modifyButton.addEventListener('click', event => {
+        const id = document.getElementById('article-id').value;
+        const title = document.getElementById('title').value;
+        const content = document.getElementById('content').value;
+        const tripInfoId = document.getElementById('tripInfo').value;
+
+        if (!title || !content || !tripInfoId) {
+            alert('제목, 내용, 여행 정보(ID)를 입력해주세요.');
+            return;
+        }
+
+        const body = JSON.stringify({
+            title: title,
+            content: content,
+            tripInfoId: tripInfoId
+        });
+
+        function success() {
+            alert('수정 완료되었습니다.');
+            location.replace(`/articles/${id}`);
+        }
+
+        function fail() {
+            alert('수정 실패했습니다.');
+        }
+
+        httpRequest('PUT', `/api/articles/${id}`, body, success, fail);
+    });
+}
+
 // 삭제 기능
 const deleteButton = document.getElementById('delete-btn');
 if (deleteButton) {
@@ -207,6 +328,7 @@ if (deleteButton) {
         if (!confirm('정말 삭제하시겠습니까?')) {
             return;
         }
+
         function success() {
             alert('삭제가 완료되었습니다.');
             location.replace('/articles');
@@ -221,42 +343,7 @@ if (deleteButton) {
     });
 }
 
-// 수정 기능
-const modifyButton = document.getElementById('modify-btn');
-if (modifyButton) {
-    modifyButton.addEventListener('click', event => {
-        // 수정할 내용 가져오기
-        const id = document.getElementById('article-id').value;  // 글 ID 가져오기
-        const title = document.getElementById('title').value;  // 제목
-        const content = document.getElementById('content').value;  // 내용
-        const tripInfoId = document.getElementById('tripInfo').value; // tripInfo 값 가져오기
 
-        // 수정할 내용이 없다면, 경고를 띄우고 종료
-        if (!title || !content || !tripInfoId) {
-            alert('제목, 내용, 여행 정보(ID)를 입력해주세요.');
-            return;
-        }
-
-        const body = JSON.stringify({
-            title: title,
-            content: content,
-            tripInfoId: tripInfoId // tripInfoId도 함께 보내기
-        });
-
-        // success, fail 함수 정의
-        function success() {
-            alert('수정 완료되었습니다.');
-            location.replace(`/articles/${id}`);  // 수정 완료 후 해당 게시글 페이지로 이동
-        }
-
-        function fail() {
-            alert('수정 실패했습니다.');
-        }
-
-        // 공통 HTTP 요청 함수로 수정 요청
-        httpRequest('PUT', `/api/articles/${id}`, body, success, fail);
-    });
-}
 
 // 로그인을 안하면 글 등록 버튼을 누르면 로그인 페이지로 이동
 const createButton = document.getElementById('create-btn');

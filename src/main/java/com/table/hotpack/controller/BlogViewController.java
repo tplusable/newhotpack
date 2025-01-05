@@ -97,15 +97,6 @@ public class BlogViewController {
     }
 
 
-    @GetMapping("/articles/{id}/edit")
-    public String showEditPage(@PathVariable("id") long id, Model model) {
-        // 게시글 정보 가져오기
-        Article article = blogService.findById(id);
-        model.addAttribute("article", article);
-        return "editArticle"; // editArticle.html로 이동
-    }
-
-
 
     @GetMapping("/new-article")
     public String newArticle(@RequestParam(value = "id", required = false) Long id, Model model) {
