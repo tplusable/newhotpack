@@ -57,6 +57,41 @@ function getCookie(key) {
     return result;
 }
 
+function fetchTripInfo(articleId) {
+    fetch(`/api/articles/${articleId}/tripinfo`, {
+        method: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to load trip info');
+        }
+        return response.json();
+    })
+    .then(data => {
+        const tripInfoContainer = document.getElementById('trip-info-container');
+        if (data) {
+            tripInfoContainer.innerHTML = `
+                <h3>여행 정보</h3>
+                <p>여행 제목: ${data.title}</p>
+                <p>여행 지역: ${data.areaName}</p>
+                <p>여행 시작일: ${formatDate(data.startDate)}</p>
+                <p>여행 종료일: ${formatDate(data.endDate)}</p>
+                <p>여행 상세 정보: ${data.details}</p>
+            `;
+        } else {
+            tripInfoContainer.innerHTML = `<p>여행 정보가 없습니다.</p>`;
+        }
+    })
+    .catch(error => {
+        console.error('여행 정보 로딩 실패:', error);
+        alert('여행 정보를 가져오는 데 실패했습니다.');
+    });
+}
+
 // 작성일 계산 함수
 const timeElements = document.querySelectorAll(".relative-time");
 timeElements.forEach((el) => {
