@@ -2,6 +2,7 @@ package com.table.hotpack.service;
 
 import com.table.hotpack.dto.*;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.security.Principal;
@@ -16,4 +17,6 @@ public interface ReplyService {
     ReplyLikeResponse toggleLike(Long replyId, String username);
     List<String> getLikers(Long replyId);
     List<ReplyResponse> findTopRepliesByLikes(Long articleId, int limit);
+    Page<ReplyResponse> findRepliesByArticleIdWithAuthorCheck(Long articleId, PageRequest pageRequest, String currentUsername);
+    List<ReplyResponse> findMyRepliesByUserId(Long userId);
 }

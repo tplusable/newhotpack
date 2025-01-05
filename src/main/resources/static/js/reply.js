@@ -31,7 +31,7 @@ function renderReply(reply) {
 // 댓글 로드 함수
 function loadReplies(page = 0) {
     articleId = document.getElementById('article-id').value;
-    fetch(`/api/replies/article/${articleId}?page=${page}&size=10`, {
+    fetch(`/replies/article/${articleId}?page=${page}&size=10`, {
         method: 'GET',
         headers: {
             Authorization: 'Bearer ' + localStorage.getItem('access_token'),
@@ -55,10 +55,11 @@ function loadReplies(page = 0) {
                         <span id="like-count-${reply.replyId}">추천 수: ${reply.totalLikes || 0 }</span>
                         <button class="btn btn-link btn-sm text-info" onclick="showLikers(${reply.replyId})">추천자 목록</button>
                     </div>
+                    ${reply.isAuthor ? `
                     <div>
                         <button class="btn btn-link btn-sm text-primary" onclick="editReply(${reply.replyId}, '${reply.reply}')">수정</button>
                         <button class="btn btn-link btn-sm text-danger" onclick="deleteReply(${reply.replyId})">삭제</button>
-                    </div>
+                    </div>` : ''}
                 `;
             repliesList.appendChild(replyElement);
         });
@@ -195,7 +196,7 @@ window.deleteReply = (replyId) => {
 
 //추천 상위 댓글을 가져와서 표시하는 함수
 function loadTopReplies() {
-    fetch(`/api/replies/article/${articleId}/top-replies?limit=1`, {
+    fetch(`/replies/article/${articleId}/top-replies?limit=1`, {
         method: 'GET',
         headers: {
             Authorization: 'Bearer ' + localStorage.getItem('access_token'),
@@ -221,10 +222,11 @@ function loadTopReplies() {
                         <span id="like-count-${reply.replyId}">추천 수: ${reply.totalLikes || 0 }</span>
                         <button class="btn btn-link btn-sm text-info" onclick="showLikers(${reply.replyId})">추천자 목록</button>
                     </div>
+                    ${reply.isAuthor ? `
                     <div>
                         <button class="btn btn-link btn-sm text-primary" onclick="editReply(${reply.replyId}, '${reply.reply}')">수정</button>
                         <button class="btn btn-link btn-sm text-danger" onclick="deleteReply(${reply.replyId})">삭제</button>
-                    </div>
+                    </div>` : ''}
                 `;
             topRepliesSection.appendChild(replyElement);
         });

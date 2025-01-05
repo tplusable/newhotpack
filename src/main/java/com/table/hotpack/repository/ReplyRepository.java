@@ -18,17 +18,20 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
 
 
 //    Page<Reply> findByArticleId(Long articleId, Pageable pageable);
-    @Query("SELECT r FROM Reply r WHERE r.article.id= :articleId")
+    @Query("SELECT r FROM Reply r WHERE r.article.id= :articleId ORDER BY r.createdAt DESC")
     Page<Reply> findByArticleIdWithPaging(@Param("articleId")Long articleId, Pageable pageable);
 
     Page<Reply> findByArticleIdOrderByCreatedAtDesc(Long articleId, Pageable pagealbe);
 
-    List<Reply> findByUser(User user);
     @Query("SELECT r FROM Reply r WHERE r.user.id= :userId")
     List<Reply> findByUserId(@Param("userId") Long userId);
 
     @Query("SELECT r FROM Reply r LEFT JOIN r.replyLikes rl "+
+            "WHERE r.article.id = :articleId " +
             "GROUP BY r " +
             "ORDER BY COUNT(rl) DESC, r.createdAt DESC")
     List<Reply> findTopRepliesByLikes(@Param("articleId") Long article, Pageable pageable);
+
+    @Query("SELECT r FROM Reply r WHERE r.user =:userId")
+    List<Reply> findMyRepliesByUserId(@Param("userId") Long userId);
 }
