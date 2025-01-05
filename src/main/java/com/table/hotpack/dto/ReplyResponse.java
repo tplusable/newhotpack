@@ -29,7 +29,7 @@ public class ReplyResponse {
     private String author;
     @JsonProperty("isAuthor")
     private boolean isAuthor;
-    
+    private Long articleId;
 
     public static ReplyResponse fromEntity(Reply reply, boolean liked, int totalLikes, boolean isAuthor) {
         return ReplyResponse.builder()
@@ -42,6 +42,7 @@ public class ReplyResponse {
                 .liked(liked)
                 .totalLikes(totalLikes)
                 .isAuthor(isAuthor)
+                .articleId(reply.getArticle().getId())
                 .build();
     }
 
