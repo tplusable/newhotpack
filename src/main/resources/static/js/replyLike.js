@@ -24,7 +24,7 @@ async function toggleLike(replyId) {
 // 추천자 목록 조회
 async function showLikers(replyId) {
     try {
-        const response = await fetch(`/api/replies/${replyId}/likers`, {
+        const response = await fetch(`/replies/${replyId}/likers`, {
             method: 'GET',
             headers: {
                 Authorization: 'Bearer ' + localStorage.getItem('access_token'),

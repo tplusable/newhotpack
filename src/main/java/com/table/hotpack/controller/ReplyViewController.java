@@ -16,25 +16,30 @@
 //public class ReplyViewController {
 //    private final ReplyService replyService;
 //
-//    @GetMapping("/article/{articleId}/replies")
-//    public String getRepliesByArticleId(
-//            @PathVariable Long articleId,
-//            @RequestParam(defaultValue="0") int page,
-//            @RequestParam(defaultValue="10") int size,
-//            Model model) {
-//        Page<ReplyResponse> replies=replyService.findRepliesByArticleId(articleId, PageRequest.of(page, size));
-//        model.addAttribute("replies", replies.getContent());
-//        model.addAttribute("totalPages", replies.getTotalPages());
-//        return "replies"; //replies.html 파일 반환
-//    }
+////    @GetMapping("/article/{articleId}/replies")
+////    public String getRepliesByArticleId(
+////            @PathVariable Long articleId,
+////            @RequestParam(defaultValue="0") int page,
+////            @RequestParam(defaultValue="10") int size,
+////            Model model) {
+////        Page<ReplyResponse> replies=replyService.findRepliesByArticleId(articleId, PageRequest.of(page, size));
+////        model.addAttribute("replies", replies.getContent());
+////        model.addAttribute("totalPages", replies.getTotalPages());
+////        return "replies"; //replies.html 파일 반환
+////    }
+////
+////    @GetMapping("/article/{articleId}/top-replies")
+////    public String getTopRepliesByLikes(
+////            @PathVariable Long articleId,
+////            @RequestParam(defaultValue = "3") int limit,
+////            Model model) {
+////        model.addAttribute("topReplies", replyService.findTopRepliesByLikes(articleId, limit));
+////        return "top-replies"; // top-replies.html 파일 반환
+////    }
 //
-//    @GetMapping("/article/{articleId}/top-replies")
-//    public String getTopRepliesByLikes(
-//            @PathVariable Long articleId,
-//            @RequestParam(defaultValue = "3") int limit,
-//            Model model) {
-//        model.addAttribute("topReplies", replyService.findTopRepliesByLikes(articleId, limit));
-//        return "top-replies"; // top-replies.html 파일 반환
+//    @GetMapping("/myReplies")
+//    public String getMyArticles() {
+//        return "myReplies";
 //    }
 //
 //}
