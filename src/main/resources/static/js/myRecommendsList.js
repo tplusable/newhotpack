@@ -37,9 +37,8 @@ function fetchMyRecommendedArticles() {
 
                 articlesHTML += `
                     <div class="card mb-3">
-                        <div class="card-header">${article.id}</div>
+                        <div class="card-header">${article.title}</div>
                         <div class="card-body">
-                            <h5 class="card-title">${article.title}</h5>
                             <p class="card-text">${truncatedContent}</p>
                             <a href="/articles/${article.id}" class="btn btn-primary">보러가기</a>
                         </div>
