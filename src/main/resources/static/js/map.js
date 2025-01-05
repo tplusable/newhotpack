@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function getAreaName() {
     const areaNameElement = document.querySelector("h1");
     return areaNameElement
-      ? areaNameElement.textContent.replace("관광지 목록 for ", "")
+      ? areaNameElement.textContent.replace("의 관광지 목록", "")
       : "Unknown Area";
   }
 

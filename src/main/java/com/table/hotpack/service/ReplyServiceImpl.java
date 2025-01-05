@@ -203,4 +203,27 @@ public class ReplyServiceImpl implements ReplyService{
 
     }
 
+    @Override
+    public List<ReplyResponse> findMyRepliesByUserEmail(String email) {
+        String currentUsername = getCurrentUsername();
+
+        if (currentUsername == null || !currentUsername.equals(email)) {
+            throw new IllegalArgumentException("Unauthorized access to replies.");
+        }
+
+        List<Reply> replies= replyRepository.findByAuthor(email);
+
+        return replies.stream()
+                .map(reply -> {
+                    ReplyLikeResponse replyLikeResponse = generateReplyLikeResponse(reply, currentUsername);
+                    return ReplyResponse.fromEntity(
+                            reply,
+                            replyLikeResponse.isLiked(),
+                            replyLikeResponse.getTotalLikes(),
+                            currentUsername.equals(reply.getAuthor())
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
 }

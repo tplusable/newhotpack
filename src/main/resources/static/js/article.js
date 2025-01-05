@@ -145,9 +145,6 @@ function showContentDetails(contentId) {
     });
 }
 
-
-
-
 // 페이지 로드 시 여행 계획 불러오기
 window.addEventListener('DOMContentLoaded', () => {
     let id = document.getElementById('article-id').value;
@@ -161,6 +158,12 @@ window.addEventListener('DOMContentLoaded', () => {
     })
     .then(response => response.json())
     .then(data => {
+        if (data.areaName) {
+            // 여행 이름을 동적으로 설정
+            const areaNameContainer = document.getElementById('areaNameContainer');
+            areaNameContainer.innerHTML = `<h3>${data.areaName} 여행</h3>`;
+        }
+
         if (data.contentIdsByDate) {
             fetchContentDetails(data.contentIdsByDate);
         } else {
