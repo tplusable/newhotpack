@@ -45,10 +45,22 @@ public class ReplyController {
     public ResponseEntity<Page<ReplyResponse>> getRepliesByArticleId(
             @PathVariable("articleId") Long articleId,
             @RequestParam(name = "page", defaultValue ="0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size,
-            @AuthenticationPrincipal User currentUser) {
+            @RequestParam(name = "size", defaultValue = "10") int size) {
 
-        String currentUsername = currentUser != null ? currentUser.getUsername() : null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = null;
+
+        if (authentication != null && authentication.isAuthenticated()
+                && !"anonymousUser".equals(authentication.getPrincipal())) {
+            currentUsername=authentication.getName();
+            log.info("Current User: {}", currentUsername);
+        } else {
+            log.info("Anonymous User is accessing replies");
+        }
+
+        log.info("Article ID: {}", articleId);
+        log.info("Page: {}, Size: {}", page, size);
+        log.info("Current User: {}", currentUsername != null ? currentUsername : "Anonymous");
 
         Page<ReplyResponse> replies = replyService.findRepliesByArticleIdWithAuthorCheck(articleId, PageRequest.of(page, size), currentUsername);
         return ResponseEntity.ok(replies);
@@ -173,34 +185,47 @@ public class ReplyController {
 //    }
 
     @GetMapping("/api/user/my-replies")
-    public ResponseEntity<List<ReplyResponse>> getUserReplies() {
-        // SecurityContextHolder를 통해 인증된 사용자 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public ResponseEntity<List<ReplyResponse>> getUserReplies(Principal principal) {
+        String username = principal.getName();
+        log.info("현재 인즈된 사용자 이메일: {}", username);
 
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new IllegalArgumentException("User authentication information is missing.");
-        }
-
-        String username = authentication.getName();
-
-        log.info("@@@@@@@@ 현재 인증된 사용자 이메일: {}", username);
-
-        // 사용자 ID 조회
-        Long userId = userService.findUserIdByUsername(username);
-        if (userId == null) {
-            throw new IllegalArgumentException("User not found for the given authentication.");
-        }
-
-        log.info("@@@@@@@@@@@@ 사용자 ID: {}", userId);
-
-        // 댓글 조회
-        List<ReplyResponse> replies = replyService.findMyRepliesByUserId(userId);
+        List<ReplyResponse> replies = replyService.findMyRepliesByUserEmail(username);
 
         if (replies.isEmpty()) {
-            log.info("@@@@@@@@@@@@ 사용자가 작성한 댓글이 없습니다.");
+            log.info("사용자가 작성한 댓글이 없습니다.");
         }
-
         return ResponseEntity.ok(replies);
     }
+
+//    @GetMapping("/api/user/my-replies")
+//    public ResponseEntity<List<ReplyResponse>> getUserReplies() {
+//        // SecurityContextHolder를 통해 인증된 사용자 가져오기
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//        if (authentication == null || !authentication.isAuthenticated()) {
+//            throw new IllegalArgumentException("User authentication information is missing.");
+//        }
+//
+//        String username = authentication.getName();
+//
+//        log.info("@@@@@@@@ 현재 인증된 사용자 이메일: {}", username);
+//
+//        // 사용자 ID 조회
+//        Long userId = userService.findUserIdByUsername(username);
+//        if (userId == null) {
+//            throw new IllegalArgumentException("User not found for the given authentication.");
+//        }
+//
+//        log.info("@@@@@@@@@@@@ 사용자 ID: {}", userId);
+//
+//        // 댓글 조회
+//        List<ReplyResponse> replies = replyService.findMyRepliesByUserId(userId);
+//
+//        if (replies.isEmpty()) {
+//            log.info("@@@@@@@@@@@@ 사용자가 작성한 댓글이 없습니다.");
+//        }
+//
+//        return ResponseEntity.ok(replies);
+//    }
 
 }

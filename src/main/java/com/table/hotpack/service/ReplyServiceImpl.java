@@ -14,6 +14,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,21 @@ public class ReplyServiceImpl implements ReplyService{
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
     private final ReplyLikeRepository replyLikeRepository;
+
+    private String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()
+            && !"anonymousUser".equals(authentication.getPrincipal())) {
+            return authentication.getName();
+        }
+        return null;
+    }
+
+    private ReplyResponse createReplyResponse(Reply reply, String currentUsername) {
+        ReplyLikeResponse replyLikeResponse = generateReplyLikeResponse(reply, currentUsername);
+        boolean isAuthor = currentUsername != null && currentUsername.equals(reply.getAuthor());
+        return ReplyResponse.fromEntity(reply, replyLikeResponse.isLiked(), replyLikeResponse.getTotalLikes(), isAuthor);
+    }
 
     private ReplyLikeResponse generateReplyLikeResponse(Reply reply, String currentUsername) {
         boolean liked=false;
@@ -61,37 +77,27 @@ public class ReplyServiceImpl implements ReplyService{
 
     @Override
     public Page<ReplyResponse> findRepliesByArticleId(Long articleId, Pageable pageable) {
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication() != null
-                ? SecurityContextHolder.getContext().getAuthentication().getName()
-                : null;
+        String currentUsername = getCurrentUsername();
 
         return replyRepository.findByArticleIdOrderByCreatedAtDesc(articleId, pageable)
-                .map(reply -> {
-                    ReplyLikeResponse replyLikeResponse=generateReplyLikeResponse(reply, currentUsername);
-                    boolean isAuthor = currentUsername != null && reply.getAuthor().equals(currentUsername);
-                    return ReplyResponse.fromEntity(reply, replyLikeResponse.isLiked(), replyLikeResponse.getTotalLikes(), isAuthor);
-                });
+                .map(reply ->  createReplyResponse(reply, currentUsername));
     }
 
     @Override
     public ReplyResponse findReplyById(Long replyId) {
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication() != null
-                ? SecurityContextHolder.getContext().getAuthentication().getName()
-                : null;
+        String currentUsername = getCurrentUsername();
 
 
         Reply reply= replyRepository.findById(replyId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
-        ReplyLikeResponse replyLikeResponse=generateReplyLikeResponse(reply, currentUsername);
-        boolean isAuthor = currentUsername != null && reply.getAuthor().equals(currentUsername);
-        return ReplyResponse.fromEntity(reply, replyLikeResponse.isLiked(), replyLikeResponse.getTotalLikes(), isAuthor);
+        return createReplyResponse(reply, currentUsername);
     }
 
     @Override
-    public ReplyResponse addReply(AddReplyRequest request, String userName) {
+    public ReplyResponse addReply(AddReplyRequest request, String username) {
         Article article=articleRepository.findById(request.getArticleId())
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
-        User user=userRepository.findByEmail(userName)
+        User user=userRepository.findByEmail(username)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         Reply reply=Reply.builder()
@@ -103,8 +109,7 @@ public class ReplyServiceImpl implements ReplyService{
                 .build();
 
         replyRepository.save(reply);
-        ReplyLikeResponse replyLikeResponse=generateReplyLikeResponse(reply, userName);
-        return ReplyResponse.fromEntity(reply, replyLikeResponse.isLiked(), replyLikeResponse.getTotalLikes(), true);
+        return createReplyResponse(reply, username);
     }
 
     @Override
@@ -115,9 +120,8 @@ public class ReplyServiceImpl implements ReplyService{
         authorizeReplyAuthor(reply);
         reply.update(request.getReply());
 
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        ReplyLikeResponse replyLikeResponse=generateReplyLikeResponse(reply, currentUsername);
-        return ReplyResponse.fromEntity(reply, replyLikeResponse.isLiked(), replyLikeResponse.getTotalLikes(), true);
+        String currentUsername = getCurrentUsername();
+        return createReplyResponse(reply, currentUsername);
     }
 
     @Override
@@ -132,8 +136,8 @@ public class ReplyServiceImpl implements ReplyService{
 
     // 댓글을 작성한 유저인지 확인
     private static void authorizeReplyAuthor(Reply reply) {
-        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!reply.getAuthor().equals(userName)) {
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!reply.getAuthor().equals(currentUsername)) {
             throw new IllegalArgumentException("not authorized");
         }
     }
@@ -158,14 +162,7 @@ public class ReplyServiceImpl implements ReplyService{
             replyLikeRepository.save(newLike);
         }
 
-        int totalLikes=replyLikeRepository.countByReply(reply);
-        boolean liked=replyLikeRepository.existsByReplyAndUser(reply, user);
-
-        return ReplyLikeResponse.builder()
-                .replyId(replyId)
-                .totalLikes(totalLikes)
-                .liked(liked)
-                .build();
+        return generateReplyLikeResponse(reply, username);
     }
 
     public List<String> getLikers(Long replyId) {
@@ -180,16 +177,10 @@ public class ReplyServiceImpl implements ReplyService{
         Pageable pageable= PageRequest.of(0, limit); //limit 수 만큼 페이징
         List<Reply> topReplies=replyRepository.findTopRepliesByLikes(articleId, pageable);
 
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication() != null
-                ? SecurityContextHolder.getContext().getAuthentication().getName()
-                : null;
+        String currentUsername = getCurrentUsername();
 
         return topReplies.stream()
-                .map(reply -> {
-                    ReplyLikeResponse replyLikeResponse=generateReplyLikeResponse(reply, currentUsername);
-                    boolean isAuthor = currentUsername != null && reply.getAuthor().equals(currentUsername);
-                    return ReplyResponse.fromEntity(reply, replyLikeResponse.isLiked(), replyLikeResponse.getTotalLikes(), isAuthor);
-                })
+                .map(reply -> createReplyResponse(reply,  currentUsername))
                 .collect(Collectors.toList());
     }
 
@@ -197,29 +188,42 @@ public class ReplyServiceImpl implements ReplyService{
         Page<Reply> replies = replyRepository.findByArticleIdWithPaging(articleId, pageRequest);
 
 
-        return replies.map(reply -> {
-            ReplyLikeResponse replyLikeResponse=generateReplyLikeResponse(reply, currentUsername);
-            boolean isAuthor = currentUsername != null && reply.getReplyer().equals(currentUsername);
-            return ReplyResponse.fromEntity(reply, replyLikeResponse.isLiked(), replyLikeResponse.getTotalLikes(), isAuthor);
-        });
+        return replies.map(reply -> createReplyResponse(reply, currentUsername));
     }
 
     @Override
     public List<ReplyResponse> findMyRepliesByUserId(Long userId) {
         List<Reply> replies = replyRepository.findMyRepliesByUserId(userId);
 
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication() != null
-                ? SecurityContextHolder.getContext().getAuthentication().getName()
-                : null;
+        String currentUsername = getCurrentUsername();
+
+        return replies.stream()
+                .map(reply -> createReplyResponse(reply, currentUsername))
+                        .collect(Collectors.toList());
+
+    }
+
+    @Override
+    public List<ReplyResponse> findMyRepliesByUserEmail(String email) {
+        String currentUsername = getCurrentUsername();
+
+        if (currentUsername == null || !currentUsername.equals(email)) {
+            throw new IllegalArgumentException("Unauthorized access to replies.");
+        }
+
+        List<Reply> replies= replyRepository.findByAuthor(email);
 
         return replies.stream()
                 .map(reply -> {
-                            ReplyLikeResponse replyLikeResponse = generateReplyLikeResponse(reply, currentUsername);
-                            boolean isAuthor = currentUsername != null && reply.getAuthor().equals(currentUsername);
-                            return ReplyResponse.fromEntity(reply, replyLikeResponse.isLiked(), replyLikeResponse.getTotalLikes(), isAuthor);
-                        })
-                        .collect(Collectors.toList());
-
+                    ReplyLikeResponse replyLikeResponse = generateReplyLikeResponse(reply, currentUsername);
+                    return ReplyResponse.fromEntity(
+                            reply,
+                            replyLikeResponse.isLiked(),
+                            replyLikeResponse.getTotalLikes(),
+                            currentUsername.equals(reply.getAuthor())
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
 }
