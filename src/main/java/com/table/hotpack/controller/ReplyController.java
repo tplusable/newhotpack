@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -53,7 +54,7 @@ public class ReplyController {
         return ResponseEntity.ok(replies);
     }
 
-    @PostMapping("/api/article/{articleId}")
+    @PostMapping("/api/replies/article/{articleId}")
     public ResponseEntity<ReplyResponse> addReply(@RequestBody AddReplyRequest request, Principal principal) {
         log.info(request.getArticleId());
         log.info(request.getUserId());
@@ -129,31 +130,31 @@ public class ReplyController {
         return ResponseEntity.ok(topReplies);
     }
 
-    @GetMapping("/api/user/my-replies")
-    public ResponseEntity<List<ReplyResponse>> getUserReplies(Principal principal) {
-
-        Long userId =null;
-
-        log.info(principal);
-
-        if (principal == null || principal.getName() == null) {
-            throw new IllegalArgumentException("User authentication information is missing.");
-        }
-
-        log.info(principal.getName());
-
-        if (userService.findUserIdByUsername(principal.getName()) == null ) {
-            userId= userService.findUserIdByUsername(principal.getName());
-            if (userId == null) {
-                throw new IllegalArgumentException("User not found for the given authentication.");
-            }
-        }
-
-        log.info(userId);
-
-        List<ReplyResponse> replies= replyService.findMyRepliesByUserId(userId);
-        return ResponseEntity.ok(replies);
-    }
+//    @GetMapping("/api/user/my-replies")
+//    public ResponseEntity<List<ReplyResponse>> getUserReplies(Principal principal) {
+//
+//        Long userId =null;
+//
+//        log.info("@@@@@@@principal:",principal);
+//
+//        if (principal == null || principal.getName() == null) {
+//            throw new IllegalArgumentException("User authentication information is missing.");
+//        }
+//
+//        log.info("@@@@@@@@email:",principal.getName());
+//
+//        if (userService.findUserIdByUsername(principal.getName()) == null ) {
+//            userId= userService.findUserIdByUsername(principal.getName());
+//            if (userId == null) {
+//                throw new IllegalArgumentException("User not found for the given authentication.");
+//            }
+//        }
+//
+//        log.info("@@@@@@@@@@@@userid:",userId);
+//
+//        List<ReplyResponse> replies= replyService.findMyRepliesByUserId(userId);
+//        return ResponseEntity.ok(replies);
+//    }
 
 //    @GetMapping("/api/user/my-replies")
 //    public ResponseEntity<List<ReplyResponse>> getUserReplies(@AuthenticationPrincipal User user) {
@@ -170,5 +171,36 @@ public class ReplyController {
 //        List<ReplyResponse> replies = replyService.findMyRepliesByUserId(userId);
 //        return ResponseEntity.ok(replies);
 //    }
+
+    @GetMapping("/api/user/my-replies")
+    public ResponseEntity<List<ReplyResponse>> getUserReplies() {
+        // SecurityContextHolder를 통해 인증된 사용자 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalArgumentException("User authentication information is missing.");
+        }
+
+        String username = authentication.getName();
+
+        log.info("@@@@@@@@ 현재 인증된 사용자 이메일: {}", username);
+
+        // 사용자 ID 조회
+        Long userId = userService.findUserIdByUsername(username);
+        if (userId == null) {
+            throw new IllegalArgumentException("User not found for the given authentication.");
+        }
+
+        log.info("@@@@@@@@@@@@ 사용자 ID: {}", userId);
+
+        // 댓글 조회
+        List<ReplyResponse> replies = replyService.findMyRepliesByUserId(userId);
+
+        if (replies.isEmpty()) {
+            log.info("@@@@@@@@@@@@ 사용자가 작성한 댓글이 없습니다.");
+        }
+
+        return ResponseEntity.ok(replies);
+    }
 
 }
