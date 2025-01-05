@@ -4,6 +4,7 @@ import com.table.hotpack.domain.Article;
 import com.table.hotpack.dto.ArticleListViewResponse;
 import com.table.hotpack.dto.ArticleViewResponse;
 import com.table.hotpack.post.controller.TripInfoController;
+import com.table.hotpack.post.domain.TripInfo;
 import com.table.hotpack.post.dto.TripInfoDto;
 import com.table.hotpack.post.service.TripInfoService;
 import com.table.hotpack.service.BlogService;
