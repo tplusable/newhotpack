@@ -57,40 +57,156 @@ function getCookie(key) {
     return result;
 }
 
-function fetchTripInfo(articleId) {
-    fetch(`/api/articles/${articleId}/tripinfo`, {
+//function fetchTripInfo(articleId) {
+//    fetch(`/api/articles/${articleId}/tripinfo`, {
+//        method: 'GET',
+//        headers: {
+//            'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+//            'Content-Type': 'application/json'
+//        }
+//    })
+//    .then(response => {
+//        if (!response.ok) {
+//            throw new Error('Failed to load trip info');
+//        }
+//        return response.json();
+//    })
+//    .then(data => {
+//        const tripInfoContainer = document.getElementById('trip-info-container');
+//        if (data) {
+//            tripInfoContainer.innerHTML = `
+//                <h3>여행 정보</h3>
+//                <p>여행 제목: ${data.title}</p>
+//                <p>여행 지역: ${data.areaName}</p>
+//                <p>여행 시작일: ${formatDate(data.startDate)}</p>
+//                <p>여행 종료일: ${formatDate(data.endDate)}</p>
+//                <p>여행 상세 정보: ${data.details}</p>
+//            `;
+//        } else {
+//            tripInfoContainer.innerHTML = `<p>여행 정보가 없습니다.</p>`;
+//        }
+//    })
+//    .catch(error => {
+//        console.error('여행 정보 로딩 실패:', error);
+//        alert('여행 정보를 가져오는 데 실패했습니다.');
+//    });
+//}
+
+// 날짜 형식을 원하는 형태로 변환하는 함수 (예: 2024-05-01 → 2024.05.01)
+function formatDate(input) {
+    if (!input) return "정보 없음";
+    if (typeof input === 'string' && !isNaN(Date.parse(input))) {
+        const date = new Date(input);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}.${month}.${day}`;
+    }
+    return input;
+}
+
+// 여행 계획 정보를 불러오는 함수
+function fetchContentDetails(contentIdsByDate) {
+    const contentDetailsContainer = document.getElementById('trip-details-list');
+    if (!contentDetailsContainer) {
+        console.error('Element with id "trip-details-list" not found.');
+        return; // 요소가 없으면 실행 중단
+    }
+
+    Object.entries(contentIdsByDate).forEach(([day, contentIds]) => {
+        const daySection = document.createElement('div');
+        daySection.classList.add('day-section');
+        daySection.innerHTML = `<h4>${day}</h4>`;
+
+        const contentList = document.createElement('div');
+        contentList.classList.add('content-list');
+
+        contentIds.forEach(contentId => {
+            fetch(`/content/${contentId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(content => {
+                const contentDiv = document.createElement('div');
+                contentDiv.classList.add('content-item');
+                contentDiv.innerHTML = `
+                    <img src="${content.firstimage || '/img/logo.png'}" alt="${content.title}" style="width: 100px; height: auto;">
+                    <h5>${content.title}</h5>
+                    <p>${content.addr1 || "정보 없음"}</p>
+                    <a href="${content.homepage || '#'}" target="_blank">홈페이지</a>
+                    <button class="btn btn-primary btn-sm" onclick="showContentDetails('${content.contentid}')">관광지 정보 상세 보기</button>
+                `;
+                contentList.appendChild(contentDiv);
+            })
+            .catch(error => {
+                console.error(`Failed to fetch content details for ID: ${contentId}`, error);
+            });
+        });
+
+        daySection.appendChild(contentList);
+        contentDetailsContainer.appendChild(daySection);
+    });
+}
+
+
+function showContentDetails(contentId) {
+    fetch(`/content/${contentId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(content => {
+        const modalBody = document.getElementById('modal-body');
+        modalBody.innerHTML = `
+            <h5>${content.title}</h5>
+            <p>${content.overview || "정보 없음"}</p>
+            <img src="${content.firstimage || '/img/logo.png'}" alt="${content.title}" style="width: 100%;">
+            <p>주소: ${content.addr1 || "정보 없음"}</p>
+            <p>전화번호: ${content.tel || "정보 없음"}</p>
+            <a href="${content.homepage || '#'}" target="_blank">홈페이지</a>
+        `;
+        const modal = new bootstrap.Modal(document.getElementById('contentDetailsModal'));
+        modal.show();
+    })
+    .catch(error => {
+        console.error('Failed to fetch content details:', error);
+    });
+}
+
+
+
+
+// 페이지 로드 시 여행 계획 불러오기
+window.addEventListener('DOMContentLoaded', () => {
+    let id = document.getElementById('article-id').value;
+
+    fetch(`/api/articles/${id}/tripinfo`, {
         method: 'GET',
         headers: {
             'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
             'Content-Type': 'application/json'
         }
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Failed to load trip info');
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-        const tripInfoContainer = document.getElementById('trip-info-container');
-        if (data) {
-            tripInfoContainer.innerHTML = `
-                <h3>여행 정보</h3>
-                <p>여행 제목: ${data.title}</p>
-                <p>여행 지역: ${data.areaName}</p>
-                <p>여행 시작일: ${formatDate(data.startDate)}</p>
-                <p>여행 종료일: ${formatDate(data.endDate)}</p>
-                <p>여행 상세 정보: ${data.details}</p>
-            `;
+        if (data.contentIdsByDate) {
+            fetchContentDetails(data.contentIdsByDate);
         } else {
-            tripInfoContainer.innerHTML = `<p>여행 정보가 없습니다.</p>`;
+            console.error('No contentIdsByDate found in response');
         }
     })
     .catch(error => {
-        console.error('여행 정보 로딩 실패:', error);
-        alert('여행 정보를 가져오는 데 실패했습니다.');
+        console.error('Failed to fetch trip info:', error);
     });
-}
+});
+
 
 // 작성일 계산 함수
 const timeElements = document.querySelectorAll(".relative-time");
@@ -138,7 +254,6 @@ if (deleteButton) {
 }
 
 // 수정 기능
-// 수정 기능 (이미 포함된 내용)
 const modifyButton = document.getElementById('modify-btn');
 if (modifyButton) {
     modifyButton.addEventListener('click', event => {

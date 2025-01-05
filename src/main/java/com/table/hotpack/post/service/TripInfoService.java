@@ -84,6 +84,12 @@ public class TripInfoService {
         return new TripInfoDto(tripInfo);
     }
 
+    public TripInfoDto getTripInfoByArticleId(Long tripInfoId) {
+        TripInfo tripInfo = tripInfoRepository.findById(tripInfoId)
+                .orElseThrow(() -> new IllegalArgumentException("TripInfo with id " + tripInfoId + " not found"));
 
+        // TripInfo -> TripInfoDto로 변환하여 반환
+        return new TripInfoDto(tripInfo);
+    }
 
 }

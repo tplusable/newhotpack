@@ -3,7 +3,9 @@ package com.table.hotpack.controller;
 import com.table.hotpack.domain.Article;
 import com.table.hotpack.domain.User;
 import com.table.hotpack.dto.*;
+import com.table.hotpack.post.domain.TripInfo;
 import com.table.hotpack.post.dto.TripInfoDto;
+import com.table.hotpack.post.service.TripInfoService;
 import com.table.hotpack.repository.RecommendRepository;
 import com.table.hotpack.service.BlogService;
 import com.table.hotpack.service.UserService;
@@ -25,6 +27,7 @@ public class BlogApiController {
 
     private final BlogService blogService;
     private final UserService userService;
+    private final TripInfoService tripInfoService;
     private final RecommendRepository recommendRepository;
 
     @PostMapping("/api/articles")
@@ -108,4 +111,18 @@ public class BlogApiController {
         return ResponseEntity.ok()
                 .body(articles);
     }
+
+    @GetMapping("/api/articles/{id}/tripinfo")
+    public ResponseEntity<TripInfoDto> getTripInfoByArticleId(@PathVariable("id") Long articleId) {
+        // 1. Article에서 tripInfoId 가져오기
+        Article article = blogService.findById(articleId);
+        if (article == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        // 2. TripInfo 조회
+        TripInfoDto tripInfoDto = tripInfoService.getTripInfoByArticleId(article.getTripInfo().getId());
+        return ResponseEntity.ok(tripInfoDto);
+    }
+
 }
