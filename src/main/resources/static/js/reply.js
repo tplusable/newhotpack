@@ -31,7 +31,7 @@ function renderReply(reply) {
 // 댓글 로드 함수
 function loadReplies(page = 0) {
     articleId = document.getElementById('article-id').value;
-    fetch(`/api/replies/article/${articleId}?page=${page}&size=10`, {
+    fetch(`/replies/article/${articleId}?page=${page}&size=10`, {
         method: 'GET',
         headers: {
             Authorization: 'Bearer ' + localStorage.getItem('access_token'),
@@ -196,7 +196,7 @@ window.deleteReply = (replyId) => {
 
 //추천 상위 댓글을 가져와서 표시하는 함수
 function loadTopReplies() {
-    fetch(`/api/replies/article/${articleId}/top-replies?limit=1`, {
+    fetch(`/replies/article/${articleId}/top-replies?limit=1`, {
         method: 'GET',
         headers: {
             Authorization: 'Bearer ' + localStorage.getItem('access_token'),

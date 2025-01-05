@@ -23,7 +23,6 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
 
     Page<Reply> findByArticleIdOrderByCreatedAtDesc(Long articleId, Pageable pagealbe);
 
-    List<Reply> findByUser(User user);
     @Query("SELECT r FROM Reply r WHERE r.user.id= :userId")
     List<Reply> findByUserId(@Param("userId") Long userId);
 
@@ -32,4 +31,7 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
             "GROUP BY r " +
             "ORDER BY COUNT(rl) DESC, r.createdAt DESC")
     List<Reply> findTopRepliesByLikes(@Param("articleId") Long article, Pageable pageable);
+
+    @Query("SELECT r FROM Reply r WHERE r.user =:userId")
+    List<Reply> findMyRepliesByUserId(@Param("userId") Long userId);
 }

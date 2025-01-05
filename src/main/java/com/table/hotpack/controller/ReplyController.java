@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,13 +34,13 @@ import java.util.List;
 
 @Log4j2
 @RestController
-@RequestMapping("/api/replies")
+//@RequestMapping("/api/replies")
 @RequiredArgsConstructor
 public class ReplyController {
     private final ReplyService replyService;
     private final UserService userService;
 
-    @GetMapping("/article/{articleId}")
+    @GetMapping("/replies/article/{articleId}")
     public ResponseEntity<Page<ReplyResponse>> getRepliesByArticleId(
             @PathVariable("articleId") Long articleId,
             @RequestParam(name = "page", defaultValue ="0") int page,
@@ -52,7 +53,7 @@ public class ReplyController {
         return ResponseEntity.ok(replies);
     }
 
-    @PostMapping("/article/{articleId}")
+    @PostMapping("/api/article/{articleId}")
     public ResponseEntity<ReplyResponse> addReply(@RequestBody AddReplyRequest request, Principal principal) {
         log.info(request.getArticleId());
         log.info(request.getUserId());
@@ -78,7 +79,7 @@ public class ReplyController {
         return ResponseEntity.status(HttpStatus.CREATED).body(reply);
     }
 
-    @PutMapping("/{replyId}")
+    @PutMapping("/api/replies/{replyId}")
     public ResponseEntity<ReplyResponse> updateReply(
             @PathVariable("replyId") Long replyId,
             @RequestBody UpdateReplyRequest request) {
@@ -86,14 +87,14 @@ public class ReplyController {
         return ResponseEntity.ok(reply);
     }
 
-    @DeleteMapping("/{replyId}")
+    @DeleteMapping("/api/replies/{replyId}")
     public ResponseEntity<Void> deleteReply(@PathVariable("replyId") Long replyId) {
         replyService.deleteReply(replyId);
             return ResponseEntity.noContent().build();
     }
 
     // 댓글 추천 토글
-    @PostMapping("/{replyId}/like")
+    @PostMapping("/api/replies/{replyId}/like")
     public ResponseEntity<ReplyLikeResponse> toggleLike(
             @PathVariable("replyId") Long replyId,
             Principal principal) {
@@ -105,13 +106,13 @@ public class ReplyController {
         return ResponseEntity.ok(response); // 업데이트된 추천 수 반환
     }
 
-    @GetMapping("/{replyId}/likers")
+    @GetMapping("/replies/{replyId}/likers")
     public ResponseEntity<List<String>> getLikers(@PathVariable("replyId") Long replyId) {
         List<String> likers=replyService.getLikers(replyId);
         return ResponseEntity.ok(likers);
     }
 
-    @GetMapping("/article/{articleId}/top-replies")
+    @GetMapping("/replies/article/{articleId}/top-replies")
     public ResponseEntity<List<ReplyResponse>> getTopRepliesByLikes(
             @PathVariable Long articleId,
             @RequestParam(defaultValue= "1") int limit) {
@@ -127,5 +128,47 @@ public class ReplyController {
 
         return ResponseEntity.ok(topReplies);
     }
+
+    @GetMapping("/api/user/my-replies")
+    public ResponseEntity<List<ReplyResponse>> getUserReplies(Principal principal) {
+
+        Long userId =null;
+
+        log.info(principal);
+
+        if (principal == null || principal.getName() == null) {
+            throw new IllegalArgumentException("User authentication information is missing.");
+        }
+
+        log.info(principal.getName());
+
+        if (userService.findUserIdByUsername(principal.getName()) == null ) {
+            userId= userService.findUserIdByUsername(principal.getName());
+            if (userId == null) {
+                throw new IllegalArgumentException("User not found for the given authentication.");
+            }
+        }
+
+        log.info(userId);
+
+        List<ReplyResponse> replies= replyService.findMyRepliesByUserId(userId);
+        return ResponseEntity.ok(replies);
+    }
+
+//    @GetMapping("/api/user/my-replies")
+//    public ResponseEntity<List<ReplyResponse>> getUserReplies(@AuthenticationPrincipal User user) {
+//        if (user == null) {
+//            throw new IllegalArgumentException("로그인이 필요합니다.");
+//        }
+//
+//        String username = user.getUsername();
+//        Long userId = userService.findUserIdByUsername(username);
+//        if (userId == null) {
+//            throw new IllegalArgumentException("사용자 정보를 찾을 수 없습니다.");
+//        }
+//
+//        List<ReplyResponse> replies = replyService.findMyRepliesByUserId(userId);
+//        return ResponseEntity.ok(replies);
+//    }
 
 }

@@ -18,4 +18,5 @@ public interface ReplyService {
     List<String> getLikers(Long replyId);
     List<ReplyResponse> findTopRepliesByLikes(Long articleId, int limit);
     Page<ReplyResponse> findRepliesByArticleIdWithAuthorCheck(Long articleId, PageRequest pageRequest, String currentUsername);
+    List<ReplyResponse> findMyRepliesByUserId(Long userId);
 }

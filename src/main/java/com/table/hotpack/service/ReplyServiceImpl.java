@@ -204,4 +204,22 @@ public class ReplyServiceImpl implements ReplyService{
         });
     }
 
+    @Override
+    public List<ReplyResponse> findMyRepliesByUserId(Long userId) {
+        List<Reply> replies = replyRepository.findMyRepliesByUserId(userId);
+
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication() != null
+                ? SecurityContextHolder.getContext().getAuthentication().getName()
+                : null;
+
+        return replies.stream()
+                .map(reply -> {
+                            ReplyLikeResponse replyLikeResponse = generateReplyLikeResponse(reply, currentUsername);
+                            boolean isAuthor = currentUsername != null && reply.getAuthor().equals(currentUsername);
+                            return ReplyResponse.fromEntity(reply, replyLikeResponse.isLiked(), replyLikeResponse.getTotalLikes(), isAuthor);
+                        })
+                        .collect(Collectors.toList());
+
+    }
+
 }
