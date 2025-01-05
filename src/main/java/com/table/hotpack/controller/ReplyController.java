@@ -45,10 +45,22 @@ public class ReplyController {
     public ResponseEntity<Page<ReplyResponse>> getRepliesByArticleId(
             @PathVariable("articleId") Long articleId,
             @RequestParam(name = "page", defaultValue ="0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size,
-            @AuthenticationPrincipal User currentUser) {
+            @RequestParam(name = "size", defaultValue = "10") int size) {
 
-        String currentUsername = currentUser != null ? currentUser.getUsername() : null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = null;
+
+        if (authentication != null && authentication.isAuthenticated()
+                && !"anonymousUser".equals(authentication.getPrincipal())) {
+            currentUsername=authentication.getName();
+            log.info("Current User: {}", currentUsername);
+        } else {
+            log.info("Anonymous User is accessing replies");
+        }
+
+        log.info("Article ID: {}", articleId);
+        log.info("Page: {}, Size: {}", page, size);
+        log.info("Current User: {}", currentUsername != null ? currentUsername : "Anonymous");
 
         Page<ReplyResponse> replies = replyService.findRepliesByArticleIdWithAuthorCheck(articleId, PageRequest.of(page, size), currentUsername);
         return ResponseEntity.ok(replies);
