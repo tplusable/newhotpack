@@ -30,7 +30,10 @@ function fetchMyReplies() {
             data.forEach(reply => {
                 repliesHTML += `
                     <div class="card mb-3">
-                        <div class="card-header">댓글 ID: ${reply.replyId}</div>
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span>댓글 ID: ${reply.replyId}</span>
+                            <a href="/articles/${reply.articleId}" class="btn btn-link btn-sm">게시물 보기</a> <!-- 게시물로 이동 -->
+                        </div>
                         <div class="card-body">
                             <p class="card-text">${reply.reply}</p>
                             <p class="card-text"><small class="text-muted">작성일: ${new Date(reply.createdAt).toLocaleString()}</small></p>
@@ -40,7 +43,7 @@ function fetchMyReplies() {
                 `;
             });
 
-            container.innerHTML = repliesHTML;  // 렌더링된 댓글 목록을 app-view-content에 삽입
+            container.innerHTML = repliesHTML; // 렌더링된 댓글 목록을 app-view-content에 삽입
         })
         .catch(error => {
             console.error('Error loading replies:', error);
