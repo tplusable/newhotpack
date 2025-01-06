@@ -110,7 +110,7 @@
                     </div>
                 </div>
 
-                <div style="display: flex; flex: 2.5;; flex-direction: column; justify-content: center; gap: 40px;">
+                <div style="display: flex; flex: 2.5;; flex-direction: column; gap: 40px;">
                     <div id="map" style="width: 100%; height: 400px; border-radius:15px"></div>
 
                     <!-- 오른쪽: Article 상세 -->
@@ -121,34 +121,34 @@
                     </div>
 
                     <!-- Reply Section -->
-                    <section class="mt-5">
-                        <h3>댓글</h3>
-                        <!-- Top Replies Section -->
-                        <div id="top-replies">
-                            <!-- 추천 상위 댓글이 표시될 영역 -->
-                        </div>
-                        <!-- Reply Input Form -->
-                        <div class="mb-3">
-                            <textarea class="form-control" id="reply-content" rows="3" placeholder="댓글을 입력하세요"></textarea>
-                            <button type="button" id="submit-reply" class="btn btn-primary mt-2">작성</button>
-                        </div>
-
-                        <!-- Replies List-->
-                        <div id="replies-list">
-                            <!-- Replies will be dynamically loaded here -->
-                        </div>
-
-                        <!-- Pagination -->
-                        <nav id="pagination" class="mt-3">
-                            <ul class="pagination">
-                                <!-- Pagination buttons will be dynamically added here -->
-                            </ul>
-                        </nav>
-                    </section>
                 </div>
             </div>
 
             <br/>
+            <section class="mt-5">
+                <h3>댓글</h3>
+                <!-- Top Replies Section -->
+                <div id="top-replies">
+                    <!-- 추천 상위 댓글이 표시될 영역 -->
+                </div>
+                <!-- Reply Input Form -->
+                <div class="mb-3">
+                    <textarea class="form-control" id="reply-content" rows="3" placeholder="댓글을 입력하세요"></textarea>
+                    <button type="button" id="submit-reply" class="btn btn-primary mt-2">작성</button>
+                </div>
+
+                <!-- Replies List-->
+                <div id="replies-list">
+                    <!-- Replies will be dynamically loaded here -->
+                </div>
+
+                <!-- Pagination -->
+                <nav id="pagination" class="mt-3">
+                    <ul class="pagination">
+                        <!-- Pagination buttons will be dynamically added here -->
+                    </ul>
+                </nav>
+            </section>
 
         </div>
     </div>
