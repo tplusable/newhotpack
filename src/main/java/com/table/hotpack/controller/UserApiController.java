@@ -76,6 +76,13 @@ public class UserApiController {
         return ResponseEntity.ok(new UserResponse(updatedUser));
     }
 
+    @DeleteMapping("/api/user")
+    public ResponseEntity<?> deleteUser(Principal principal) {
+        userService.delete(principal.getName());
+        return ResponseEntity.ok()
+                .build();
+    }
+
     // 이메일 중복 확인 API
     @GetMapping("check-email")
     public ResponseEntity<Map<String, Object>> checkEmail(@RequestParam("email") String email) {

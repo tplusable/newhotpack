@@ -78,7 +78,13 @@ function fetchContentDetails(contentIdsByDate) {
         return; // 요소가 없으면 실행 중단
     }
 
-    Object.entries(contentIdsByDate).forEach(([day, contentIds]) => {
+    Object.entries(contentIdsByDate)
+      .sort((a, b) => {
+        const dayA = parseInt(a[0].replace('일차', ''), 10);  // '1일차' -> 1
+        const dayB = parseInt(b[0].replace('일차', ''), 10);  // '2일차' -> 2
+        return dayA - dayB;  // 숫자 순으로 정렬
+      })
+      .forEach(([day, contentIds]) => {
         const daySection = document.createElement('div');
         daySection.classList.add('day-section');
         daySection.innerHTML = `<h4>${day}</h4>`;
@@ -102,7 +108,6 @@ function fetchContentDetails(contentIdsByDate) {
                     <img src="${content.firstimage || '/img/logo.png'}" alt="${content.title}" style="width: 100px; height: auto;">
                     <h5>${content.title}</h5>
                     <p>${content.addr1 || "정보 없음"}</p>
-                    <a href="${content.homepage || '#'}" target="_blank">홈페이지</a>
                     <button class="btn btn-primary btn-sm" onclick="showContentDetails('${content.contentid}')">관광지 정보 상세 보기</button>
                 `;
                 contentList.appendChild(contentDiv);
@@ -148,6 +153,7 @@ function showContentDetails(contentId) {
 // 페이지 로드 시 여행 계획 불러오기
 window.addEventListener('DOMContentLoaded', () => {
     let id = document.getElementById('article-id').value;
+    console.log(id);
 
     fetch(`/api/articles/${id}/tripinfo`, {
         method: 'GET',
@@ -407,7 +413,6 @@ if (logoutButton) {
         function success() {
             localStorage.removeItem('access_token');
             deleteCookie('refresh_token');
-            alert('로그아웃 성공');
             location.replace('/');
         }
         function fail() {

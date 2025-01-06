@@ -2,11 +2,13 @@ package com.table.hotpack.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,7 +39,7 @@ public class User implements UserDetails {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
-    private Set<String> roles; // e.g., ROLE_USER, ROLE_ADMIN
+    private Set<String> roles = new HashSet<>(); // e.g., ROLE_USER, ROLE_ADMIN
 
     @PostPersist
     private void updateNickname() {
@@ -45,7 +47,7 @@ public class User implements UserDetails {
         if (this.nickname == null || this.nickname.isBlank()) {
             this.nickname = "hotpack" + this.id;
         }
-    }
+    }  
 
     @Builder
     public User(String email, String password, String name, String nickname, Set<String> roles) {

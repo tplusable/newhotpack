@@ -54,6 +54,7 @@
 <header th:replace="layouts/header::header"></header>
 <div class="container mt-5">
     <h2 class="text-center">여행 리뷰를 작성해 주세요</h2>
+    <input type="hidden" id="article-id" th:value="${article.id}">
     <input type="text" class="form-control" placeholder="제목" id="title" th:value="${article.title}">
 
     <br/>
