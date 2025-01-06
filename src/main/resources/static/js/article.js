@@ -80,7 +80,13 @@ function fetchContentDetails(contentIdsByDate) {
 
     let isFirstMarker = true;
 
-    Object.entries(contentIdsByDate).forEach(([day, contentIds]) => {
+    Object.entries(contentIdsByDate)
+      .sort((a, b) => {
+        const dayA = parseInt(a[0].replace('일차', ''), 10);  // '1일차' -> 1
+        const dayB = parseInt(b[0].replace('일차', ''), 10);  // '2일차' -> 2
+        return dayA - dayB;  // 숫자 순으로 정렬
+      })
+      .forEach(([day, contentIds]) => {
         const daySection = document.createElement('div');
         daySection.classList.add('day-section');
         daySection.innerHTML = `<h4>${day}</h4>`;
@@ -104,12 +110,10 @@ function fetchContentDetails(contentIdsByDate) {
                     <img src="${content.firstimage || '/img/logo.png'}" alt="${content.title}" style="width: 100px; height: auto;">
                     <h5>${content.title}</h5>
                     <p>${content.addr1 || "정보 없음"}</p>
-                    <a href="${content.homepage || '#'}" target="_blank">홈페이지</a>
+
                     <button class="btn btn-primary btn-sm" onclick="showContentDetails('${content.contentid}')">관광지 정보 상세 보기</button>
                 `;
                 contentList.appendChild(contentDiv);
-
-
             })
             .catch(error => {
                 console.error(`Failed to fetch content details for ID: ${contentId}`, error);
@@ -119,10 +123,7 @@ function fetchContentDetails(contentIdsByDate) {
         daySection.appendChild(contentList);
         contentDetailsContainer.appendChild(daySection);
     });
-
 }
-
-
 
 
 function showContentDetails(contentId) {
@@ -287,39 +288,6 @@ timeElements.forEach((el) => {
     el.textContent = relativeTime;
 });
 
-// 수정 기능
-const modifyButton = document.getElementById('modify-btn');
-if (modifyButton) {
-    modifyButton.addEventListener('click', event => {
-        const id = document.getElementById('article-id').value;
-        const title = document.getElementById('title').value;
-        const content = document.getElementById('content').value;
-        const tripInfoId = document.getElementById('tripInfo').value;
-
-        if (!title || !content || !tripInfoId) {
-            alert('제목, 내용, 여행 정보(ID)를 입력해주세요.');
-            return;
-        }
-
-        const body = JSON.stringify({
-            title: title,
-            content: content,
-            tripInfoId: tripInfoId
-        });
-
-        function success() {
-            alert('수정 완료되었습니다.');
-            location.replace(`/articles/${id}`);
-        }
-
-        function fail() {
-            alert('수정 실패했습니다.');
-        }
-
-        httpRequest('PUT', `/api/articles/${id}`, body, success, fail);
-    });
-}
-
 // 삭제 기능
 const deleteButton = document.getElementById('delete-btn');
 if (deleteButton) {
@@ -328,7 +296,6 @@ if (deleteButton) {
         if (!confirm('정말 삭제하시겠습니까?')) {
             return;
         }
-
         function success() {
             alert('삭제가 완료되었습니다.');
             location.replace('/articles');
@@ -343,7 +310,42 @@ if (deleteButton) {
     });
 }
 
+// 수정 기능
+const modifyButton = document.getElementById('modify-btn');
+if (modifyButton) {
+    modifyButton.addEventListener('click', event => {
+        // 수정할 내용 가져오기
+        const id = document.getElementById('article-id').value;  // 글 ID 가져오기
+        const title = document.getElementById('title').value;  // 제목
+        const content = document.getElementById('content').value;  // 내용
+        const tripInfoId = document.getElementById('tripInfo').value; // tripInfo 값 가져오기
 
+        // 수정할 내용이 없다면, 경고를 띄우고 종료
+        if (!title || !content || !tripInfoId) {
+            alert('제목, 내용, 여행 정보(ID)를 입력해주세요.');
+            return;
+        }
+
+        const body = JSON.stringify({
+            title: title,
+            content: content,
+            tripInfoId: tripInfoId // tripInfoId도 함께 보내기
+        });
+
+        // success, fail 함수 정의
+        function success() {
+            alert('수정 완료되었습니다.');
+            location.replace(`/articles/${id}`);  // 수정 완료 후 해당 게시글 페이지로 이동
+        }
+
+        function fail() {
+            alert('수정 실패했습니다.');
+        }
+
+        // 공통 HTTP 요청 함수로 수정 요청
+        httpRequest('PUT', `/api/articles/${id}`, body, success, fail);
+    })
+}
 
 // 로그인을 안하면 글 등록 버튼을 누르면 로그인 페이지로 이동
 const createButton = document.getElementById('create-btn');
@@ -494,7 +496,6 @@ if (logoutButton) {
         function success() {
             localStorage.removeItem('access_token');
             deleteCookie('refresh_token');
-            alert('로그아웃 성공');
             location.replace('/');
         }
         function fail() {
