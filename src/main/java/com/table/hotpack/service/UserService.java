@@ -1,5 +1,6 @@
 package com.table.hotpack.service;
 
+import com.table.hotpack.domain.Article;
 import com.table.hotpack.domain.User;
 import com.table.hotpack.dto.AddUserRequest;
 import com.table.hotpack.dto.UpdateUserRequest;
@@ -95,5 +96,12 @@ public class UserService {
         User user= userRepository.findByEmail(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found for username: " + username));
         return user.getId();
+    }
+
+    public void delete(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("not found : " + email));
+
+        userRepository.delete(user);
     }
 }

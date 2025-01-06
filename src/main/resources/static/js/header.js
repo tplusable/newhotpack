@@ -57,7 +57,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 function success() {
                     localStorage.removeItem('access_token'); // 액세스 토큰 삭제
                     deleteCookie('refresh_token'); // 리프레시 토큰 삭제
-                    alert('로그아웃 성공');
                     location.replace('/');
                 }
 

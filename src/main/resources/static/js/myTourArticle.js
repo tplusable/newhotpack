@@ -142,33 +142,41 @@ function failLoadMyTripDetails(error) {
 function fetchMyContentDetails(contentIdsByDate) {
     const detailsContainer = document.getElementById('trip-details');
 
-    Object.entries(contentIdsByDate).forEach(([day, contentIds]) => {
-        const daySection = document.createElement('div');
-        daySection.classList.add('day-section');
-        daySection.innerHTML = `<h4>${day}</h4>`;
+    // 날짜 순으로 정렬
+    Object.entries(contentIdsByDate)
+        .sort((a, b) => {
+            const dayA = parseInt(a[0].replace('일차', ''), 10); // '1일차' -> 1
+            const dayB = parseInt(b[0].replace('일차', ''), 10); // '2일차' -> 2
+            return dayA - dayB; // 숫자 순으로 정렬
+        })
+        .forEach(([day, contentIds]) => {
+            const daySection = document.createElement('div');
+            daySection.classList.add('day-section');
+            daySection.innerHTML = `<h4>${day}</h4>`;
 
-        const contentList = document.createElement('div');
-        contentList.classList.add('content-list');
+            const contentList = document.createElement('div');
+            contentList.classList.add('content-list');
 
-        contentIds.forEach(contentId => {
-            httpRequestTour('GET', `/content/${contentId}`, null, content => {
-                const contentDiv = document.createElement('div');
-                contentDiv.classList.add('content-item');
-                contentDiv.innerHTML = `
-                    <h5>${content.title}</h5>
-                    <p>${content.addr1 || '주소 정보 없음'}</p>
-                    <button class="btn btn-primary btn-sm" onclick="showMyContentDetails('${content.contentid}')">상세 보기</button>
-                `;
-                contentList.appendChild(contentDiv);
-            }, error => {
-                console.error(`Error fetching content ID ${contentId}:`, error);
+            contentIds.forEach(contentId => {
+                httpRequestTour('GET', `/content/${contentId}`, null, content => {
+                    const contentDiv = document.createElement('div');
+                    contentDiv.classList.add('content-item');
+                    contentDiv.innerHTML = `
+                        <h5>${content.title}</h5>
+                        <p>${content.addr1 || '주소 정보 없음'}</p>
+                        <button class="btn btn-primary btn-sm" onclick="showMyContentDetails('${content.contentid}')">상세 보기</button>
+                    `;
+                    contentList.appendChild(contentDiv);
+                }, error => {
+                    console.error(`Error fetching content ID ${contentId}:`, error);
+                });
             });
-        });
 
-        daySection.appendChild(contentList);
-        detailsContainer.appendChild(daySection);
-    });
+            daySection.appendChild(contentList);
+            detailsContainer.appendChild(daySection);
+        });
 }
+
 
 // 콘텐츠 상세 정보 보기
 function showMyContentDetails(contentId) {

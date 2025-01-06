@@ -80,6 +80,23 @@ if (modifyButton) {
     });
 }
 
+const deleteButton = document.getElementById('deleteUser-btn');
+if (deleteButton) {
+    deleteButton.addEventListener('click', event => {
+
+        function success() {
+            alert('회원탈퇴가 완료되었습니다.');
+            location.replace(`/`);
+        }
+
+        function fail() {
+            alert('회원탈퇴에 실패했습니다.');
+            location.replace('/updateUser');
+        }
+        httpRequest('DELETE', '/api/user', null, success, fail);
+    });
+}
+
 // 닉네임 중복 확인
 document.getElementById('checkNicknameButton').addEventListener('click', function () {
     const nickname = document.getElementById('nickname').value;
